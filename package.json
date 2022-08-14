@@ -7,7 +7,7 @@
     "preview": false,
     "publisher": "mindaro",
     "qna": "marketplace",
-    "license": "SEE LICENSE IN LICENSE.md",
+    "license": "MIT",
     "engines": {
         "vscode": "^1.57.0",
         "node": ">=16.6.x",
@@ -244,7 +244,7 @@
     "homepage": "https://aka.ms/bridge-to-k8s-vscode-quickstart",
     "repository": {
         "type": "git",
-        "url": "https://aka.ms/mindaro-repository"
+        "url": "https://github.com/Azure/vscode-bridge-to-kubernetes"
     },
     "extensionMetadata": {
         "expectedCLIVersion": "$Expected_CLI_Version$"

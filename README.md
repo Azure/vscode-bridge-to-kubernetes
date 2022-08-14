@@ -12,6 +12,14 @@ Some important information reside here:
 * [How Bridge to Kubernetes works](https://docs.microsoft.com/en-us/visualstudio/bridge/overview-bridge-to-kubernetes)
 * [Use Bridge to Kubernetes (VS Code)](https://docs.microsoft.com/en-au/visualstudio/bridge/bridge-to-kubernetes-vs-code)
 
+## Telemetry
+
+This extension collects telemetry data to help us build a better experience for building applications with Azure Kubernetes Service and VS Code. We only collect the following data:
+
+* Usage information and error's diagnotic information.
+
+We do not collect any information about image names, paths, etc. Read our [privacy statement](https://privacy.microsoft.com/privacystatement) to learn more. If you don’t wish to send usage data to Microsoft, you can set the `telemetry.enableTelemetry` setting to `false`. Learn more in our [FAQ](https://code.visualstudio.com/docs/supporting/faq#_how-to-disable-telemetry-reporting).
+
 ## Contributing
 
 This project welcomes contributions and suggestions.  Most contributions require you to agree to a

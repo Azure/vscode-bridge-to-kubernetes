@@ -3,18 +3,18 @@
     <img src="https://vsmarketplacebadge.apphb.com/rating-star/mindaro.mindaro.svg">
 </a>
 
-# VsCode Bridge to Kubernetes
+# Bridge to Kubernetes VS Code Extension
 
 > This repo has been populated for separating vscode extension implementation of [Bridge to Kubernetes](https://github.com/Azure/Bridge-To-Kubernetes).
 
 Some important information reside here:
 
-* [How Bridge to Kubernetes works](https://docs.microsoft.com/en-us/visualstudio/bridge/overview-bridge-to-kubernetes)
-* [Use Bridge to Kubernetes (VS Code)](https://docs.microsoft.com/en-au/visualstudio/bridge/bridge-to-kubernetes-vs-code)
+* [How Bridge to Kubernetes works](https://aka.ms/bridge-how-it-works)
+* [Use Bridge to Kubernetes (VS Code)]( https://aka.ms/bridge-to-k8s-vsc-quickstart)
 
 ## Telemetry
 
-This extension collects telemetry data to help us build a better experience for building applications with Azure Kubernetes Service and VS Code. We only collect the following data:
+This extension collects telemetry data to help us build a better experience for building applications with Kubernetes Service and VS Code. We only collect the following data:
 
 * Usage information and error's diagnotic information.
 

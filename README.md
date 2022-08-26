@@ -1,14 +1,24 @@
-# Project
+<a href="https://marketplace.visualstudio.com/items?itemName=mindaro.mindaro" alt="Click to visit marketplace">
+    <img src="https://vsmarketplacebadge.apphb.com/version-short/mindaro.mindaro.svg">
+    <img src="https://vsmarketplacebadge.apphb.com/rating-star/mindaro.mindaro.svg">
+</a>
 
-> This repo has been populated by an initial template to help get you started. Please
-> make sure to update the content to build a great experience for community-building.
+# Bridge to Kubernetes VS Code Extension
 
-As the maintainer of this project, please make a few updates:
+> This repo has been populated for separating vscode extension implementation of [Bridge to Kubernetes](https://github.com/Azure/Bridge-To-Kubernetes).
 
-- Improving this README.MD file to provide a great experience
-- Updating SUPPORT.MD with content about this project's support experience
-- Understanding the security reporting process in SECURITY.MD
-- Remove this section from the README
+Some important information reside here:
+
+* [How Bridge to Kubernetes works](https://aka.ms/bridge-how-it-works)
+* [Use Bridge to Kubernetes (VS Code)]( https://aka.ms/bridge-to-k8s-vsc-quickstart)
+
+## Telemetry
+
+This extension collects telemetry data to help us build a better experience for building applications with Kubernetes Service and VS Code. We only collect the following data:
+
+* Usage information and error's diagnotic information.
+
+We do not collect any information about image names, paths, etc. Read our [privacy statement](https://privacy.microsoft.com/privacystatement) to learn more. If you don’t wish to send usage data to Microsoft, you can set the `telemetry.enableTelemetry` setting to `false`. Learn more in our [FAQ](https://code.visualstudio.com/docs/supporting/faq#_how-to-disable-telemetry-reporting).
 
 ## Contributing
 

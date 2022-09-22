@@ -125,7 +125,7 @@ export class ConnectWizard {
                     if (split.length > 1) {
                         // Delete last segment
                         split.splice(-1, 1);
-                        resourceNameToPersist = `${split.join(`-`)}-`;
+                        resourceNameToPersist = `${split.join(`-`)}`;
                     }
                 }
 

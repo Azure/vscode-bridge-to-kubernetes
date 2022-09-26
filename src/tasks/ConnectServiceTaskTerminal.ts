@@ -6,7 +6,6 @@
 import * as vscode from 'vscode';
 import { IExperimentationService } from 'vscode-tas-client';
 
-import { IBinariesUtility } from '../binaries/IBinariesUtility';
 import { IKubeconfigEnrichedContext, KubectlClient } from '../clients/KubectlClient';
 import { ConnectionStatus, ConnectWorkspaceFolder, IConnectionTarget } from '../connect/ConnectWorkspaceFolder';
 import { ResourceType } from '../connect/ResourceType';
@@ -31,7 +30,6 @@ export class ConnectServiceTaskTerminal extends TaskTerminalBase {
         private readonly _targetNamespace: string,
         private readonly _useKubernetesServiceEnvironmentVariables: boolean,
         private readonly _experimentationService: IExperimentationService,
-        private readonly _binariesUtility: IBinariesUtility,
         private readonly _logger: Logger,
         private readonly _connectStartedCallback: (alreadyConnected: boolean) => void) {
         super();
@@ -64,7 +62,7 @@ export class ConnectServiceTaskTerminal extends TaskTerminalBase {
             this._write(`${data}`);
         });
 
-        const kubectlClient: KubectlClient = await this._binariesUtility.tryGetKubectlAsync();
+        var kubectlClient: KubectlClient;
         if (kubectlClient == null) {
             this._writeLine(`This action requires dependencies that are not available yet. Please look at the "Kubernetes" item in the status bar for more information.`);
             this._exit(1);

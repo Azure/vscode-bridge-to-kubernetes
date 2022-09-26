@@ -7,7 +7,6 @@
 import * as usernameGetter from 'username';
 import * as vscode from 'vscode';
 
-import { IBinariesUtility } from '../binaries/IBinariesUtility';
 import { IKubeconfigEnrichedContext } from '../clients/KubectlClient';
 import { Constants } from '../Constants';
 import { DebugAssetsInitializer } from '../debug/DebugAssetsInitializer';
@@ -15,7 +14,6 @@ import { Logger } from '../logger/Logger';
 import { TelemetryEvent } from '../logger/TelemetryEvent';
 import { IKubernetesService } from '../models/IKubernetesService';
 import { CheckExtensionSupport } from '../utility/CheckExtensionSupport';
-import { KubeconfigCredentialsManager } from '../utility/KubeconfigCredentialsManager';
 import { IActionQuickPickItem, IQuickPickParameters, MultiStepInput } from '../utility/MultiStepInput';
 import { StringUtility } from '../utility/StringUtility';
 import { UrlUtility } from '../utility/UrlUtility';
@@ -29,7 +27,6 @@ export class ConnectWizard {
     private _isWizardComplete = false;
 
     public constructor(
-        private readonly _binariesUtility: IBinariesUtility,
         private readonly _workspaceFolder: vscode.WorkspaceFolder,
         private readonly _logger: Logger) {
     }
@@ -74,20 +71,7 @@ export class ConnectWizard {
                     items: []
                 });
 
-                const kubectlClient = await this._binariesUtility.tryGetKubectlAsync();
-                const bridgeClient = await this._binariesUtility.tryGetBridgeAsync();
                 let currentContext: IKubeconfigEnrichedContext = null;
-                if (kubectlClient != null) {
-                    currentContext = await kubectlClient.getCurrentContextAsync();
-                }
-
-                if (kubectlClient == null || bridgeClient == null || currentContext == null) {
-                    return null;
-                }
-
-                if (!await KubeconfigCredentialsManager.refreshCredentialsAsync(currentContext.kubeconfigPath, currentContext.namespace, bridgeClient, this._logger)) {
-                    return null;
-                }
 
                 if (targetResourceName == null) {
                     // Note: This will only happen when the Configuration flow is activated through the Command Palette. The Command Palette currently only allows
@@ -106,13 +90,6 @@ export class ConnectWizard {
                 }
 
                 let namespaces: string[] = null;
-                try {
-                    namespaces = await kubectlClient.getNamespacesAsync(currentContext.kubeconfigPath);
-                }
-                catch (error) {
-                    // We want to recover if for some reason the user isn't able to list namespaces.
-                    this._logger.warning(`Failed to list namespaces`, error);
-                }
                 if (namespaces != null && !namespaces.includes(targetResourceNamespace)) {
                     // In practice, this error should happen rarely, as the K8s cluster explorer only allows interaction with resources from the current cluster
                     throw new Error(`Failed to find the namespace '${targetResourceNamespace}' in cluster '${currentContext.cluster}'`);
@@ -173,17 +150,12 @@ export class ConnectWizard {
         currentContext: IKubeconfigEnrichedContext,
         resourceType: ResourceType
     ): Promise<(input: MultiStepInput) => Promise<(input: MultiStepInput) => Promise<(input: MultiStepInput) => Promise<void>>>> {
-        const kubectlClient = await this._binariesUtility.tryGetKubectlAsync();
-        if (kubectlClient == null) {
-            return null;
-        }
-
         // Store the target cluster/namespace so that we can validate the users are using the right context.
         this._result.targetCluster = currentContext.cluster;
         this._result.targetNamespace = currentContext.namespace;
         this._result.resourceType = resourceType;
 
-        let services: IKubernetesService[] = await kubectlClient.getServicesAsync(currentContext.namespace);
+        let services: IKubernetesService[];
         services = services.filter(service => service.name !== `routingmanager-service`);
         this._logger.trace(TelemetryEvent.Connect_ServiceList, { count: services.length.toString() });
         if (services.length === 0) {

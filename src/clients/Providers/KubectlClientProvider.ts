@@ -9,8 +9,6 @@ import { Constants } from "../../Constants";
 import { Logger } from "../../logger/Logger";
 import { TelemetryEvent } from "../../logger/TelemetryEvent";
 import { AccountContextManager } from "../../models/context/AccountContextManager";
-import { IBinariesDownloadInfo, IDownloadInfo } from "../../models/IBinariesDownloadInfo";
-import { BinariesVersionClient } from "../BinariesVersionClient";
 import { ClientType } from "../ClientType";
 import { CommandRunner } from "../CommandRunner";
 import { IClient } from "../IClient";
@@ -20,7 +18,6 @@ import { IClientProvider } from "./IClientProvider";
 export class KubectlClientProvider implements IClientProvider {
 
     public constructor(
-        private readonly _binaryVersionsClient: BinariesVersionClient,
         private readonly _commandRunner: CommandRunner,
         private readonly _accountContextManager: AccountContextManager,
         private readonly _logger: Logger
@@ -53,11 +50,6 @@ export class KubectlClientProvider implements IClientProvider {
 
     public getExpectedVersion(): string {
         return Constants.KubectlMinVersion;
-    }
-
-    public async getDownloadInfoAsync(): Promise<IDownloadInfo> {
-        const binariesDownloadInfo: IBinariesDownloadInfo = await this._binaryVersionsClient.getCachedBinariesDownloadInfoAsync();
-        return binariesDownloadInfo.downloadInfoMap.get(ClientType.Kubectl);
     }
 
     public getLocalBuildExecutablePath(): string {

@@ -29,7 +29,6 @@ export class BridgeClient implements IClient {
         dotNetPath: string,
         private readonly _executablePath: string,
         private readonly _commandRunner: CommandRunner,
-        private readonly _expectedBridgeVersion: string,
         private readonly _logger: Logger
     ) {
         this._dotNetDirectory = dotNetPath != null ? path.dirname(dotNetPath) : null;
@@ -39,33 +38,6 @@ export class BridgeClient implements IClient {
 
     public get outputEmitted(): IReadOnlyEventSource<string> {
         return this._commandRunner.outputEmitted;
-    }
-
-    public async getVersionAsync(): Promise<string> {
-        try {
-            // Adding retries to ensure the bridge client is intialized properly
-            // as this command is executed right after the download.
-            const getVersionAsyncFn = async (): Promise<string> => {
-                const args: string[] = [ `--version` ];
-                const output: string = await this._commandRunner.runAsync(
-                    this._executablePath,
-                    args,
-                    null /* currentWorkingDirectory */,
-                    this.getRequiredEnvironmentVariables());
-                // The output of bridge --version will be:
-                //     0.1.20181023.7
-                // for prod, dev, staging and "0.1.0.11071149-username" or "0.1.0.11071149" for local builds.
-                const bridgeVersion: string = output.trim();
-
-                this._logger.trace(TelemetryEvent.BridgeClient_GetVersionSuccess);
-                return bridgeVersion;
-            };
-            return await RetryUtility.retryAsync<string>(getVersionAsyncFn, /*retries*/3, /*delayInMs*/100);
-        }
-        catch (error) {
-            this._logger.error(TelemetryEvent.BridgeClient_GetVersionError, error);
-            throw error;
-        }
     }
 
     public async checkCredentialsAsync(kubeconfigPath: string, namespace: string): Promise<void> {
@@ -148,12 +120,7 @@ export class BridgeClient implements IClient {
                     throw new Error(`Unable to determine the resource flag for resource '${resourceType}'`);
             }
             let args: string[];
-            if (this._expectedBridgeVersion == null || this._expectedBridgeVersion > `1.0.20210615.1`) { // Note: Expected version is null if vsix was built locally
-                args = [ `prep-connect`, `--output`, `json`, resourceTypeFlag, resource, `--namespace`, currentNamespace ];
-            }
-            else {
-                args = [ `prep-connect`, `--output`, `json`, `--namespace`, currentNamespace ];
-            }
+            args = [ `prep-connect`, `--output`, `json`, resourceTypeFlag, resource, `--namespace`, currentNamespace ];
 
             const customEnvironmentVariables: NodeJS.ProcessEnv = { ...this.getRequiredEnvironmentVariables(), ...this.getCustomEnvironmentVariables(kubeconfigPath) };
             const output: string = await this._commandRunner.runAsync(

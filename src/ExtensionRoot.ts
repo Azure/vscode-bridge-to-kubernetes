@@ -9,7 +9,6 @@ import * as vscode from 'vscode';
 import TelemetryReporter from 'vscode-extension-telemetry';
 
 import { BinariesManager } from './binaries/BinariesManager';
-import { IBinariesUtility } from './binaries/IBinariesUtility';
 import { Constants } from './Constants';
 import { LocalTunnelDebuggingManager } from './debug/LocalTunnelDebuggingManager';
 import { createExperimentationServiceAsync, ExperimentationTelemetry } from './ExperimentationService';
@@ -93,10 +92,7 @@ export class ExtensionRoot {
         // Initialize ExP
         const experimentationService = await createExperimentationServiceAsync(context, new ExperimentationTelemetry(this._logger));
 
-        const expectedCLIVersion: string = await VersionUtility.getExpectedCliVersionAsync(context, experimentationService, packageJsonContent, this._logger);
-        const binariesUtility: IBinariesUtility = BinariesManager.getBinariesUtility(this._logger, context, commandEnvironmentVariables, accountContextManager, expectedCLIVersion);
-
-        this._kubernetesPanelCustomizer = new KubernetesPanelCustomizer(binariesUtility, this._logger);
+        this._kubernetesPanelCustomizer = new KubernetesPanelCustomizer(this._logger);
 
         const outputChannel: vscode.OutputChannel = vscode.window.createOutputChannel(Constants.ProductName);
         outputChannel.appendLine(`${Constants.ProductName} initialization (VS Code v${vscode.version} - Extension v${extensionVersion})`);
@@ -113,7 +109,6 @@ export class ExtensionRoot {
             this._kubernetesPanelCustomizer,
             statusBarMenu,
             outputChannel,
-            binariesUtility,
             experimentationService);
 
         // Load hook into the Kubernetes extension & register ourselves as a Local Tunnel Debug Provider
@@ -126,7 +121,7 @@ export class ExtensionRoot {
 
         await this._kubernetesPanelCustomizer.initializeAsync();
 
-        await statusBarMenu.initializeAsync(this._logger, binariesUtility, accountContextManager);
+        await statusBarMenu.initializeAsync(this._logger, accountContextManager);
 
         this._logger.trace(TelemetryEvent.Activation, {
             workspacesCommonId: workspacesCommonId.toString(),

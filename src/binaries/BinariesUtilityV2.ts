@@ -22,13 +22,11 @@ import { Constants } from '../Constants';
 import { Logger } from '../logger/Logger';
 import { TelemetryEvent } from '../logger/TelemetryEvent';
 import { AccountContextManager } from '../models/context/AccountContextManager';
-import { IDownloadInfo } from '../models/IBinariesDownloadInfo';
 import { EventSource, IReadOnlyEventSource } from '../utility/Event';
 import { fileSystem } from '../utility/FileSystem';
 import { VersionUtility } from '../utility/VersionUtility';
-import { IBinariesUtility } from './IBinariesUtility';
 
-export class BinariesUtilityV2 implements IBinariesUtility {
+export class BinariesUtilityV2 {
     private readonly _binaryVersionsClient: BinariesVersionClient;
     private _binariesPromise: Promise<[BridgeClient, KubectlClient]>;
     private _binariesPromiseIsResolved = false;
@@ -39,15 +37,13 @@ export class BinariesUtilityV2 implements IBinariesUtility {
     private readonly _downloadStarted: EventSource<void>;
     private readonly _downloadFinished: EventSource<void>;
     private readonly _downloadProgress: EventSource<number>;
+    private readonly _logger: Logger;
 
     public constructor(
-        private readonly _logger: Logger,
         private readonly _context: vscode.ExtensionContext,
         private readonly _commandEnvironmentVariables: NodeJS.ProcessEnv,
         private readonly _accountContextManager: AccountContextManager,
-        private readonly _expectedBridgeVersion: string
     ) {
-        this._binaryVersionsClient = new BinariesVersionClient(this._expectedBridgeVersion, this._logger);
         this._downloadStarted = new EventSource<void>();
         this._downloadFinished = new EventSource<void>();
         this._downloadProgress = new EventSource<number>();
@@ -70,39 +66,6 @@ export class BinariesUtilityV2 implements IBinariesUtility {
      */
     public downloadProgress(): IReadOnlyEventSource<number> {
         return this._downloadProgress;
-    }
-
-    /**
-     * If the binaries aren't downloaded, download newest versions.
-     * If the binaries is already downloaded, check the version the first time.
-     * If the version is insufficient, then download the newest version.
-     * If the version is sufficient, then all good!
-     * Returns the BridgeClient, KubectlClient to enable working with the clients.
-     * Does not retry.
-     */
-    public async ensureBinariesAsync(): Promise<[BridgeClient, KubectlClient]> {
-        this._logger.trace(`Making sure that the CLI is present locally, by downloading it if needed`);
-        if (this._binariesPromise == null) {
-            this._binariesPromise = this.runEnsureBinariesAsync();
-            this._binariesPromise.then(() => {
-                this._binariesPromiseIsResolved = true;
-                this._logger.trace(TelemetryEvent.BinariesUtility_EnsureBinariesSuccess, {
-                    isUsingLocalBinaries: (process.env.BRIDGE_BUILD_PATH != null).toString(),
-                    isUsingLocalDotNet: (process.env.DOTNET_ROOT != null).toString()
-                });
-            }).catch(error => {
-                this._binariesPromise = null;
-                this._logger.error(TelemetryEvent.BinariesUtility_EnsureBinariesError, error, {
-                    isUsingLocalBinaries: (process.env.BRIDGE_BUILD_PATH != null).toString(),
-                    isUsingLocalDotNet: (process.env.DOTNET_ROOT != null).toString()
-                });
-            }).finally(() => {
-                // Whatever happened (success or failure when getting binaries), at this
-                // point we know the binaries local status.
-                this._resolveBinariesLocalStatusDeterminedPromise();
-            });
-        }
-        return this._binariesPromise;
     }
 
     public async tryGetBridgeAsync(): Promise<BridgeClient> {
@@ -151,8 +114,8 @@ export class BinariesUtilityV2 implements IBinariesUtility {
      * Doesn't retry. The download retry is part of the filedownloader api.
      */
     private async runEnsureBinariesAsync(): Promise<[BridgeClient, KubectlClient]> {
-        const bridgeClientProvider: IClientProvider = new BridgeClientProvider(this._binaryVersionsClient, this._expectedBridgeVersion, new CommandRunner(this._commandEnvironmentVariables), this._logger);
-        const kubectlClientProvider: IClientProvider = new KubectlClientProvider(this._binaryVersionsClient, new CommandRunner(this._commandEnvironmentVariables), this._accountContextManager, this._logger);
+        const bridgeClientProvider: IClientProvider = new BridgeClientProvider(new CommandRunner(this._commandEnvironmentVariables), this._logger);
+        const kubectlClientProvider: IClientProvider = new KubectlClientProvider(new CommandRunner(this._commandEnvironmentVariables), this._accountContextManager, this._logger);
         const dotNetClientProvider: IClientProvider = new DotNetClientProvider(this._binaryVersionsClient, new CommandRunner(this._commandEnvironmentVariables), this._logger);
 
         let bridgeClient: IClient;
@@ -265,18 +228,6 @@ export class BinariesUtilityV2 implements IBinariesUtility {
         }
 
         const client: IClient = clientProvider.getClient(executablePath, dotNetPath);
-        const expectedVersion: string = clientProvider.getExpectedVersion();
-        const currentVersion: string = await client.getVersionAsync();
-        if (!this.isBinaryVersionSufficient(currentVersion, expectedVersion, clientProvider.Type, clientProvider.Type === ClientType.Bridge, /*strict*/ true)) {
-            const error = new Error(`Current version of the '${clientProvider.Type}' binaries does not match the expected version.`);
-            this._logger.error(TelemetryEvent.UnexpectedError, error, /*properties*/ {
-                expectedVersion: expectedVersion,
-                actualVersion: currentVersion,
-                clientType: clientProvider.Type
-            });
-            throw error;
-        }
-
         return client;
     }
 
@@ -294,8 +245,6 @@ export class BinariesUtilityV2 implements IBinariesUtility {
             await cleanUpBeforeDownload();
         }
 
-        const downloadInfo: IDownloadInfo = await clientProvider.getDownloadInfoAsync();
-
         // Only increment the progress when it is greater than previous progress
         // Updates the overall download progress call back so that an aggregate progress is shown to user
         let previousProgress = 0;
@@ -311,37 +260,15 @@ export class BinariesUtilityV2 implements IBinariesUtility {
 
         const downloadProperties: { [key: string]: string } = {
             clientType: clientProvider.Type,
-            downloadUrl: downloadInfo.downloadUrl
         };
 
         // Download and make sure we can access the executable
         this._logger.trace(`Downloading client ${clientProvider.Type}...`);
-        const fileDownloader: FileDownloader = await this.validateAndGetFileDownloaderApiAsync();
-        let unzipDirectory: vscode.Uri;
-        try {
-            this._logger.trace(TelemetryEvent.BinariesUtility_DownloadStart, downloadProperties);
-            unzipDirectory = await fileDownloader.downloadFile(
-                vscode.Uri.parse(downloadInfo.downloadUrl),
-                clientProvider.getDownloadDirectoryName(),
-                this._context,
-                /*cancellationToken*/ undefined,
-                downloadProgressCallback,
-                {
-                    shouldUnzip: true,
-                    retries: 8
-                }
-            );
-
-            const binaryPath = path.join(unzipDirectory.fsPath, clientProvider.getExecutableFilePath());
+            const binaryPath = path.join(clientProvider.getExecutableFilePath());
             await fileSystem.accessAsync(binaryPath);
             this._logger.trace(TelemetryEvent.BinariesUtility_DownloadSuccess, downloadProperties);
 
             return binaryPath;
-        }
-        catch (error) {
-            this._logger.error(TelemetryEvent.BinariesUtility_DownloadError, error, downloadProperties);
-            throw error;
-        }
     }
 
     /*
@@ -383,31 +310,6 @@ export class BinariesUtilityV2 implements IBinariesUtility {
             this._logger.warning(`${clientProvider.Type} is not present locally.`);
             return null;
         }
-
-        let client: IClient;
-        let currentClientVersion: string;
-        try {
-            client = clientProvider.getClient(clientExecutablePath, dotNetPath);
-            currentClientVersion = await client.getVersionAsync();
-        }
-        catch (error) {
-            this._logger.warning(`Encountered error running get version on ${clientProvider.Type}: ${error.message}`, /*error*/null, properties);
-            return null;
-        }
-
-        const expectedVersion = clientProvider.getExpectedVersion();
-
-        if (!this.isBinaryVersionSufficient(currentClientVersion, expectedVersion, clientProvider.Type, /*allowLocalBuildFormat*/ clientProvider.Type === ClientType.Bridge)) {
-            this._logger.warning(`${clientProvider.Type} binaries are present locally but their version is outdated: downloading the latest ones.`, /*error*/ null, /*properties*/ {
-                currentClientVersion: currentClientVersion,
-                expectedVersion: expectedVersion,
-                clientType: clientProvider.Type
-            });
-
-            return null;
-        }
-
-        return Promise.resolve(client);
     }
 
     private async moveKubectlToBridgeFolderIfRequiredAsync(bridgeOrKubectlClientDownloaded: boolean,
@@ -420,10 +322,6 @@ export class BinariesUtilityV2 implements IBinariesUtility {
             const checkKubectlExistsWithRequiredVersionCallBack = async (): Promise<boolean> => {
                 if (await fileSystem.existsAsync(kubectlExecutableFilePathForBridge)) {
                     const kubectlClient: IClient = kubectlClientProvider.getClient(kubectlExecutableFilePathForBridge, /*dotNetPath*/ null);
-                    const kubectlVersion: string = await kubectlClient.getVersionAsync();
-                    if (this.isBinaryVersionSufficient(kubectlVersion, kubectlClientProvider.getExpectedVersion(), kubectlClientProvider.Type, /*allowLocalBuildFormat*/ false)) {
-                        return true;
-                    }
                 }
                 return false;
             };
@@ -446,7 +344,7 @@ export class BinariesUtilityV2 implements IBinariesUtility {
             if (bridgeExecutablePath == null || dotNetPath == null) {
                 return;
             }
-            const oldBridgeClient = new BridgeClient(dotNetPath, bridgeExecutablePath, commandRunner, this._expectedBridgeVersion, this._logger);
+            const oldBridgeClient = new BridgeClient(dotNetPath, bridgeExecutablePath, commandRunner, this._logger);
             await oldBridgeClient.cleanLocalConnectAsync();
             this._logger.trace(TelemetryEvent.BinariesUtility_CleanUpBeforeDownloadSuccess, /*properties*/ {
                 clientType: ClientType.Bridge

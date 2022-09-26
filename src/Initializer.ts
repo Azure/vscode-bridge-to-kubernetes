@@ -6,7 +6,6 @@
 import { Guid } from 'guid-typescript';
 import * as vscode from 'vscode';
 
-import { IBinariesUtility } from './binaries/IBinariesUtility';
 import { ConnectWorkspaceFolder } from './connect/ConnectWorkspaceFolder';
 import { Constants } from './Constants';
 import { DebugAssetsInitializer } from './debug/DebugAssetsInitializer';
@@ -24,8 +23,7 @@ export class Initializer {
         private readonly _workspaceFolder: vscode.WorkspaceFolder,
         private readonly _logger: Logger,
         private readonly _accountContextManager: AccountContextManager,
-        private readonly _outputChannel: vscode.OutputChannel,
-        private readonly _binariesUtility: IBinariesUtility
+        private readonly _outputChannel: vscode.OutputChannel
     ) {
     }
 
@@ -40,8 +38,7 @@ export class Initializer {
                 fileLogWriter,
                 this._accountContextManager,
                 statusBarMenu,
-                this._outputChannel,
-                this._binariesUtility);
+                this._outputChannel);
 
             this._logger.trace(TelemetryEvent.ConnectInitializationSuccess, {
                 workspacesCommonId: this._workspacesCommonId.toString()

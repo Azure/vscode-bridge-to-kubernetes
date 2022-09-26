@@ -5,7 +5,6 @@
 
 import * as vscode from 'vscode';
 
-import { IBinariesUtility } from './binaries/IBinariesUtility';
 import { BridgeClient } from './clients/BridgeClient';
 import { IKubeconfigEnrichedContext, KubectlClient } from './clients/KubectlClient';
 import { Constants } from './Constants';
@@ -42,7 +41,6 @@ export class StatusBarMenu {
     private _resolveInitializationPromise: () => void;
     private _logger: Logger;
     private _accountContextManager: AccountContextManager;
-    private _binariesUtility: IBinariesUtility;
     private _isLoading: boolean;
     private _isUpdatingDependencies: boolean;
     private _prerequisitesAlertCallback: () => void;
@@ -89,11 +87,9 @@ export class StatusBarMenu {
 
     public async initializeAsync(
         logger: Logger,
-        binariesUtility: IBinariesUtility,
         accountContextManager: AccountContextManager): Promise<void> {
         this._logger = logger;
         this._accountContextManager = accountContextManager;
-        this._binariesUtility = binariesUtility;
 
         const environment: Environment = EnvironmentUtility.getBridgeEnvironment(this._logger);
         if (environment !== Environment.Production) {
@@ -134,7 +130,7 @@ export class StatusBarMenu {
         this._isLoading = true;
         this.refreshStatusItem();
         if (this._currentKubeconfigContext != null) {
-            const kubectlClient = await this._binariesUtility.tryGetKubectlAsync();
+            var kubectlClient;
             await this.refreshIngressesAsync(kubectlClient, this._currentKubeconfigContext, isolateAs);
         }
 
@@ -206,31 +202,10 @@ export class StatusBarMenu {
                 return false;
             }
 
-            // Register the event handlers in case we need to update binaries.
-            this._binariesUtility.downloadStarted().subscribe(() => {
-                this._isUpdatingDependencies = true;
-                this._statusBarText = `${this._extensionIdentifier}: Updating dependencies (0%)`;
-                this.refreshStatusItem();
-            });
-
-            this._binariesUtility.downloadProgress().subscribe((percentComplete: number) => {
-                // Making sure we switch to "updating dependencies" mode even if the
-                // status bar menu is not the class that started the binaries update.
-                this._isUpdatingDependencies = true;
-                this._statusBarText = `${this._extensionIdentifier}: Updating dependencies (${percentComplete}%)`;
-                this.refreshStatusItem();
-            });
-
-            this._binariesUtility.downloadFinished().subscribe(() => {
-                this._isUpdatingDependencies = false;
-                this._statusBarText = `${this._extensionIdentifier}`;
-                this.refreshStatusItem();
-            });
-
             let kubectlClient: KubectlClient;
             let bridgeClient: BridgeClient;
             try {
-                const binaries: [BridgeClient, KubectlClient] = await this._binariesUtility.ensureBinariesAsync();
+                var binaries: [BridgeClient, KubectlClient];
                 bridgeClient = binaries[0];
                 kubectlClient = binaries[1];
             }
@@ -366,7 +341,7 @@ export class StatusBarMenu {
         try {
             this._isLoading = true;
             this.refreshStatusItem();
-            const kubectlClient = await this._binariesUtility.tryGetKubectlAsync();
+            var kubectlClient;
             if (kubectlClient == null) {
                 return false;
             }

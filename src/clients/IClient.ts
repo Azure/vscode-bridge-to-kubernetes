@@ -13,11 +13,6 @@ export interface IClient {
     readonly Type: ClientType;
 
     /**
-     * Returns the version the client
-     */
-    getVersionAsync(): Promise<string>;
-
-    /**
      * Returns the path of the executable
      */
     getExecutablePath(): string;

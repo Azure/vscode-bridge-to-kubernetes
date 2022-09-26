@@ -6,9 +6,7 @@
 import * as vscode from 'vscode';
 import * as k8s from 'vscode-kubernetes-tools-api';
 
-import { IBinariesUtility } from '../binaries/IBinariesUtility';
 import { IKubeconfigEnrichedContext, KubectlClient } from '../clients/KubectlClient';
-import { Constants } from '../Constants';
 import { Logger } from '../logger/Logger';
 import { TelemetryEvent } from '../logger/TelemetryEvent';
 import { CheckExtensionSupport } from '../utility/CheckExtensionSupport';
@@ -19,7 +17,6 @@ export class KubernetesPanelCustomizer implements k8s.ClusterExplorerV1.NodeUICu
     private _currentAksClusterChanged: EventSource<string>;
 
     public constructor(
-        private readonly _binariesUtility: IBinariesUtility,
         private readonly _logger: Logger) {
         this._currentAksCluster = null;
         this._currentAksClusterChanged = new EventSource<string>();
@@ -75,13 +72,6 @@ export class KubernetesPanelCustomizer implements k8s.ClusterExplorerV1.NodeUICu
         }
 
         let kubectlClient: KubectlClient;
-        try {
-            kubectlClient = (await this._binariesUtility.ensureBinariesAsync())[1];
-        }
-        catch (error) {
-            // We couldn't retrieve the required binaries. Ignoring as this is a fire and forget method.
-            return;
-        }
 
         const currentContext: IKubeconfigEnrichedContext = await kubectlClient.getCurrentContextAsync();
         const currentFqdnDomain: string = this.getFqdnDomain(currentContext.fqdn);

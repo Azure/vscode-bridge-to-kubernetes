@@ -7,7 +7,6 @@ import { Guid } from 'guid-typescript';
 import * as vscode from 'vscode';
 import { IExperimentationService } from 'vscode-tas-client';
 
-import { IBinariesUtility } from './binaries/IBinariesUtility';
 import { ConnectionStatus, ConnectWorkspaceFolder } from './connect/ConnectWorkspaceFolder';
 import { IWizardOutput } from './connect/IWizardOutput';
 import { ResourceType } from './connect/ResourceType';
@@ -47,7 +46,6 @@ export class WorkspaceFolderManager {
         private readonly _kubernetesPanelCustomizer: KubernetesPanelCustomizer,
         private readonly _statusBarMenu: StatusBarMenu,
         private readonly _outputChannel: vscode.OutputChannel,
-        private readonly _binariesUtility: IBinariesUtility,
         private readonly _experimentationService: IExperimentationService) {
         this._connectWorkspaceFolderMap = new Map<vscode.WorkspaceFolder, ConnectWorkspaceFolder>();
         this._connectDebugSessions = new Set<vscode.DebugSession>();
@@ -259,8 +257,7 @@ export class WorkspaceFolderManager {
             workspaceFolder,
             this._logger,
             this._accountContextManager,
-            this._outputChannel,
-            this._binariesUtility);
+            this._outputChannel);
         return initializer.retrieveBridgeConfigurationDebugAssetsPresentInFolderAsync(checkReason);
     }
 
@@ -332,7 +329,6 @@ export class WorkspaceFolderManager {
                     targetNamespace,
                     useKubernetesServiceEnvironmentVariables,
                     this._experimentationService,
-                    this._binariesUtility,
                     this._logger,
                     /*connectStartedCallback*/ (alreadyConnected: boolean): void => {
                         // If routing is enabled, we will refresh the ingress list to only show routing ingresses.
@@ -426,8 +422,7 @@ export class WorkspaceFolderManager {
                 workspaceFolder,
                 this._logger,
                 this._accountContextManager,
-                this._outputChannel,
-                this._binariesUtility);
+                this._outputChannel);
 
             if (!this._connectWorkspaceFolderMap.has(workspaceFolder)) {
                 initializationPromises.push(this.tryInitializeConnectWorkspaceFolderAsync(workspaceFolder, initializer));

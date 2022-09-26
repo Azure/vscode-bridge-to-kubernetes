@@ -20,9 +20,8 @@ import { ICliDownloadInfo } from '../models/ICliDownloadInfo';
 import { EventSource, IReadOnlyEventSource } from '../utility/Event';
 import { fileSystem } from '../utility/FileSystem';
 import { VersionUtility } from '../utility/VersionUtility';
-import { IBinariesUtility } from './IBinariesUtility';
 
-export class BinariesUtility implements IBinariesUtility {
+export class BinariesUtility {
     private readonly _cliVersionsClient: CliVersionsClient;
     private _binariesPromise: Promise<[CliClient, KubectlClient]>;
     private _binariesPromiseIsResolved = false;
@@ -134,7 +133,7 @@ export class BinariesUtility implements IBinariesUtility {
         if (process.env.BRIDGE_BUILD_PATH != null) {
             const cliExecutablePath = path.join(process.env.BRIDGE_BUILD_PATH, this.cliExecutableFilePath);
             const kubectlExecutablePath = path.join(process.env.BRIDGE_BUILD_PATH, this.kubectlExecutableFilePath);
-            const cliClient = new CliClient(/*dotNetPath*/null, cliExecutablePath, new CommandRunner(this._commandEnvironmentVariables), this._expectedCLIVersion, this._logger);
+            const cliClient = new CliClient(/*dotNetPath*/null, cliExecutablePath, new CommandRunner(this._commandEnvironmentVariables), this._logger);
             const kubectlClient = new KubectlClient(kubectlExecutablePath, new CommandRunner(this._commandEnvironmentVariables), this._accountContextManager, this._logger);
             this._logger.warning(`The BRIDGE_BUILD_PATH environment variable is set: targeting the binaries located at ${process.env.BRIDGE_BUILD_PATH}`);
             this._resolveBinariesLocalStatusDeterminedPromise();
@@ -158,17 +157,8 @@ export class BinariesUtility implements IBinariesUtility {
             await this.cleanUpBeforeDownload(cliExecutablePath, new CommandRunner(this._commandEnvironmentVariables));
             const { cliPath, kubectlPath } = await this.downloadLatestBinariesAsync();
             this._downloadFinished.trigger();
-            const cliClient = new CliClient(/*dotNetPath*/null, cliPath, new CommandRunner(this._commandEnvironmentVariables), this._expectedCLIVersion, this._logger);
+            const cliClient = new CliClient(/*dotNetPath*/null, cliPath, new CommandRunner(this._commandEnvironmentVariables), this._logger);
             const kubectlClient = new KubectlClient(kubectlPath, new CommandRunner(this._commandEnvironmentVariables), this._accountContextManager, this._logger);
-            const currentCliVersion = await cliClient.getVersionAsync();
-            if (!this.isCliVersionEqual(currentCliVersion)) {
-                    const error = new Error(`Current version of the binaries does not match the expected version.`);
-                    this._logger.error(TelemetryEvent.UnexpectedError, error, /*properties*/ {
-                        expectedVersion: this._expectedCLIVersion,
-                        actualVersion: currentCliVersion
-                    });
-                    throw error;
-                }
             return [ cliClient, kubectlClient ];
         };
 
@@ -179,25 +169,6 @@ export class BinariesUtility implements IBinariesUtility {
         }
 
         let cliClient: CliClient;
-        let currentCliVersion: string;
-        try {
-            cliClient = new CliClient(/*dotNetPath*/null, cliExecutablePath, new CommandRunner(this._commandEnvironmentVariables), this._expectedCLIVersion, this._logger);
-            currentCliVersion = await cliClient.getVersionAsync();
-        }
-        catch (error) {
-            this._logger.warning(`Encountered error running CLI: ${error.message}`);
-            this._resolveBinariesLocalStatusDeterminedPromise();
-            return downloadLatestAsyncHelper();
-        }
-
-        if (!this.isCliVersionEqual(currentCliVersion)) {
-            this._logger.warning(`CLI binaries are present locally but their version is outdated: downloading the latest ones`, /*error*/ null, /*properties*/ {
-                currentCliVersion: currentCliVersion
-            });
-            this._resolveBinariesLocalStatusDeterminedPromise();
-            return downloadLatestAsyncHelper();
-        }
-
         let kubectlClient: KubectlClient;
         try {
             kubectlClient = new KubectlClient(kubectlExecutablePath, new CommandRunner(this._commandEnvironmentVariables), this._accountContextManager, this._logger);
@@ -223,7 +194,7 @@ export class BinariesUtility implements IBinariesUtility {
             if (cliExecutablePath == null) {
                 return;
             }
-            const oldCliClient = new CliClient(/*dotNetPath*/null, cliExecutablePath, commandRunner, this._expectedCLIVersion, this._logger);
+            const oldCliClient = new CliClient(/*dotNetPath*/null, cliExecutablePath, commandRunner, this._logger);
             await oldCliClient.cleanLocalConnectAsync();
             this._logger.trace(TelemetryEvent.BinariesUtility_CleanUpBeforeDownloadSuccess);
         }

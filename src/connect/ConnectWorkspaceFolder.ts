@@ -11,7 +11,6 @@ import * as tmp from 'tmp';
 import * as vscode from 'vscode';
 
 import { IExperimentationService } from 'vscode-tas-client';
-import { IBinariesUtility } from '../binaries/IBinariesUtility';
 import { BridgeClient } from '../clients/BridgeClient';
 import { IKubeconfigEnrichedContext, KubectlClient } from '../clients/KubectlClient';
 import { Constants } from '../Constants';
@@ -61,8 +60,7 @@ export class ConnectWorkspaceFolder extends WorkspaceFolderBase {
         fileLogWriter: FileLogWriter,
         private readonly _accountContextManager: AccountContextManager,
         private readonly _statusBarMenu: StatusBarMenu,
-        private readonly _outputChannel: vscode.OutputChannel,
-        private readonly _binariesUtility: IBinariesUtility) {
+        private readonly _outputChannel: vscode.OutputChannel) {
         super(context, workspaceFolder, fileLogWriter, /*logIdentifier*/ `Connect`);
 
         this._preConnectStatusBarMenuItems = [];
@@ -97,7 +95,7 @@ export class ConnectWorkspaceFolder extends WorkspaceFolderBase {
         targetResourceType: ResourceType = ResourceType.Service
     ): Promise<IWizardOutput> {
         try {
-            const connectWizard = new ConnectWizard(this._binariesUtility, this._workspaceFolder, this._logger);
+            const connectWizard = new ConnectWizard(this._workspaceFolder, this._logger);
             return await connectWizard.runAsync(wizardReason, targetResourceName, targetResourceNamespace, targetResourceType);
         }
         catch (error) {
@@ -165,8 +163,8 @@ export class ConnectWorkspaceFolder extends WorkspaceFolderBase {
             return false;
         }
 
-        const bridgeClient: BridgeClient = await this._binariesUtility.tryGetBridgeAsync();
-        const kubectlClient: KubectlClient = await this._binariesUtility.tryGetKubectlAsync();
+        var bridgeClient: BridgeClient;
+        var kubectlClient: KubectlClient;
         if (bridgeClient == null || kubectlClient == null) {
             return false;
         }

@@ -32,16 +32,6 @@ export interface IClientProvider {
     getClient(executablePath: string, dotNetPath: string): IClient;
 
     /**
-     * Returns the min expected version required for the client
-     */
-    getExpectedVersion(): string;
-
-    /**
-     * Returns the information to download the client
-     */
-    getDownloadInfoAsync(): Promise<IDownloadInfo>;
-
-    /**
      * Returns the executable path considering by client specific environment variables
      */
     getLocalBuildExecutablePath(): string;

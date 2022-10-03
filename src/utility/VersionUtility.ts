@@ -61,10 +61,9 @@ export class VersionUtility {
         //  2. Is a flight in progress? Get the binaries version from ExP.
         //  3. Fall back onto whichever LKS version was specified in package.json. (For dev and staging, this is whichever version matches this extension. For Prod, this is a variable we specify in the Mindaro-Connect-VSCode pipeline.)
         const packageJsonVersion: string = packageJsonContent[`extensionMetadata`][`expectedCLIVersion`];
-        const expectedCLIVersion = process.env.BRIDGE_CLI_VERSION != null ? process.env.BRIDGE_CLI_VERSION :
-            (expBinariesVersion != null && bridgeEnvironment === Environment.Production ? expBinariesVersion :
-            (process.env.BRIDGE_BUILD_PATH != null ? null :
-            (packageJsonVersion != null && !packageJsonVersion.startsWith(`$`) ? packageJsonVersion : null)));
+        const expectedCLIVersion = (bridgeEnvironment === Environment.Production) ? packageJsonVersion : 
+              (process.env.BRIDGE_CLI_VERSION != null) ? process.env.BRIDGE_CLI_VERSION :
+              (process.env.BRIDGE_BUILD_PATH != null) ? null : null;
 
         logger.trace(`Resolved expected CLI version '${expectedCLIVersion}'`);
         if (expectedCLIVersion != null && !/^\d+(\.\d+){3}$/.test(expectedCLIVersion)) {

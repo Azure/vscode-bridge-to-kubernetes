@@ -93,7 +93,7 @@ export class ExtensionRoot {
         // Initialize ExP
         const experimentationService = await createExperimentationServiceAsync(context, new ExperimentationTelemetry(this._logger));
 
-        const expectedCLIVersion: string = await VersionUtility.getExpectedCliVersionAsync(context, experimentationService, packageJsonContent, this._logger);
+        const expectedCLIVersion: string = await VersionUtility.getExpectedCliVersionAsync(packageJsonContent);
         const binariesUtility: IBinariesUtility = BinariesManager.getBinariesUtility(this._logger, context, commandEnvironmentVariables, accountContextManager, expectedCLIVersion);
 
         this._kubernetesPanelCustomizer = new KubernetesPanelCustomizer(binariesUtility, this._logger);

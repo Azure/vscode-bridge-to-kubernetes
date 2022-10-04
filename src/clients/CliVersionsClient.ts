@@ -70,7 +70,7 @@ export class CliVersionsClient {
     }
 
     private getCliVersionsUrl(expectedCLIVersion: string): string {
-        const environment: Environment = EnvironmentUtility.getBridgeEnvironment(this._logger);
+        const environment: Environment = EnvironmentUtility.getBridgeEnvironment();
         let versionUrl: string;
         switch (environment) {
             case Environment.Production:

@@ -95,7 +95,7 @@ export class StatusBarMenu {
         this._accountContextManager = accountContextManager;
         this._binariesUtility = binariesUtility;
 
-        const environment: Environment = EnvironmentUtility.getBridgeEnvironment(this._logger);
+        const environment: Environment = EnvironmentUtility.getBridgeEnvironment();
         if (environment !== Environment.Production) {
             // Show in the status bar the BRIDGE_ENVIRONMENT if we're not in production.
             this._extensionIdentifier = `[${environment.toUpperCase()}] ${this._extensionIdentifier}`;

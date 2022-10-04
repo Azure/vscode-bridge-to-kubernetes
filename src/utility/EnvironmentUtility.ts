@@ -16,7 +16,7 @@ export enum Environment {
 }
 
 export class EnvironmentUtility {
-    public static getBridgeEnvironment(logger: Logger): Environment {
+    public static getBridgeEnvironment(): Environment {
         if (process.env.BRIDGE_ENVIRONMENT == null) {
             return Environment.Production;
         }
@@ -34,7 +34,6 @@ export class EnvironmentUtility {
                 return Environment.Dev;
             default:
                 const error = new Error(`Unsupported value for the BRIDGE_ENVIRONMENT environment variable: ${environment}`);
-                logger.error(TelemetryEvent.UnexpectedError, error);
                 throw error;
         }
     }

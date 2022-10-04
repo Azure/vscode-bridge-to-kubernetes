@@ -25,10 +25,6 @@ export class BinariesManager {
     }
 
     private static useBinariesUtility(): boolean {
-        const useBinaryUtilityEnvironmentVariable: string = process.env.BRIDGE_BINARYUTILITYVERSION;
-        if (useBinaryUtilityEnvironmentVariable != null && useBinaryUtilityEnvironmentVariable.toLowerCase() === `v2`) {
-            return true;
-        }
         const userMachineID: string = vscode.env.machineId;
         if (userMachineID == null || userMachineID === `someValue.machineId`) {
             return true;
@@ -40,6 +36,6 @@ export class BinariesManager {
             }
         }
 
-        return false;
+        return true;
     }
 }

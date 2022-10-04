@@ -1,4 +1,4 @@
-import { assert, expect } from 'chai';
+import * as assert from 'assert';
 import * as versionUtility  from '../../utility/VersionUtility';
 
 suite(`Expected CLI Test`, () => {
@@ -11,6 +11,6 @@ suite(`Expected CLI Test`, () => {
     }`);
     const expectedCLIVersion: string = await versionUtility.VersionUtility.getExpectedCliVersionAsync(packageJsonContent);
 
-    expect(expectedCLIVersion).to.equal(`1.0.20220816.2`);
+    assert.strictEqual(expectedCLIVersion, `1.0.20220816.2`);
   });
 });

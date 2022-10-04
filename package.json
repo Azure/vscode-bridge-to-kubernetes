@@ -200,7 +200,6 @@
         "copy": "^0.3.2",
         "del-cli": "^4.0.1",
         "mocha": "^6.2.2",
-        "chai": "^4.3.4",
         "mocha-trx-reporter": "^3.3.1",
         "ts-loader": "^6.2.1",
         "tslint": "^5.20.1",
@@ -219,7 +218,6 @@
     "dependencies": {
         "@microsoft/vscode-file-downloader-api": "^1.0.1",
         "@types/tmp": "^0.1.0",
-        "@types/chai": "^4.2.21",
         "chokidar": "^3.5.3",
         "command-exists": "^1.2.8",
         "glob-promise": "^3.4.0",

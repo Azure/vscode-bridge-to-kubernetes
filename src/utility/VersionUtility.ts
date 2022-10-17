@@ -52,7 +52,7 @@ export class VersionUtility {
         //  3. If bridge build path is not set to null, then expected CLI version will be null
         const packageJsonVersion: string = packageJsonContent[`extensionMetadata`][`expectedCLIVersion`];
         const expectedCLIVersion = process.env.BRIDGE_CLI_VERSION != null ? process.env.BRIDGE_CLI_VERSION :
-            (process.env.BRIDGE_BUILD_PATH === null ? packageJsonVersion : null);
+            (process.env.BRIDGE_BUILD_PATH != null || process.env.BRIDGE_BUILD_PATH != undefined ? null : packageJsonVersion);
 
         return expectedCLIVersion;
     }

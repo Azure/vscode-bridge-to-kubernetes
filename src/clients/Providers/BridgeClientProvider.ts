@@ -28,9 +28,7 @@ export class BridgeClientProvider implements IClientProvider {
     public Type: ClientType = ClientType.Bridge;
 
     public getExecutableFilePath(): string {
-        const binariesName = this._expectedBridgeVersion != null &&
-                            (this._expectedBridgeVersion <= `1.0.20210708.15` ||
-                            this._expectedBridgeVersion > `1.0.20210818.0`) ? `dsc` : `bridge`;
+        const binariesName = `dsc`;
 
         switch (process.platform) {
         case `win32`:

@@ -199,7 +199,7 @@ export class ConnectWizard {
             totalSteps: this.NumberOfSteps,
             placeholder: `Choose a service to redirect to your machine`,
             items: serviceChoices.sort((s1, s2) => s1.label < s2.label ? -1 : 1),
-            activeItem: serviceChoices[0]
+            activeItem: null
         });
         this._result.resourceName = pick.label;
 
@@ -261,7 +261,7 @@ export class ConnectWizard {
             totalSteps: this.NumberOfSteps,
             placeholder: `Choose the launch configuration to use to run your component locally`,
             items: choices,
-            activeItem: choices[0]
+            activeItem: null
         });
 
         if (pick.label === createNewLaunchConfigurationLabel) {
@@ -310,7 +310,7 @@ export class ConnectWizard {
             totalSteps: this.NumberOfSteps,
             placeholder: `Isolate your local version of "${this._result.resourceName}" from other developers?`,
             items: choices,
-            activeItem: choices[0]
+            activeItem: null
         });
         this._result.isolateAs = (pick === yesChoice) ? routingHeader : null;
 

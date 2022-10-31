@@ -6,3 +6,10 @@
 * Fixes `1:n` release issue and now expectedCLIversion is hooked to a well known version.
 
 Thanks @gambtho, @daniv-msft, @hsubramanianaks, @elenavillamil, @lolodi for collaborations.
+
+## [1.0.120221031]
+
+* Bug fix for Pod name issue when debugged via k8s extension.
+* Refactor binaries utility and manager ts files, making v2 as default version always.
+
+Thanks @Tatsinnit, @Vidya2606, @daniv-msft, @hsubramanianaks for contributions and collaborations.

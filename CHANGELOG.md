@@ -1,5 +1,12 @@
 # Change Log
 
+## [1.0.120221031]
+
+* Bug fix for Pod name issue when debugged via k8s extension.
+* Refactor binaries utility and manager ts files, making v2 as default version always.
+
+Thanks @Tatsinnit, @Vidya2606, @daniv-msft, @hsubramanianaks for contributions and collaborations.
+
 ## [1.0.120220915]
 
 * First release with code moved to the decentralised github repo.

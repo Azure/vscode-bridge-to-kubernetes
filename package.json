@@ -247,6 +247,6 @@
         "url": "https://github.com/Azure/vscode-bridge-to-kubernetes"
     },
     "extensionMetadata": {
-        "expectedCLIVersion": "1.0.20220816.2"
+        "expectedCLIVersion": "1.0.20221103.4"
     }
 }

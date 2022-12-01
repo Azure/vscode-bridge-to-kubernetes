@@ -199,7 +199,7 @@
         "@types/vscode": "1.57.0",
         "copy": "^0.3.2",
         "del-cli": "^4.0.1",
-        "mocha": "^6.2.2",
+        "mocha": "^10.1.0",
         "mocha-trx-reporter": "^3.3.1",
         "ts-loader": "^6.2.1",
         "tslint": "^5.20.1",

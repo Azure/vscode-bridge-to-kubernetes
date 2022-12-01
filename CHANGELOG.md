@@ -1,8 +1,9 @@
 # Change Log
 
 ## [1.0.120221116]
-* Bug fixes for managed identity when using useKubernetesServiceEnvironmentVariables
-* Bug fixes for headless services when using useKubernetesServiceEnvironmentVariables
+Updating B2K CLI version for following fixes:
+* Bug fixes for managed identity when using useKubernetesServiceEnvironmentVariables [PR1](https://github.com/Azure/Bridge-To-Kubernetes/pull/88),[PR2](https://github.com/Azure/Bridge-To-Kubernetes/pull/93)
+* Bug fixes for headless services when using useKubernetesServiceEnvironmentVariables [PR](https://github.com/Azure/Bridge-To-Kubernetes/pull/78)
 
 Thanks @hsubramanianaks and @Tatsinnit for collaborations to make this changes happen.
 

@@ -1,5 +1,11 @@
 # Change Log
 
+## [1.0.120221116]
+* Bug fixes for managed identity when using useKubernetesServiceEnvironmentVariables
+* Bug fixes for headless services when using useKubernetesServiceEnvironmentVariables
+
+Thanks @hsubramanianaks and @Tatsinnit for collaborations to make this changes happen.
+
 ## [1.0.120221031]
 
 * Bug fix for Pod name issue when debugged via k8s extension.

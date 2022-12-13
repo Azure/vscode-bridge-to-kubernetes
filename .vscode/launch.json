@@ -13,8 +13,6 @@
             "outFiles": [ "${workspaceFolder}/dist/*.js" ],
             "preLaunchTask": "npm: compile",
             "env": {
-                "BRIDGE_CLI_VERSION": "1.0.20221103.4",
-                "BRIDGE_ENVIRONMENT": "dev"
             }
         },
         {

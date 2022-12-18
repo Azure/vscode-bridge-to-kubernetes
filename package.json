@@ -178,7 +178,7 @@
         }
     },
     "scripts": {
-        "vscode:prepublish": "del-cli dist/template && webpack --mode production && cd ./src/template && node ../../node_modules/copy/bin/cli.js ./**/* ../../dist/template",
+        "vscode:prepublish": "del-cli dist/template && webpack --mode production && cd ./src/template && node ../../node_modules/copy/copy.js ./**/* ../../dist/template",
         "vscode:package": "node ./node_modules/vsce/vsce package",
         "lint": "node node_modules/tslint/bin/tslint **/*.ts -e **/*.d.ts -e node_modules/**/*.ts -p .",
         "fixlint": "node node_modules/tslint/bin/tslint **/*.ts -e **/*.d.ts -e node_modules/**/*.ts -p . --fix",
@@ -186,7 +186,7 @@
         "preinstall": "npx npm-force-resolutions",
         "pretest": "npm run test-compile",
         "test": "node ./out/tests/TestsRunHost.js",
-        "test-compile": "npm run compile && del-cli out/models/recognizers/template && tsc -p ./ && cd ./src/template && node ../../node_modules/copy/bin/cli.js ./**/* ../../out/models/recognizers/template"
+        "test-compile": "npm run compile && del-cli out/models/recognizers/template && tsc -p ./ && cd ./src/template && node ../../node_modules/copy/copy.js ./**/* ../../out/models/recognizers/template"
     },
     "extensionDependencies": [
         "ms-kubernetes-tools.vscode-kubernetes-tools",

@@ -1,11 +1,8 @@
 {
-    "rulesDirectory": ["tslint-microsoft-contrib"],
-    "extends": [ "tslint-eslint-rules" ],
     "rules": {
         /*
         * SECURITY RULES: The following rules should be turned on because they find security issues
         * or are recommended in the Microsoft Secure Development Lifecycle (SDL).
-        * Reference: node_modules\tslint-microsoft-contrib\recommended_ruleset.js
         */
         "no-banned-terms": true,
         "no-cookies": true,

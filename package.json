@@ -179,7 +179,7 @@
     },
     "scripts": {
         "vscode:prepublish": "del-cli dist/template && webpack --mode production && cd ./src/template && node ../../node_modules/copy/copy.js ./**/* ../../dist/template",
-        "vscode:package": "node ./node_modules/vsce/vsce package",
+        "vscode:package": "node ./node_modules/@vscode/vsce/vsce package",
         "lint": "node node_modules/tslint/bin/tslint **/*.ts -e **/*.d.ts -e node_modules/**/*.ts -p .",
         "fixlint": "node node_modules/tslint/bin/tslint **/*.ts -e **/*.d.ts -e node_modules/**/*.ts -p . --fix",
         "compile": "del-cli dist/template && webpack --mode development && node ./node_modules/copy/copy.js ./src/template/**/* dist/template",

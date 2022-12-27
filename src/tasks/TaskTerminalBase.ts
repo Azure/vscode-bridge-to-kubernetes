@@ -14,7 +14,7 @@ export abstract class TaskTerminalBase implements vscode.Pseudoterminal {
     public onDidWrite: vscode.Event<string> = this._writeEmitter.event;
     public onDidClose?: vscode.Event<number> = this._closeEmitter.event;
 
-    public abstract async open(initialDimensions: vscode.TerminalDimensions | undefined): Promise<void>;
+    public abstract open(initialDimensions: vscode.TerminalDimensions | undefined): Promise<void>;
 
     public close(): void {
         // The terminal has been closed by the user. Nothing specific to do.

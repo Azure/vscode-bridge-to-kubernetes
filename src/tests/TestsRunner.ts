@@ -20,7 +20,7 @@ export async function run(): Promise<void> {
         },
         timeout: 2000
     });
-    mocha.useColors(true);
+    mocha.options.color = true;
 
     const testsRoot: string = path.resolve(__dirname, `..`);
 

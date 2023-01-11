@@ -18,7 +18,7 @@ export class Constants {
     public static readonly KubectlDownloadDirectoryName = `kubectl`;
     public static readonly DotNetDownloadDirectoryName = `dotnet`;
     public static readonly KubectlMinVersion = `1.21.2`;
-    public static readonly DotNetMinVersion = `3.1.6`;
+    public static readonly DotNetMinVersion = `6.0.11`;
 
     /* BinariesUtility Constants */
     public static readonly CliVersionsUrlProd = `https://aka.ms/bridge-lks`;

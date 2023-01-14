@@ -1,6 +1,6 @@
 # Change Log
 
-## [1.0.120230112]
+## [2.0.120230112]
 * dotnet 6 upgrade changes - minimum required dotnet version is 6.0.11 and downloads it when latest extension is used. 
 * NOTE: Going back to previous version of extension requires manual action by user to download the dotnet 3.1.6 and replace it in downloaded location. Extension would not download because 6.0.11 is higher than 3.1.6. 
 

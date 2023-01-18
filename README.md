@@ -1,7 +1,3 @@
-<a href="https://marketplace.visualstudio.com/items?itemName=mindaro.mindaro" alt="Click to visit marketplace">
-    <img src="https://vsmarketplacebadge.apphb.com/version-short/mindaro.mindaro.svg">
-    <img src="https://vsmarketplacebadge.apphb.com/rating-star/mindaro.mindaro.svg">
-</a>
 
 # Bridge to Kubernetes VS Code Extension
 

@@ -1,5 +1,11 @@
 # Change Log
 
+## [2.0.120230112]
+* dotnet 6 upgrade changes - minimum required dotnet version is 6.0.11 and downloads it when latest extension is used. 
+* NOTE: Going back to previous version of extension requires manual action by user to download the dotnet 3.1.6 and replace it in downloaded location. Extension would not download because 6.0.11 is higher than 3.1.6. 
+
+Thanks @pkoelbl, Joyer and team for testing effort, @GatoonJin, @Tatsinnit, @elenavillamil for collobarations, @daniv-msft and everyone else involved in this effort.
+
 ## [1.0.120221201]
 * Prod Fix - Correcting B2K CLI version from previous release from 1.0.20221116.4 to 1.0.20221116.4
 

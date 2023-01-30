@@ -8,8 +8,7 @@ import { Telemetry } from 'telaug';
 import * as vscode from 'vscode';
 import TelemetryReporter from 'vscode-extension-telemetry';
 
-import { BinariesManager } from './binaries/BinariesManager';
-import { IBinariesUtility } from './binaries/IBinariesUtility';
+import { BinariesUtilityV2 } from './binaries/BinariesUtilityV2';
 import { Constants } from './Constants';
 import { LocalTunnelDebuggingManager } from './debug/LocalTunnelDebuggingManager';
 import { createExperimentationServiceAsync, ExperimentationTelemetry } from './ExperimentationService';
@@ -94,7 +93,7 @@ export class ExtensionRoot {
         const experimentationService = await createExperimentationServiceAsync(context, new ExperimentationTelemetry(this._logger));
 
         const expectedCLIVersion: string = await VersionUtility.getExpectedCliVersionAsync(packageJsonContent);
-        const binariesUtility: IBinariesUtility = BinariesManager.getBinariesUtility(this._logger, context, commandEnvironmentVariables, accountContextManager, expectedCLIVersion);
+        const binariesUtility = new BinariesUtilityV2(this._logger, context, commandEnvironmentVariables, accountContextManager, expectedCLIVersion);
 
         this._kubernetesPanelCustomizer = new KubernetesPanelCustomizer(binariesUtility, this._logger);
 

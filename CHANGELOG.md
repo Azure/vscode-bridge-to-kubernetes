@@ -1,5 +1,11 @@
 # Change Log
 
+## [2.0.120230124]
+
+* CLI version update that provides: Devhost agent port change for compatibility with GRPC unofficial port [PR for details](https://github.com/Azure/Bridge-To-Kubernetes/pull/129) and JSon serialization changes [STJ changes](https://github.com/Azure/Bridge-To-Kubernetes/pull/124).
+
+Thank you everyone and special thanks to the community contributions Bridge CLI received!
+ 
 ## [2.0.120230118]
 
 * dotnet 6 upgrade changes - minimum required dotnet version is 6.0.11 and downloads it when latest extension is used. 

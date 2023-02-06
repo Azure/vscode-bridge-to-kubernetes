@@ -14,6 +14,7 @@ import { Constants } from '../Constants';
 import { Logger } from '../logger/Logger';
 import { TelemetryEvent } from '../logger/TelemetryEvent';
 import { IReleasable } from '../utility/Event';
+import { redactJsonObject } from '../utility/Redact';
 import { UrlUtility } from '../utility/UrlUtility';
 import { TaskTerminalBase } from './TaskTerminalBase';
 
@@ -120,7 +121,7 @@ export class ConnectServiceTaskTerminal extends TaskTerminalBase {
             this._writeLine(`Error: ${error.message}`);
             vscode.window.showErrorMessage(error.message);
             this.showUseKubernetesServiceEnvironmentVariablesPromptIfRequired(error.message);
-            this._logger.error(TelemetryEvent.ConnectServiceTaskTerminal_Error, error);
+            this._logger.error(TelemetryEvent.ConnectServiceTaskTerminal_Error, redactJsonObject(error));
             this._exit(1);
         }
         finally {

@@ -26,6 +26,7 @@ import { CheckExtensionSupport } from '../utility/CheckExtensionSupport';
 import { EventSource, IReadOnlyEventSource, IReleasable } from '../utility/Event';
 import { fileSystem } from '../utility/FileSystem';
 import { KubeconfigCredentialsManager } from '../utility/KubeconfigCredentialsManager';
+import { redactJsonObject } from '../utility/Redact';
 import { ThenableUtility } from '../utility/ThenableUtility';
 import { UrlUtility } from '../utility/UrlUtility';
 import { WorkspaceFolderBase } from '../WorkspaceFolderBase';
@@ -101,7 +102,7 @@ export class ConnectWorkspaceFolder extends WorkspaceFolderBase {
             return await connectWizard.runAsync(wizardReason, targetResourceName, targetResourceNamespace, targetResourceType);
         }
         catch (error) {
-            this._logger.error(TelemetryEvent.Connect_Error, error);
+            this._logger.error(TelemetryEvent.Connect_Error, redactJsonObject(error));
             vscode.window.showErrorMessage(`Failed to run the wizard. Error: ${error.message}`);
         }
     }
@@ -353,7 +354,7 @@ export class ConnectWorkspaceFolder extends WorkspaceFolderBase {
                     this._outputChannel.show();
                     progress.report({ increment: 100 });
                     this.setConnectStatus(ConnectionStatus.Failed);
-                    this._logger.error(TelemetryEvent.Connect_Error, error);
+                    this._logger.error(TelemetryEvent.Connect_Error, redactJsonObject(error));
                     throw new Error(errorMessage);
                 }).finally(() => {
                     onOutputEmittedReleasable.release();

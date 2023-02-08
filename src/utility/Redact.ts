@@ -6,9 +6,12 @@ enum SesitiveInfoFlags {
 }
 
 export function redactJsonObject(obj: any) {
-
-    obj.message = JSON.stringify(JSON.parse(obj.message), replacer)
-    return obj;
+   try {
+        obj.message = JSON.stringify(JSON.parse(obj.message), replacer)
+        return obj;
+   } catch(error) {
+        return new Error(`Invalid Json: ${obj}`);
+   }
 }
 
 function replacer(key: string, value: any) {

@@ -20,6 +20,7 @@ suite('Redact Test', () => {
         const result = redactJsonObject(error);
 
        assert.equal(JSON.parse(result.message)["clientsecret"], "[REDACTED]");
+       assert.equal(JSON.parse(result.message)["extra"]["clientsecret"], "[REDACTED]");
     });
     test('should return invalid json error when supplied with malformed json', async () => {
         const error = new Error(`

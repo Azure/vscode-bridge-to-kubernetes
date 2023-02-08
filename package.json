@@ -214,7 +214,6 @@
         "fsevents": "^2.1.3"
     },
     "dependencies": {
-        "@medikura/redact-secrets": "^2.1.1",
         "@microsoft/vscode-file-downloader-api": "^1.0.1",
         "@types/request-promise-native": "^1.0.18",
         "@types/tmp": "^0.1.0",
@@ -228,7 +227,6 @@
         "node-fetch": "^2.6.7",
         "opener": "^1.5.1",
         "portfinder": "^1.0.28",
-        "redact-secrets": "^1.0.0",
         "request": "^2.88.0",
         "request-promise-native": "^1.0.9",
         "telaug": "0.0.13",

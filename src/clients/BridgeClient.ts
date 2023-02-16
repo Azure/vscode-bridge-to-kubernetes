@@ -14,6 +14,7 @@ import { IAuthenticationTarget } from '../models/IAuthenticationTarget';
 import { IElevationRequest } from '../models/IElevationRequest';
 import { EnvironmentUtility } from '../utility/EnvironmentUtility';
 import { IReadOnlyEventSource, IReleasable } from '../utility/Event';
+import { redactJsonObject } from '../utility/Redact';
 import { RetryUtility } from '../utility/RetryUtility';
 import { ClientType } from './ClientType';
 import { CommandRunner } from './CommandRunner';
@@ -254,7 +255,7 @@ export class BridgeClient implements IClient {
             this._logger.trace(TelemetryEvent.BridgeClient_ConnectSuccess);
         }
         catch (error) {
-            this._logger.error(TelemetryEvent.BridgeClient_ConnectError, error);
+            this._logger.error(TelemetryEvent.BridgeClient_ConnectError, redactJsonObject(error));
             throw error;
         }
     }

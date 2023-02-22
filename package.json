@@ -2,7 +2,7 @@
     "name": "mindaro",
     "displayName": "Bridge to Kubernetes",
     "description": "Rapid Kubernetes development for teams",
-    "version": "2.0.120230124",
+    "version": "2.0.120230216",
     "icon": "images/bridge128.png",
     "preview": false,
     "publisher": "mindaro",
@@ -246,6 +246,6 @@
         "url": "https://github.com/Azure/vscode-bridge-to-kubernetes"
     },
     "extensionMetadata": {
-        "expectedCLIVersion": "1.0.20230124.1"
+        "expectedCLIVersion": "1.0.20230216.21"
     }
 }

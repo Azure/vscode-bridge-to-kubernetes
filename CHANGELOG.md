@@ -6,7 +6,7 @@
 * Complete refactor of BinaryUtility
 * Added redact funct for logging information under [Fix/readact creds from logging](https://github.com/Azure/vscode-bridge-to-kubernetes/commit/73bc3d8218c47eacadadc23d59a5f442346ef28e)
 
-Thank you to everyone who contributed!
+Thank you to everyone who contributed.
 
 ## [2.0.120230124]
 

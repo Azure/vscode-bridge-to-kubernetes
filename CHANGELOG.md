@@ -1,5 +1,13 @@
 # Change Log
 
+## [2.0.120230216]
+
+* CLI version update that address [issue](https://github.com/Azure/Bridge-To-Kubernetes/issues/162), [issue 89](https://github.com/Azure/Bridge-To-Kubernetes/issues/89) and [issue 56](https://github.com/Azure/Bridge-To-Kubernetes/issues/56)
+* Complete refactor of BinaryUtility
+* Added redact funct for logging information under [Fix/readact creds from logging](https://github.com/Azure/vscode-bridge-to-kubernetes/commit/73bc3d8218c47eacadadc23d59a5f442346ef28e)
+
+Thank you to everyone who contributed.
+
 ## [2.0.120230124]
 
 * CLI version update that provides: Devhost agent port change for compatibility with GRPC unofficial port [PR for details](https://github.com/Azure/Bridge-To-Kubernetes/pull/129) and JSon serialization changes [STJ changes](https://github.com/Azure/Bridge-To-Kubernetes/pull/124).

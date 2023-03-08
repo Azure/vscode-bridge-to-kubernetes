@@ -1,5 +1,11 @@
 # Change Log
 
+## [2.0.120230303]
+
+* CLI version update that includes minor bug fixes, address [issue165](https://github.com/Azure/Bridge-To-Kubernetes/issues/165) [issue134](https://github.com/Azure/Bridge-To-Kubernetes/issues/134) and [issue135](https://github.com/Azure/Bridge-To-Kubernetes/issues/135)
+
+Thank you to everyone who contributed and particular thank you to community contributions from @Eneuman and @Strayfe!
+
 ## [2.0.120230216]
 
 * CLI version update that address [issue](https://github.com/Azure/Bridge-To-Kubernetes/issues/162), [issue 89](https://github.com/Azure/Bridge-To-Kubernetes/issues/89) and [issue 56](https://github.com/Azure/Bridge-To-Kubernetes/issues/56)

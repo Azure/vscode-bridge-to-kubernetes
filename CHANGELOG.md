@@ -2,7 +2,13 @@
 
 ## [2.0.120230303]
 
-* CLI version update that includes minor bug fixes, address [issue165](https://github.com/Azure/Bridge-To-Kubernetes/issues/165) [issue134](https://github.com/Azure/Bridge-To-Kubernetes/issues/134) and [issue135](https://github.com/Azure/Bridge-To-Kubernetes/issues/135)
+* CLI version update that includes:
+  - Minor bug fixes
+  - Address [issue around named port environment variables not being created](https://github.com/Azure/Bridge-To-Kubernetes/issues/165) 
+  - Address [migrating from netwonsoft to stj](https://github.com/Azure/Bridge-To-Kubernetes/issues/134)
+  - Address [fix to AddhostFileEntry tuple](https://github.com/Azure/Bridge-To-Kubernetes/issues/135)
+  - Address [JSon serialization issue](https://github.com/Azure/Bridge-To-Kubernetes/issues/55)
+  - Address [headless service not getting forwarded all the time](https://github.com/Azure/Bridge-To-Kubernetes/issues/167)
 
 Thank you to everyone who contributed and particular thank you to community contributions from @Eneuman and @Strayfe!
 

@@ -1,6 +1,6 @@
 # Change Log
 
-## [2.0.120230303]
+## [2.0.120230310]
 
 * CLI version update that includes:
   - Minor bug fixes

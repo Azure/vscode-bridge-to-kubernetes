@@ -1,6 +1,6 @@
 # Change Log
 
-## [1.0.20230327.2]
+## [2.0.120230327]
 - Address [Remove BouncyCastle Nuget package since .NET 6 can handle this internally](https://github.com/Azure/Bridge-To-Kubernetes/pull/183)
 - Address [Remove minimatch and replace it with internal .NET package](https://github.com/Azure/Bridge-To-Kubernetes/pull/184)
 - Address [Restore job failure fix](https://github.com/Azure/Bridge-To-Kubernetes/pull/203)

@@ -1,5 +1,16 @@
 # Change Log
 
+## [2.0.120230418]
+- [Enable auto review by chatgpt](https://github.com/Azure/Bridge-To-Kubernetes/pull/232)
+- [Update base images to microsoft mariner images](https://github.com/Azure/Bridge-To-Kubernetes/pull/175)
+- [Add new editor config files](https://github.com/Azure/Bridge-To-Kubernetes/pull/230)
+- [Added SupportedOSPlatformGuard and new improved operating system identification](https://github.com/Azure/Bridge-To-Kubernetes/pull/213)
+- [Remove root permissions for creating symlink in user's local bin folder](https://github.com/Azure/Bridge-To-Kubernetes/pull/216)
+- [Modified method to have one set of env variables and added UTs](https://github.com/Azure/Bridge-To-Kubernetes/pull/178)
+- [Json patch issue fix for stateful sets](https://github.com/Azure/Bridge-To-Kubernetes/pull/237)
+- [timeout override from getContainerEnv](https://github.com/Azure/Bridge-To-Kubernetes/pull/231)
+
+Thank you @Eneuman,@gambtho,@Tatsinnit, @Vidya2606, @maksimr, and dgarberj for great contributions.
 ## [2.0.120230327]
 - Address [Remove BouncyCastle Nuget package since .NET 6 can handle this internally](https://github.com/Azure/Bridge-To-Kubernetes/pull/183)
 - Address [Remove minimatch and replace it with internal .NET package](https://github.com/Azure/Bridge-To-Kubernetes/pull/184)

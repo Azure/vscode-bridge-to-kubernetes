@@ -6,7 +6,7 @@
 Some important information reside here:
 
 * [How Bridge to Kubernetes works](https://aka.ms/bridge-how-it-works)
-* [Use Bridge to Kubernetes (VS Code)]( https://aka.ms/bridge-to-k8s-vsc-quickstart)
+* [Use Bridge to Kubernetes - Visual Studio Code]( https://aka.ms/bridge-to-k8s-vsc-quickstart)
 
 ## Telemetry
 

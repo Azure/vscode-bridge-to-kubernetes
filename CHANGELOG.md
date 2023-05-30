@@ -1,5 +1,7 @@
 # Change Log
 
+## [2.0.120230525]
+- Updating to latest B2K CLI version - please refer for release notes [here](https://github.com/Azure/Bridge-To-Kubernetes/pull/275)
 ## [2.0.120230418]
 - Updating to latest B2K CLI version - please refer for release notes [here](https://github.com/Azure/Bridge-To-Kubernetes/blob/main/CHANGELOG.md#10202304181)
 

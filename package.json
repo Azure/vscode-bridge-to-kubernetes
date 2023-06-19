@@ -99,6 +99,9 @@
                     },
                     "useKubernetesServiceEnvironmentVariables": {
                         "type": "boolean"
+                    },
+                    "useContainers": {
+                        "type": "boolean"
                     }
                 }
             },
@@ -126,6 +129,9 @@
                     },
                     "useKubernetesServiceEnvironmentVariables": {
                         "type": "boolean"
+                    },
+                    "useContainers": {
+                        "type": "boolean"
                     }
                 }
             },
@@ -148,19 +154,16 @@
                 }
             },
             {
-                "type": "dev-spaces.connect.service",
+                "type": "bridge-to-kubernetes-use-containers.resource",
                 "required": [
-                    "service",
-                    "ports"
+                    "dependsOn",
+                    "dependsOrder"
                 ],
                 "properties": {
-                    "service": {
-                        "type": "string"
-                    },
-                    "ports": {
+                    "dependsOn": {
                         "type": "array"
                     },
-                    "isolateAs": {
+                    "dependsOrder": {
                         "type": "string"
                     }
                 }

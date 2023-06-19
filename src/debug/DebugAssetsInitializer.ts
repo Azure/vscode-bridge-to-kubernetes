@@ -37,6 +37,11 @@ export class DebugAssetsInitializer {
                 || taskLabel.startsWith(Constants.LegacyTaskSource2));
     }
 
+    public static isDockerTask(taskLabel: string): boolean {
+        return taskLabel != null
+            && (taskLabel.startsWith("b2k-docker"));
+    }
+
     public constructor(
         private readonly _workspaceFolder: vscode.WorkspaceFolder,
         private readonly _logger: Logger) {
@@ -109,7 +114,8 @@ export class DebugAssetsInitializer {
         launchConfigurationName: string,
         isolateAs: string,
         targetCluster: string,
-        targetNamespace: string): Promise</*connectDebugConfigurationName*/ string> {
+        targetNamespace: string,
+        useContainers: boolean): Promise</*connectDebugConfigurationName*/ string> {
         const launchConfig: vscode.WorkspaceConfiguration = vscode.workspace.getConfiguration(`launch`, this._workspaceFolder.uri);
         let debugConfigurations: object[] = launchConfig.get<{}[]>(`configurations`, /*defaultValue*/ []);
         const tasksConfig: vscode.WorkspaceConfiguration = vscode.workspace.getConfiguration(`tasks`, this._workspaceFolder.uri);
@@ -126,11 +132,12 @@ export class DebugAssetsInitializer {
                 && !DebugAssetsInitializer.isConnectTask(debugConfiguration[`preLaunchTask`]);
         });
         tasks = tasks.filter((task) => {
-            return !DebugAssetsInitializer.isConnectTask(task[`label`]);
+            return !DebugAssetsInitializer.isConnectTask(task[`label`]) && !DebugAssetsInitializer.isDockerTask(task[`label`]);
         });
 
         // Create the Connect task.
-        let connectPreLaunchTaskName: string = Constants.ConnectResourceTaskType;
+        
+        let connectPreLaunchTaskName: string = useContainers ? Constants.ConnectResourceTaskTypeForUseContainers : Constants.ConnectResourceTaskType;
         const connectPreLaunchTask = {
             label: Constants.ConnectResourceTaskType,
             type: Constants.ConnectResourceTaskType,
@@ -139,12 +146,49 @@ export class DebugAssetsInitializer {
             ports: ports,
             targetCluster: targetCluster,
             targetNamespace: targetNamespace,
-            useKubernetesServiceEnvironmentVariables: false
+            useKubernetesServiceEnvironmentVariables: false,
+            useContainers: useContainers,
         };
 
         if (isolateAs != null) {
             connectPreLaunchTask[`isolateAs`] = isolateAs;
         }
+
+        // if use containers is true then create docker-run task
+        if (useContainers) {
+            const dockerRunTask = {
+                label: "b2k-docker-run",
+                type: "docker-run",
+                platform: "node",
+                dependsOn: [ "b2k-docker-build" ],
+                dockerRun: {
+                    "network": "b2k-network",
+                    "volume": [],
+                }
+            };
+            tasks = tasks.concat(dockerRunTask);
+
+            const dockerBuildTask = {
+                label: "b2k-docker-build",
+                type: "docker-build",
+                platform: "node",
+                dockerBuild: {
+                    "dockerfile": "${workspaceFolder}/Dockerfile",
+                    "context": "${workspaceFolder}",
+                    "pull": true,
+                }
+            };
+            tasks = tasks.concat(dockerBuildTask);
+
+            const b2kPreLaunchTask = {
+                label: Constants.ConnectResourceTaskTypeForUseContainers,
+                type: Constants.ConnectResourceTaskTypeForUseContainers,
+                dependsOn: [ Constants.ConnectResourceTaskType, "b2k-docker-run" ],
+                dependsOrder: `sequence`,
+            };
+            tasks = tasks.concat(b2kPreLaunchTask);
+        }
+        
 
         tasks = tasks.concat(connectPreLaunchTask);
 
@@ -160,9 +204,10 @@ export class DebugAssetsInitializer {
         const sourcePreLaunchTask: string = sourceDebugConfiguration[`preLaunchTask`];
         if (sourcePreLaunchTask != null) {
             connectPreLaunchTaskName = Constants.ConnectCompoundTaskType;
+            let b2kPreLaunchTask = useContainers ? Constants.ConnectResourceTaskTypeForUseContainers : Constants.ConnectResourceTaskType;
             tasks = tasks.concat({
                 label: Constants.ConnectCompoundTaskType,
-                dependsOn: [ Constants.ConnectResourceTaskType, sourcePreLaunchTask ],
+                dependsOn: [ b2kPreLaunchTask, sourcePreLaunchTask ],
                 dependsOrder: `sequence`
             });
         }

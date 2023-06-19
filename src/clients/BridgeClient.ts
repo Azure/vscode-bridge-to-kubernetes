@@ -194,6 +194,7 @@ export class BridgeClient implements IClient {
         isolateAs: string,
         currentNamespace: string,
         useKubernetesServiceEnvironmentVariables: boolean,
+        useContainers: boolean,
         experimentationService: IExperimentationService): Promise<void> {
         try {
             let resourceTypeFlag: string;
@@ -228,6 +229,10 @@ export class BridgeClient implements IClient {
 
             if (useKubernetesServiceEnvironmentVariables) {
                 args.push(`--use-kubernetes-service-environment-variables`);
+            }
+
+            if (useContainers) {
+                args.push(`--containerized`);
             }
 
             const routingManagerFeatureFlags = this.getRoutingManagerFeatureFlags(experimentationService);

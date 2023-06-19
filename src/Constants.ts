@@ -31,6 +31,8 @@ export class Constants {
     public static readonly ExtensionIdentifier = `mindaro.mindaro`;
     public static readonly ConnectConfigurationDebuggerType = `bridge-to-kubernetes.configuration`;
     public static readonly TaskSource = `bridge-to-kubernetes`;
+    public static readonly TaskSourceForUseContainers = `bridge-to-kubernetes-use-containers`;
+    public static readonly ConnectResourceTaskTypeForUseContainers = `${Constants.TaskSourceForUseContainers}.resource`;
     public static readonly ConnectResourceTaskType = `${Constants.TaskSource}.resource`;
     public static readonly ConnectCompoundTaskType = `${Constants.TaskSource}.compound`;
     public static readonly ConnectConfigureCommand = `mindaro.configure`;

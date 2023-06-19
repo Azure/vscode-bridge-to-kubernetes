@@ -31,6 +31,7 @@ export class ConnectServiceTaskTerminal extends TaskTerminalBase {
         private readonly _targetCluster: string,
         private readonly _targetNamespace: string,
         private readonly _useKubernetesServiceEnvironmentVariables: boolean,
+        private readonly _useContainers: boolean,
         private readonly _experimentationService: IExperimentationService,
         private readonly _binariesUtility: IBinariesUtility,
         private readonly _logger: Logger,
@@ -106,6 +107,7 @@ export class ConnectServiceTaskTerminal extends TaskTerminalBase {
                 this._targetCluster,
                 this._targetNamespace,
                 this._useKubernetesServiceEnvironmentVariables,
+                this._useContainers,
                 this._experimentationService);
             if (!success) {
                 this._writeLine(``);

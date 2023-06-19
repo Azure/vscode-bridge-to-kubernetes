@@ -159,6 +159,7 @@ export class ConnectWorkspaceFolder extends WorkspaceFolderBase {
         targetCluster: string,
         targetNamespace: string,
         useKubernetesServiceEnvironmentVariables: boolean,
+        useContainers: boolean,
         experimentationService: IExperimentationService): Promise</*success*/ boolean> {
         const prerequisitesAlertCallback = CheckExtensionSupport.validatePrerequisites(this._logger, /*validatePostDownloadPrerequisites*/ true, this._workspaceFolder);
         if (prerequisitesAlertCallback != null) {
@@ -341,6 +342,7 @@ export class ConnectWorkspaceFolder extends WorkspaceFolderBase {
                     isolateAs,
                     kubeconfig.namespace,
                     useKubernetesServiceEnvironmentVariables,
+                    useContainers,
                     experimentationService);
 
                 this._currentConnectCommandPromise = connectCommandPromise.then(() => {

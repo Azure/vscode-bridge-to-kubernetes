@@ -23,7 +23,7 @@ import { IWizardOutput } from './IWizardOutput';
 import { ResourceType } from './ResourceType';
 
 export class ConnectWizard {
-    private NumberOfSteps = 4; // Update this number if you add/remove any steps in the wizard
+    private NumberOfSteps = 5; // Update this number if you add/remove any steps in the wizard
     private readonly _result: Partial<IWizardOutput> = {};
     private _isCreatingNewLaunchConfiguration = false;
     private _isWizardComplete = false;
@@ -53,7 +53,7 @@ export class ConnectWizard {
 
         if (targetResourceType.toLowerCase() === `pod`) {
             // We skip the isolation step when debugging pods
-            this.NumberOfSteps = 3;
+            this.NumberOfSteps = 4;
         }
 
         try {
@@ -134,7 +134,7 @@ export class ConnectWizard {
                 this._result.targetNamespace = targetResourceNamespace;
                 this._result.resourceType = targetResourceType;
 
-                return (input: MultiStepInput): Promise<(input: MultiStepInput) => Promise<(input: MultiStepInput) => Promise<void>>> => this.inputPortsAsync(input, targetResourceType);
+                return (input: MultiStepInput): Promise<(input: MultiStepInput) => Promise<(input: MultiStepInput) => Promise<(input: MultiStepInput) => Promise<void>>>> => this.inputPortsAsync(input, targetResourceType);
             });
         }
         catch (error) {
@@ -172,7 +172,7 @@ export class ConnectWizard {
         input: MultiStepInput,
         currentContext: IKubeconfigEnrichedContext,
         resourceType: ResourceType
-    ): Promise<(input: MultiStepInput) => Promise<(input: MultiStepInput) => Promise<(input: MultiStepInput) => Promise<void>>>> {
+    ): Promise<(input:MultiStepInput) => Promise<(input: MultiStepInput) => Promise<(input: MultiStepInput) => Promise<(input: MultiStepInput) => Promise<void>>>>> {
         const kubectlClient = await this._binariesUtility.tryGetKubectlAsync();
         if (kubectlClient == null) {
             return null;
@@ -203,10 +203,10 @@ export class ConnectWizard {
         });
         this._result.resourceName = pick.label;
 
-        return (input: MultiStepInput): Promise<(input: MultiStepInput) => Promise<(input: MultiStepInput) => Promise<void>>> => this.inputPortsAsync(input, resourceType);
+        return (input: MultiStepInput): Promise<(input: MultiStepInput) => Promise<(input: MultiStepInput) => Promise<(input: MultiStepInput) => Promise<void>>>> => this.inputPortsAsync(input, resourceType);
     }
 
-    private async inputPortsAsync(input: MultiStepInput, resourceType: ResourceType): Promise<(input: MultiStepInput) => Promise<(input: MultiStepInput) => Promise<void>>> {
+    private async inputPortsAsync(input: MultiStepInput, resourceType: ResourceType): Promise<(input: MultiStepInput) => Promise<(input: MultiStepInput) => Promise<(input: MultiStepInput) => Promise<void>>>> {
         const value = await input.showInputBox({
             title: this.getInputTitle(),
             step: 2,
@@ -219,7 +219,7 @@ export class ConnectWizard {
         // At this point, we know that the input is valid, as it passed the validateInput check.
         this._result.ports = [ Number(value) ];
 
-        return (input: MultiStepInput): Promise<(input: MultiStepInput) => Promise<void>> => this.pickLaunchConfigurationAsync(input, resourceType);
+        return (input: MultiStepInput): Promise<(input: MultiStepInput) => Promise<(input: MultiStepInput) => Promise<void>>> => this.pickLaunchConfigurationAsync(input, resourceType);
     }
 
     private async validatePortInputAsync(value: string): Promise<string> {
@@ -236,7 +236,7 @@ export class ConnectWizard {
         return undefined;
     }
 
-    private async pickLaunchConfigurationAsync(input: MultiStepInput, resourceType: ResourceType): Promise<(input: MultiStepInput) => Promise<void>> {
+    private async pickLaunchConfigurationAsync(input: MultiStepInput, resourceType: ResourceType): Promise<(input: MultiStepInput) => Promise<(input: MultiStepInput) => Promise<void>>>  {
         const launchConfigurations = this.getAvailableDebugConfigurations();
         const createNewLaunchConfigurationLabel = `$(plus) Create a new launch configuration`;
         const noLaunchConfigurationLabel = `$(warning) Configure ${Constants.ProductName} without a launch configuration`;
@@ -275,10 +275,10 @@ export class ConnectWizard {
 
         const username: string = await usernameGetter();
         const routingHeader: string = await StringUtility.generateRoutingHeaderAsync(username);
-        return (input: MultiStepInput): Promise<void> => this.pickIsolationModeAsync(input, routingHeader, resourceType);
+        return (input: MultiStepInput): Promise<(input: MultiStepInput) => Promise<void>> => this.pickIsolationModeAsync(input, routingHeader, resourceType);
     }
 
-    private async pickIsolationModeAsync(input: MultiStepInput, routingHeader: string, resourceType: ResourceType): Promise<void> {
+    private async pickIsolationModeAsync(input: MultiStepInput, routingHeader: string, resourceType: ResourceType): Promise<(input: MultiStepInput) => Promise<void>> {
         if (resourceType.toLowerCase() === `pod`) {
             // We do not support isolation mode when debugging a single pod
             this._isWizardComplete = true;
@@ -314,6 +314,34 @@ export class ConnectWizard {
         });
         this._result.isolateAs = (pick === yesChoice) ? routingHeader : null;
 
+        return (input: MultiStepInput): Promise<void> => this.pickContainerModeAsync(input); 
+
+        //this._isWizardComplete = true;
+    }
+
+    private async pickContainerModeAsync(input: MultiStepInput): Promise<void> {
+
+        const noChoice: vscode.QuickPickItem = {
+            label: `No`,
+            detail: `Run your code locally, outside of a container.`
+        };
+
+        const yesChoice: vscode.QuickPickItem = {
+            label: `Yes`,
+            detail: `Run your code inside a container`
+        };
+
+        const choices: vscode.QuickPickItem[] = [ noChoice, yesChoice ];
+
+        const pick = await input.showQuickPickAsync<IActionQuickPickItem, IQuickPickParameters<IActionQuickPickItem>>({
+            title: this.getInputTitle(),
+            step: 5,
+            totalSteps: this.NumberOfSteps,
+            placeholder: `Run your code inside a container?`,
+            items: choices,
+            activeItem: choices[0]
+        });
+        this._result.useContainers = (pick === yesChoice) ? true : false;
         this._isWizardComplete = true;
     }
 

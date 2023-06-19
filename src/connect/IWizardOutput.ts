@@ -9,6 +9,7 @@ export interface IWizardOutput {
     resourceName: string;
     resourceType: ResourceType;
     ports: number[];
+    useContainers: boolean;
     launchConfigurationName: string;
     isolateAs: string;
     targetCluster: string;

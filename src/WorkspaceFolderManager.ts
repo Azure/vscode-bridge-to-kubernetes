@@ -79,32 +79,41 @@ export class WorkspaceFolderManager {
             }
         }));
 
-        this._context.subscriptions.push(vscode.tasks.registerTaskProvider(Constants.LegacyConnectServiceTaskType3, {
+        this._context.subscriptions.push(vscode.tasks.registerTaskProvider(Constants.ConnectResourceTaskTypeForUseContainers, {
             provideTasks: (cancellationToken?: vscode.CancellationToken): vscode.ProviderResult<vscode.Task[]> => {
                 return [];
             },
             resolveTask: async (task: vscode.Task, token?: vscode.CancellationToken): Promise<vscode.Task> => {
-                return this.resolveConnectTask(task, Constants.LegacyConnectServiceTaskType3);
+                return this.resolveConnectTask(task, Constants.ConnectResourceTaskTypeForUseContainers);
             }
         }));
 
-        this._context.subscriptions.push(vscode.tasks.registerTaskProvider(Constants.LegacyConnectServiceTaskType1, {
-            provideTasks: (cancellationToken?: vscode.CancellationToken): vscode.ProviderResult<vscode.Task[]> => {
-                return [];
-            },
-            resolveTask: async (task: vscode.Task, token?: vscode.CancellationToken): Promise<vscode.Task> => {
-                return this.resolveConnectTask(task, Constants.LegacyConnectServiceTaskType1);
-            }
-        }));
+        // this._context.subscriptions.push(vscode.tasks.registerTaskProvider(Constants.LegacyConnectServiceTaskType3, {
+        //     provideTasks: (cancellationToken?: vscode.CancellationToken): vscode.ProviderResult<vscode.Task[]> => {
+        //         return [];
+        //     },
+        //     resolveTask: async (task: vscode.Task, token?: vscode.CancellationToken): Promise<vscode.Task> => {
+        //         return this.resolveConnectTask(task, Constants.LegacyConnectServiceTaskType3);
+        //     }
+        // }));
 
-        this._context.subscriptions.push(vscode.tasks.registerTaskProvider(Constants.LegacyConnectServiceTaskType2, {
-            provideTasks: (cancellationToken?: vscode.CancellationToken): vscode.ProviderResult<vscode.Task[]> => {
-                return [];
-            },
-            resolveTask: async (task: vscode.Task, token?: vscode.CancellationToken): Promise<vscode.Task> => {
-                return this.resolveConnectTask(task, Constants.LegacyConnectServiceTaskType2);
-            }
-        }));
+        // this._context.subscriptions.push(vscode.tasks.registerTaskProvider(Constants.LegacyConnectServiceTaskType1, {
+        //     provideTasks: (cancellationToken?: vscode.CancellationToken): vscode.ProviderResult<vscode.Task[]> => {
+        //         return [];
+        //     },
+        //     resolveTask: async (task: vscode.Task, token?: vscode.CancellationToken): Promise<vscode.Task> => {
+        //         return this.resolveConnectTask(task, Constants.LegacyConnectServiceTaskType1);
+        //     }
+        // }));
+
+        // this._context.subscriptions.push(vscode.tasks.registerTaskProvider(Constants.LegacyConnectServiceTaskType2, {
+        //     provideTasks: (cancellationToken?: vscode.CancellationToken): vscode.ProviderResult<vscode.Task[]> => {
+        //         return [];
+        //     },
+        //     resolveTask: async (task: vscode.Task, token?: vscode.CancellationToken): Promise<vscode.Task> => {
+        //         return this.resolveConnectTask(task, Constants.LegacyConnectServiceTaskType2);
+        //     }
+        // }));
 
         // Register a DebugConfigurationProvider, so that we intercept debug sessions starting, and can act on them such as
         // adding environment variables to the launched process for Connect.
@@ -288,7 +297,8 @@ export class WorkspaceFolderManager {
             return undefined;
         }
 
-        let resourceName: string = task.definition[`resource`];
+        if (connectTaskType === Constants.ConnectResourceTaskType) {
+            let resourceName: string = task.definition[`resource`];
         let resourceType: ResourceType = null;
         switch (task.definition[`resourceType`] != null ? task.definition[`resourceType`].toLowerCase() : null) {
             case `service`:
@@ -314,6 +324,7 @@ export class WorkspaceFolderManager {
         const targetNamespace: string = task.definition[`targetNamespace`];
         const useKubernetesServiceEnvironmentVariablesValue: any = task.definition[`useKubernetesServiceEnvironmentVariables`];
         const useKubernetesServiceEnvironmentVariables: boolean = useKubernetesServiceEnvironmentVariablesValue != null ? useKubernetesServiceEnvironmentVariablesValue : false;
+        const useContainers: boolean = task.definition[`useContainers`];
 
         return new vscode.Task(
             task.definition,
@@ -331,6 +342,7 @@ export class WorkspaceFolderManager {
                     targetCluster,
                     targetNamespace,
                     useKubernetesServiceEnvironmentVariables,
+                    useContainers,
                     this._experimentationService,
                     this._binariesUtility,
                     this._logger,
@@ -348,6 +360,10 @@ export class WorkspaceFolderManager {
                 )
             ),
             task.problemMatchers);
+        }
+        else if (connectTaskType === Constants.ConnectResourceTaskTypeForUseContainers) {
+            return new vscode.Task(task.definition, task.scope, task.name, task.source, new vscode.ShellExecution('echo testing'));
+        }    
     }
 
     private async showOpenSettingMessage(disconnectAfterDebugging: boolean): Promise<void> {
@@ -509,7 +525,8 @@ export class WorkspaceFolderManager {
             wizardOutput.launchConfigurationName,
             wizardOutput.isolateAs,
             wizardOutput.targetCluster,
-            wizardOutput.targetNamespace
+            wizardOutput.targetNamespace,
+            wizardOutput.useContainers
         );
 
         if (wizardOutput.launchConfigurationName == null) {

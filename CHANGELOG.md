@@ -1,5 +1,7 @@
 # Change Log
 
+## [2.0.120230716]
+- Updating to latest B2k CLI version majorly for dotnet 7.0 upgrade. Please refer for release notes [here](https://github.com/Azure/Bridge-To-Kubernetes/blob/main/CHANGELOG.md#10202307061)
 ## [2.0.120230525]
 - Updating to latest B2K CLI version - please refer for release notes [here](https://github.com/Azure/Bridge-To-Kubernetes/blob/main/CHANGELOG.md#10202305251)
 - Fix the link appearing out of place in VS Code marketplace changes , PR link [here](https://github.com/Azure/vscode-bridge-to-kubernetes/pull/48)

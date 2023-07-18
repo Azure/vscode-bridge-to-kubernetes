@@ -6,7 +6,7 @@
 import { Guid } from 'guid-typescript';
 import { Telemetry } from 'telaug';
 import * as vscode from 'vscode';
-import TelemetryReporter from 'vscode-extension-telemetry';
+import TelemetryReporter from '@vscode/extension-telemetry';
 import { BinariesUtilityV2 } from './binaries/BinariesUtilityV2';
 import { IBinariesUtility } from './binaries/IBinariesUtility';
 import { Constants } from './Constants';

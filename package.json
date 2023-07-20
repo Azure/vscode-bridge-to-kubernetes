@@ -217,7 +217,7 @@
         "@microsoft/vscode-file-downloader-api": "^1.0.1",
         "@types/request-promise-native": "^1.0.18",
         "@types/tmp": "^0.1.0",
-        "@vscode/extension-telemetry": "^0.8.1",
+        "@vscode/extension-telemetry": "^0.6.2",
         "chokidar": "^3.5.3",
         "command-exists": "^1.2.8",
         "glob": "^8.0.3",

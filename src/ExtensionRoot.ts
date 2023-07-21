@@ -83,10 +83,7 @@ export class ExtensionRoot {
         const workspacesCommonId = Guid.create();
 
         this._reporter = new TelemetryReporter(
-            packageJsonContent[`name`],
-            extensionVersion,
-            packageJsonContent[`aiKey`],
-            /*firstParty*/ true);
+            packageJsonContent[`aiKey`]);
         Telemetry.init(this._reporter, /*featureName*/ null, () => this._fileLogWriter.getLastLogsAsync(), /*errorToString*/ null);
 
         // Initialize ExP

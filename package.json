@@ -10,8 +10,8 @@
     "license": "MIT",
     "engines": {
         "vscode": "^1.74.0",
-        "node": ">=16.6.x",
-        "npm": ">=8.11.x"
+        "node": ">=16.20.x",
+        "npm": ">=8.19.x"
     },
     "categories": [
         "Azure",

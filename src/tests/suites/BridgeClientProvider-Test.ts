@@ -1,4 +1,5 @@
 import * as assert from 'assert';
+import * as process from 'process';
 import { BinariesVersionClient } from '../../clients/BinariesVersionClient';
 import { CommandRunner } from '../../clients/CommandRunner';
 import { BridgeClientProvider } from '../../clients/Providers/BridgeClientProvider';
@@ -9,6 +10,7 @@ suite('BridgeClientProviderTest', () => {
         const binariesVersionClient: BinariesVersionClient = new BinariesVersionClient(expectedCLIVersion, null);
         const bridgeClientProvider: IClientProvider = new BridgeClientProvider(binariesVersionClient, expectedCLIVersion, new CommandRunner(null), null);
         const binariesName = bridgeClientProvider.getExecutableFilePath();
-        assert.strictEqual(binariesName, `dsc`);
+        const expectedName = process.platform == 'win32' ? 'dsc.exe' : 'dsc';
+        assert.strictEqual(binariesName, expectedName);
     });
 });

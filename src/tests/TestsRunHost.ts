@@ -3,8 +3,10 @@
 // ----------------------------------------------------------------------------
 'use strict';
 
+import {
+    runTests
+} from '@vscode/test-electron';
 import * as path from 'path';
-import { runTests } from '@vscode/test-electron';
 
 async function main(): Promise<void> {
     try {
@@ -12,9 +14,12 @@ async function main(): Promise<void> {
         const extensionDevelopmentPath: string = path.resolve(__dirname, `../../`);
 
         // The path to the extension test script.
-        const extensionTestsPath: string = path.resolve(__dirname, `./TestsRunner`);
+        const extensionTestsPath: string = path.resolve(__dirname, `./suites/index`);
 
-        await runTests({ extensionDevelopmentPath, extensionTestsPath });
+        await runTests({
+            extensionDevelopmentPath,
+            extensionTestsPath
+        });
     }
     catch (error) {
         console.error(error);

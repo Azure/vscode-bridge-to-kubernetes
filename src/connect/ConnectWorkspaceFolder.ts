@@ -8,7 +8,7 @@ import * as portfinder from 'portfinder';
 import * as process from 'process';
 import * as tmp from 'tmp';
 import * as vscode from 'vscode';
-import * as got from 'got';
+import got from 'got';
 
 import { IExperimentationService } from 'vscode-tas-client';
 import { IBinariesUtility } from '../binaries/IBinariesUtility';

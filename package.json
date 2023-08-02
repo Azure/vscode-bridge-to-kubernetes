@@ -185,7 +185,7 @@
         "compile": "del-cli dist/template && webpack --mode development && node ./node_modules/copy/copy.js ./src/template/**/* dist/template",
         "preinstall": "npx npm-force-resolutions",
         "pretest": "npm run test-compile",
-        "test": "nyc node ./out/tests/TestsRunHost.js --reporter=lcov",
+        "test": "c8 node ./out/tests/TestsRunHost.js",
         "test-compile": "npm run compile && del-cli out/models/recognizers/template && tsc -p ./ && cd ./src/template && node ../../node_modules/copy/copy.js ./**/* ../../out/models/recognizers/template"
     },
     "extensionDependencies": [
@@ -201,12 +201,12 @@
         "@types/vscode": "1.74.0",
         "@vscode/test-electron": "^2.3.3",
         "@vscode/vsce": "^2.15.0",
+        "c8": "^8.0.1",
         "copy": "^0.0.1",
         "del-cli": "^5.0.0",
         "eslint": "^8.27.0",
         "glob": "^7.1.4",
         "mocha": "^10.2.0",
-        "nyc": "15.0.0",
         "source-map-support": "^0.5.12",
         "ts-loader": "^9.4.2",
         "typemoq": "^2.1.0",

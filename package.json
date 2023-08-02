@@ -185,7 +185,7 @@
         "compile": "del-cli dist/template && webpack --mode development && node ./node_modules/copy/copy.js ./src/template/**/* dist/template",
         "preinstall": "npx npm-force-resolutions",
         "pretest": "npm run test-compile",
-        "test": "c8 node ./out/tests/TestsRunHost.js",
+        "test": "c8 node ./out/tests/TestsRunHost.js -reporter=text-lcov",
         "test-compile": "npm run compile && del-cli out/models/recognizers/template && tsc -p ./ && cd ./src/template && node ../../node_modules/copy/copy.js ./**/* ../../out/models/recognizers/template"
     },
     "extensionDependencies": [

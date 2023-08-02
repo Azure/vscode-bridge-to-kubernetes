@@ -237,7 +237,8 @@
         "watchpack": "^2.3.1"
     },
     "overrides": {
-        "serialize-javascript": "3.1.0"
+        "serialize-javascript": "3.1.0",
+        "execa": "5.1.1"
     },
     "homepage": "https://aka.ms/bridge-to-k8s-vscode-quickstart",
     "repository": {

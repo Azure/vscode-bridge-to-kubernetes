@@ -4,12 +4,10 @@
 'use strict';
 
 import * as fs from 'fs';
-import * as glob from 'glob-promise';
 import * as util from 'util';
 
 class FileSystem {
     public accessAsync = util.promisify(fs.access);
-    public globAsync = glob;
     public mkdirAsync = util.promisify(fs.mkdir);
     public readDirAsync = util.promisify(fs.readdir);
     public readFileAsync = util.promisify(fs.readFile);

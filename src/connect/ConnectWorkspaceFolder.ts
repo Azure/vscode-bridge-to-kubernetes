@@ -6,9 +6,9 @@
 import * as os from 'os';
 import * as portfinder from 'portfinder';
 import * as process from 'process';
-import * as request from 'request-promise-native';
 import * as tmp from 'tmp';
 import * as vscode from 'vscode';
+import got from 'got';
 
 import { IExperimentationService } from 'vscode-tas-client';
 import { IBinariesUtility } from '../binaries/IBinariesUtility';
@@ -398,12 +398,7 @@ export class ConnectWorkspaceFolder extends WorkspaceFolderBase {
 
         try {
             // Send POST request to http://localhost:<control-port>/api/remoting/stop.
-            await request.post({
-                method: `POST`,
-                uri: `http://localhost:${this._controlPort.toString()}/api/remoting/stop/`,
-                body: ``,
-                simple: true
-            });
+            await got.post(`http://localhost:${this._controlPort.toString()}/api/remoting/stop/`);
 
             // We triggered an HTTP call to stop the connection, but at this point the connection is still ongoing.
             // Wait for the current Connect command to complete, which means the connection is really disconnected.
@@ -557,10 +552,7 @@ export class ConnectWorkspaceFolder extends WorkspaceFolderBase {
     private async getDnsStatusAsync(): Promise<string> {
         try {
             // The CLI DNS uses the port 50052.
-            return await request.get({
-                method: `GET`,
-                uri: `http://localhost:50052/api/hosts/info/`
-            });
+            return (await got.get(`http://localhost:50052/api/hosts/info/`)).body;
         }
         catch {
             return `Local DNS service is not running.`;

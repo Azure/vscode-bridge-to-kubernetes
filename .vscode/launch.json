@@ -8,7 +8,6 @@
             "request": "launch",
             "runtimeExecutable": "${execPath}",
             "args": ["--extensionDevelopmentPath=${workspaceFolder}" ],
-            "stopOnEntry": false,
             "sourceMaps": true,
             "outFiles": [ "${workspaceFolder}/dist/*.js" ],
             "preLaunchTask": "npm: compile",
@@ -20,8 +19,7 @@
             "type": "extensionHost",
             "request": "launch",
             "runtimeExecutable": "${execPath}",
-            "args": ["--extensionDevelopmentPath=${workspaceFolder}", "--extensionTestsPath=${workspaceFolder}/out/tests/TestsRunner" ],
-            "stopOnEntry": false,
+            "args": ["--extensionDevelopmentPath=${workspaceFolder}", "--extensionTestsPath=${workspaceFolder}/out/tests/suites/index" ],
             "sourceMaps": true,
             "outFiles": [ "${workspaceFolder}/out/tests/**/*.js" ],
             "preLaunchTask": "npm: test-compile"

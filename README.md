@@ -1,6 +1,9 @@
 
 # Bridge to Kubernetes VS Code Extension
 
+[![Build](https://github.com/Azure/vscode-bridge-to-kubernetes/actions/workflows/build.yml/badge.svg)](https://github.com/Azure/vscode-bridge-to-kubernetes/actions/workflows/build.yml)
+[![codecov](https://codecov.io/github/azure/vscode-bridge-to-kubernetes/branch/main/graph/badge.svg)](https://codecov.io/github/azure/vscode-bridge-to-kubernetes)
+
 > This repo has been populated for separating vscode extension implementation of [Bridge to Kubernetes](https://github.com/Azure/Bridge-To-Kubernetes).
 
 Some important information reside here:

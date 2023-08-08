@@ -6,7 +6,7 @@
 import { Guid } from 'guid-typescript';
 import { Telemetry } from 'telaug';
 import * as vscode from 'vscode';
-import TelemetryReporter from 'vscode-extension-telemetry';
+import TelemetryReporter from '@vscode/extension-telemetry';
 import { BinariesUtilityV2 } from './binaries/BinariesUtilityV2';
 import { IBinariesUtility } from './binaries/IBinariesUtility';
 import { Constants } from './Constants';
@@ -83,10 +83,7 @@ export class ExtensionRoot {
         const workspacesCommonId = Guid.create();
 
         this._reporter = new TelemetryReporter(
-            packageJsonContent[`name`],
-            extensionVersion,
-            packageJsonContent[`aiKey`],
-            /*firstParty*/ true);
+            packageJsonContent[`aiKey`]);
         Telemetry.init(this._reporter, /*featureName*/ null, () => this._fileLogWriter.getLastLogsAsync(), /*errorToString*/ null);
 
         // Initialize ExP

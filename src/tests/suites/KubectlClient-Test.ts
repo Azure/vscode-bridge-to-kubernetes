@@ -4,8 +4,8 @@
 'use strict';
 
 import * as assert from 'assert';
-import { It, Mock } from 'typemoq';
-
+import * as sinon from 'sinon';
+import { expect } from 'chai';
 import { CommandRunner } from '../../clients/CommandRunner';
 import { KubectlClient } from '../../clients/KubectlClient';
 import { IKubernetesIngress } from '../../models/IKubernetesIngress';
@@ -14,7 +14,8 @@ import { accountContextManagerMock, loggerMock } from '../CommonTestObjects';
 
 suite(`KubectlClient Test`, () => {
     test(`getIngressesAsync when the kubectl command returns a set of various ingresses`, async () => {
-        const commandRunnerMock = Mock.ofType<CommandRunner>();
+        const commandRunnerMock = sinon.Fake(CommandRunner);
+        commandRunnerMock
         commandRunnerMock.setup(x => x.runAsync(It.isAnyString(), It.isAny(), It.isAny(), It.isAny(), It.isAny(), It.isAny())).returns(async () => `{
             "apiVersion": "v1",
             "items": [

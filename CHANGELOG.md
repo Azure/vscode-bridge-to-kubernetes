@@ -1,5 +1,12 @@
 # Change Log
 
+## [2.0.120230817]
+- Updating to latest B2k CLI version majorly for remediating security vulnerability for CBL mariner. Please refer for release notes [here](https://github.com/Azure/Bridge-To-Kubernetes/blob/main/CHANGELOG.md#10202308112)
+- [Remove deprecated packages request and vscode-test](https://github.com/Azure/vscode-bridge-to-kubernetes/pull/60)
+- [Add support for Code coverage checks](https://github.com/Azure/vscode-bridge-to-kubernetes/pull/62)
+- [Enabe codecov and build badges for visibility](https://github.com/Azure/vscode-bridge-to-kubernetes/pull/63)
+Thank you @Eneuman,@Tatsinnit, @BartNetJS and @cxznmhdcxz for great contributions.
+
 ## [2.0.120230716]
 - Updating to latest B2k CLI version majorly for dotnet 7.0 upgrade. Please refer for release notes [here](https://github.com/Azure/Bridge-To-Kubernetes/blob/main/CHANGELOG.md#10202307061)
 ## [2.0.120230525]

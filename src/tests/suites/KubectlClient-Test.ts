@@ -137,11 +137,7 @@ describe(`KubectlClient Test`, () => {
         commandRunnerStub.runAsync.returns(returnString);
         const kubectlClient = new KubectlClient(`my/path/kubectl.exe`, commandRunnerStub, accountContextManagerStub, loggerStub);
         let ingresses: IKubernetesIngress[];
-        try {
-            ingresses = await kubectlClient.getIngressesAsync(`dev`, `c:/users/alias/.kube/config`, true);
-        } catch (e) {
-            console.log("error" + e);
-        }
+        ingresses = await kubectlClient.getIngressesAsync(`dev`, `c:/users/alias/.kube/config`, true);
 
         expect(ingresses.length).to.equal(2);
         expect(ingresses[0].name).to.equal(`bikesharingweb`);

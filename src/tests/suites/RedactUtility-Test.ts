@@ -1,8 +1,10 @@
 import * as assert from 'assert';
 import { redactJsonObject } from '../../utility/Redact';
+import { describe, it } from 'mocha';
+import { expect } from 'chai';
 
-suite('Redact Test', () => {
-    test('should return redacted secrets always', async () => {
+describe('Redact Test', () => {
+    it('should return redacted secrets always', async () => {
         const error = new Error(`
         {
             "username": "tatsat",
@@ -18,11 +20,10 @@ suite('Redact Test', () => {
         `);
 
         const result = redactJsonObject(error);
-
-       assert.equal(JSON.parse(result.message)["clientsecret"], "[REDACTED]");
-       assert.equal(JSON.parse(result.message)["extra"]["clientsecret"], "[REDACTED]");
+       expect(JSON.parse(result.message)["extra"]["clientsecret"]).to.equal("[REDACTED]");
+       expect(JSON.parse(result.message)["clientsecret"]).to.equal("[REDACTED]");
     });
-    test('should return invalid json error when supplied with malformed json', async () => {
+    it('should return invalid json error when supplied with malformed json', async () => {
         const error = new Error(`
         {
             "username": "tatsat",
@@ -42,7 +43,7 @@ suite('Redact Test', () => {
         // Now lets test the Invalid Json Erro when incorrect json is fed into the funct.
         const result = redactJsonObject(error);
         const containsInvalidJson = result.message.toString().includes("Invalid Json");
-        assert.equal(containsInvalidJson, true);
+        expect(containsInvalidJson).to.equal(true);
     });
 });
 

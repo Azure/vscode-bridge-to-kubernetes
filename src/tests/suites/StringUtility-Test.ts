@@ -3,71 +3,71 @@
 // ----------------------------------------------------------------------------
 'use strict';
 
-import * as assert from 'assert';
-
+import { expect } from 'chai';
+import { describe, it } from 'mocha';
 import { StringUtility } from '../../utility/StringUtility';
 
-suite(`StringUtility Test`, () => {
-    test(`compareNoCase`, () => {
-        assert.strictEqual(StringUtility.compareNoCase(`hello`, `hello`), true);
-        assert.strictEqual(StringUtility.compareNoCase(`hello`, `hi`), false);
-        assert.strictEqual(StringUtility.compareNoCase(`hello`, undefined), false);
-        assert.strictEqual(StringUtility.compareNoCase(null, `hi`), false);
-        assert.strictEqual(StringUtility.compareNoCase(undefined, undefined), true);
-        assert.strictEqual(StringUtility.compareNoCase(null, null), true);
-        assert.strictEqual(StringUtility.compareNoCase(undefined, null), false);
-        assert.strictEqual(StringUtility.compareNoCase(`hello`, `HELLO`), true);
+describe(`StringUtility Tests`, () => {
+    it(`compareNoCase`, () => {
+        expect(StringUtility.compareNoCase(`hello`, `hello`)).to.equal(true);
+        expect(StringUtility.compareNoCase(`hello`, `hi`)).to.equal(false);
+        expect(StringUtility.compareNoCase(`hello`, undefined)).to.equal(false);
+        expect(StringUtility.compareNoCase(null, `hi`)).to.equal(false);
+        expect(StringUtility.compareNoCase(undefined, undefined)).to.equal(true);
+        expect(StringUtility.compareNoCase(null, null)).to.equal(true);
+        expect(StringUtility.compareNoCase(undefined, null)).to.equal(false);
+        expect(StringUtility.compareNoCase(`hello`, `HELLO`)).to.equal(true);
     });
 
-    test(`generateRoutingHeaderAsync`, async () => {
+    it(`generateRoutingHeaderAsync`, async () => {
         let routingHeader = await StringUtility.generateRoutingHeaderAsync(``);
-        assert.strictEqual(routingHeader.length, 13);
+        expect(routingHeader.length).to.equal(13);
 
         routingHeader = await StringUtility.generateRoutingHeaderAsync(``);
-        assert.strictEqual(routingHeader.length, 13);
+        expect(routingHeader.length).to.equal(13);
 
         routingHeader = await StringUtility.generateRoutingHeaderAsync(`   `);
-        assert.strictEqual(routingHeader.length, 13);
+        expect(routingHeader.length).to.equal(13);
 
         routingHeader = await StringUtility.generateRoutingHeaderAsync(undefined);
-        assert.strictEqual(routingHeader.length, 13);
+        expect(routingHeader.length).to.equal(13);
 
         routingHeader = await StringUtility.generateRoutingHeaderAsync(`Glück`);
-        assert.strictEqual(routingHeader.length, 13);
+        expect(routingHeader.length).to.equal(13);
 
         routingHeader = await StringUtility.generateRoutingHeaderAsync(`Gléck`);
-        assert.strictEqual(routingHeader.length, 13);
+        expect(routingHeader.length).to.equal(13);
 
         routingHeader = await StringUtility.generateRoutingHeaderAsync(`こんにちわ`);
-        assert.strictEqual(routingHeader.length, 13);
+        expect(routingHeader.length).to.equal(13);
 
         routingHeader = await StringUtility.generateRoutingHeaderAsync(`alias@alias.al`);
-        assert.strictEqual(routingHeader.length, 13);
+        expect(routingHeader.length).to.equal(13);
 
         routingHeader = await StringUtility.generateRoutingHeaderAsync(`alias%alias`);
-        assert.strictEqual(routingHeader.length, 13);
+        expect(routingHeader.length).to.equal(13);
 
         routingHeader = await StringUtility.generateRoutingHeaderAsync(`myverylongusername`);
-        assert.strictEqual(routingHeader.length, 13);
-        assert.strictEqual(routingHeader.startsWith(`myverylo-`), true);
+        expect(routingHeader.length).to.equal(13);
+        expect(routingHeader.startsWith(`myverylo-`)).to.equal(true);
 
         routingHeader = await StringUtility.generateRoutingHeaderAsync(`alias`);
-        assert.strictEqual(routingHeader.length, 10);
-        assert.strictEqual(routingHeader.startsWith(`alias-`), true);
+        expect(routingHeader.length).to.equal(10);
+        expect(routingHeader.startsWith(`alias-`)).to.equal(true);
 
         const routingHeader2 = await StringUtility.generateRoutingHeaderAsync(`alias`);
-        assert.notStrictEqual(routingHeader, routingHeader2);
+        expect(routingHeader2).not.to.equal(routingHeader);
 
         routingHeader = await StringUtility.generateRoutingHeaderAsync(` alias `);
-        assert.strictEqual(routingHeader.length, 10);
-        assert.strictEqual(routingHeader.startsWith(`alias-`), true);
+        expect(routingHeader.length).to.equal(10);
+        expect(routingHeader.startsWith(`alias-`)).to.equal(true);
 
         routingHeader = await StringUtility.generateRoutingHeaderAsync(`ALIAS`);
-        assert.strictEqual(routingHeader.length, 10);
-        assert.strictEqual(routingHeader.startsWith(`alias-`), true);
+        expect(routingHeader.length).to.equal(10);
+        expect(routingHeader.startsWith(`alias-`)).to.equal(true);
 
         routingHeader = await StringUtility.generateRoutingHeaderAsync(`My Username`);
-        assert.strictEqual(routingHeader.length, 13);
-        assert.strictEqual(routingHeader.startsWith(`myuserna-`), true);
+        expect(routingHeader.length).to.equal(13);
+        expect(routingHeader.startsWith(`myuserna-`)).to.equal(true);
     });
 });

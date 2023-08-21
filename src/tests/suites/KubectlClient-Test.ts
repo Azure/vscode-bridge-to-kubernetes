@@ -8,20 +8,13 @@ import { beforeEach, describe, it } from 'mocha';
 import * as sinon from 'sinon';
 import { CommandRunner } from '../../clients/CommandRunner';
 import { KubectlClient } from '../../clients/KubectlClient';
-import { Logger } from '../../logger/Logger';
 import { IKubernetesIngress } from '../../models/IKubernetesIngress';
-import { AccountContextManager } from '../../models/context/AccountContextManager';
 import { IKubernetesService } from '../../models/IKubernetesService';
+import { accountContextManagerStub, loggerStub } from '../CommonTestObjects';
 
 describe(`KubectlClient Test`, () => {
-    let loggerStub, accountContextManagerStub;
     beforeEach(() => {
         sinon.restore();
-        loggerStub = sinon.createStubInstance(Logger);
-        loggerStub.log.returns(async () => { });
-        loggerStub.error.returns(async () => { });
-        loggerStub.trace.returns(async () => { });
-        accountContextManagerStub = sinon.createStubInstance(AccountContextManager);
     });
     it(`getIngressesAsync when the kubectl command returns a set of various ingresses`, async () => {
         const returnString = `{
@@ -134,7 +127,7 @@ describe(`KubectlClient Test`, () => {
             ]
         }`;
         const commandRunnerStub = sinon.createStubInstance(CommandRunner);
-        commandRunnerStub.runAsync.returns(returnString);
+        commandRunnerStub.runAsync.resolves(returnString);
         const kubectlClient = new KubectlClient(`my/path/kubectl.exe`, commandRunnerStub, accountContextManagerStub, loggerStub);
         let ingresses: IKubernetesIngress[];
         ingresses = await kubectlClient.getIngressesAsync(`dev`, `c:/users/alias/.kube/config`, true);
@@ -153,7 +146,7 @@ describe(`KubectlClient Test`, () => {
     it(`getIngressesAsync when the kubectl command returns no ingresses`, async () => {
         const returnString = `{ "items": [] }`;
         const commandRunnerStub = sinon.createStubInstance(CommandRunner);
-        commandRunnerStub.runAsync.returns(returnString);
+        commandRunnerStub.runAsync.resolves(returnString);
         const kubectlClient = new KubectlClient(`my/path/kubectl.exe`, commandRunnerStub, accountContextManagerStub, loggerStub);
         const ingresses: IKubernetesIngress[] = await kubectlClient.getIngressesAsync(`dev`, `c:/users/alias/.kube/config`, true);
 
@@ -217,7 +210,7 @@ describe(`KubectlClient Test`, () => {
                         ]
                     }`;
         const commandRunnerStub = sinon.createStubInstance(CommandRunner);
-        commandRunnerStub.runAsync.returns(returnString);
+        commandRunnerStub.runAsync.resolves(returnString);
         const kubectlClient = new KubectlClient(`my/path/kubectl.exe`, commandRunnerStub, accountContextManagerStub, loggerStub);
         const services: IKubernetesService[] = await kubectlClient.getServicesAsync();
 
@@ -235,7 +228,7 @@ describe(`KubectlClient Test`, () => {
     it(`getServicesAsync when the kubectl command returns no services`, async () => {
         const returnString = `{ "items": [] }`;
         const commandRunnerStub = sinon.createStubInstance(CommandRunner);
-        commandRunnerStub.runAsync.returns(returnString);
+        commandRunnerStub.runAsync.resolves(returnString);
         const kubectlClient = new KubectlClient(`my/path/kubectl.exe`, commandRunnerStub, accountContextManagerStub, loggerStub);
         const services: IKubernetesService[] = await kubectlClient.getServicesAsync();
 
@@ -245,7 +238,7 @@ describe(`KubectlClient Test`, () => {
     it(`getNamespacesAsync when the kubectl command returns a set of various namespaces`, async () => {
         const returnString = `default kube-node-lease voting-app`;
         const commandRunnerStub = sinon.createStubInstance(CommandRunner);
-        commandRunnerStub.runAsync.returns(returnString);
+        commandRunnerStub.runAsync.resolves(returnString);
         const kubectlClient = new KubectlClient(`my/path/kubectl.exe`, commandRunnerStub, accountContextManagerStub, loggerStub);
         const namespaces: string[] = await kubectlClient.getNamespacesAsync(`c:/users/alias/.kube/config`);
 
@@ -301,7 +294,7 @@ describe(`KubectlClient Test`, () => {
             ]
         }`;
         const commandRunnerStub = sinon.createStubInstance(CommandRunner);
-        commandRunnerStub.runAsync.returns(returnString);
+        commandRunnerStub.runAsync.resolves(returnString);
         const kubectlClient = new KubectlClient(`my/path/kubectl.exe`, commandRunnerStub, accountContextManagerStub, loggerStub);
         const services: IKubernetesService[] = await kubectlClient.getServicesAsync();
 

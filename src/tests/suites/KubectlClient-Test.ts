@@ -3,19 +3,21 @@
 // ----------------------------------------------------------------------------
 'use strict';
 
-import * as assert from 'assert';
-import { It, Mock } from 'typemoq';
-
+import { expect } from 'chai';
+import { beforeEach, describe, it } from 'mocha';
+import * as sinon from 'sinon';
 import { CommandRunner } from '../../clients/CommandRunner';
 import { KubectlClient } from '../../clients/KubectlClient';
 import { IKubernetesIngress } from '../../models/IKubernetesIngress';
 import { IKubernetesService } from '../../models/IKubernetesService';
-import { accountContextManagerMock, loggerMock } from '../CommonTestObjects';
+import { accountContextManagerStub, loggerStub } from '../CommonTestObjects';
 
-suite(`KubectlClient Test`, () => {
-    test(`getIngressesAsync when the kubectl command returns a set of various ingresses`, async () => {
-        const commandRunnerMock = Mock.ofType<CommandRunner>();
-        commandRunnerMock.setup(x => x.runAsync(It.isAnyString(), It.isAny(), It.isAny(), It.isAny(), It.isAny(), It.isAny())).returns(async () => `{
+describe(`KubectlClient Test`, () => {
+    beforeEach(() => {
+        sinon.restore();
+    });
+    it(`getIngressesAsync when the kubectl command returns a set of various ingresses`, async () => {
+        const returnString = `{
             "apiVersion": "v1",
             "items": [
                 {
@@ -123,106 +125,130 @@ suite(`KubectlClient Test`, () => {
                     }
                 }
             ]
-        }`);
-        const kubectlClient = new KubectlClient(`my/path/kubectl.exe`, commandRunnerMock.object, accountContextManagerMock.object, loggerMock.object);
-        const ingresses: IKubernetesIngress[] = await kubectlClient.getIngressesAsync(`dev`, `c:/users/alias/.kube/config`, true);
+        }`;
+        const commandRunnerStub = sinon.createStubInstance(CommandRunner);
+        commandRunnerStub.runAsync.resolves(returnString);
+        const kubectlClient = new KubectlClient(`my/path/kubectl.exe`, commandRunnerStub, accountContextManagerStub, loggerStub);
+        let ingresses: IKubernetesIngress[];
+        ingresses = await kubectlClient.getIngressesAsync(`dev`, `c:/users/alias/.kube/config`, true);
 
-        assert.strictEqual(ingresses.length, 2);
-        assert.strictEqual(ingresses[0].name, `bikesharingweb`);
-        assert.strictEqual(ingresses[0].namespace, `dev`);
-        assert.strictEqual(ingresses[0].host, `dev.bikesharingweb.j7l6v4gz8d.eus.mindaro.io`);
-        assert.strictEqual(ingresses[0].protocol, `http`);
-        assert.strictEqual(ingresses[1].name, `gateway`);
-        assert.strictEqual(ingresses[1].namespace, `dev`);
-        assert.strictEqual(ingresses[1].host, `dev.gateway.j7l6v4gz8d.eus.mindaro.io`);
-        assert.strictEqual(ingresses[1].protocol, `http`);
+        expect(ingresses.length).to.equal(2);
+        expect(ingresses[0].name).to.equal(`bikesharingweb`);
+        expect(ingresses[0].namespace).to.equal(`dev`);
+        expect(ingresses[0].host).to.equal(`dev.bikesharingweb.j7l6v4gz8d.eus.mindaro.io`);
+        expect(ingresses[0].protocol).to.equal(`http`);
+        expect(ingresses[1].name).to.equal(`gateway`);
+        expect(ingresses[1].namespace).to.equal(`dev`);
+        expect(ingresses[1].host).to.equal(`dev.gateway.j7l6v4gz8d.eus.mindaro.io`);
+        expect(ingresses[1].protocol).to.equal(`http`);
     });
 
-    test(`getIngressesAsync when the kubectl command returns no ingresses`, async () => {
-        const commandRunnerMock = Mock.ofType<CommandRunner>();
-        commandRunnerMock.setup(x => x.runAsync(It.isAnyString(), It.isAny(), It.isAny(), It.isAny(), It.isAny(), It.isAny())).returns(async () => `{
-            "items": []
-        }`);
-        const kubectlClient = new KubectlClient(`my/path/kubectl.exe`, commandRunnerMock.object, accountContextManagerMock.object, loggerMock.object);
+    it(`getIngressesAsync when the kubectl command returns no ingresses`, async () => {
+        const returnString = `{ "items": [] }`;
+        const commandRunnerStub = sinon.createStubInstance(CommandRunner);
+        commandRunnerStub.runAsync.resolves(returnString);
+        const kubectlClient = new KubectlClient(`my/path/kubectl.exe`, commandRunnerStub, accountContextManagerStub, loggerStub);
         const ingresses: IKubernetesIngress[] = await kubectlClient.getIngressesAsync(`dev`, `c:/users/alias/.kube/config`, true);
 
-        assert.strictEqual(ingresses.length, 0);
+        expect(ingresses.length).to.equal(0);
     });
 
-    test(`getServicesAsync when the kubectl command returns a set of various services`, async () => {
-        const commandRunnerMock = Mock.ofType<CommandRunner>();
-        commandRunnerMock.setup(x => x.runAsync(It.isAnyString(), It.isAny(), It.isAny(), It.isAny(), It.isAny(), It.isAny())).returns(async () => `{
-            "items": [
-                {
-                    "metadata": {
-                        "name": "bikes",
-                        "namespace": "dev"
-                    },
-                    "spec": {
-                        "selector": {
-                            "app": "bikes",
-                            "release": "bikesharing"
-                        }
-                    }
-                },
-                {
-                    "metadata": {
-                        "name": "routingmanager-service",
-                        "namespace": "dev"
-                    },
-                    "spec": {
-                        "selector": {
-                            "app": "routingmanager-service",
-                            "release": "routingmanager"
-                        }
-                    }
-                },
-                {
-                    "metadata": {
-                        "name": "bikesharingweb",
-                        "namespace": "dev"
-                    },
-                    "spec": {
-                        "selector": {
-                            "app": "bikesharingweb",
-                            "release": "bikesharing"
-                        }
-                    }
-                },
-                {
-                    "metadata": {
-                        "labels": {
-                            "routing.visualstudio.io/generated": "true"
-                        },
-                        "name": "bikesharingwebclone",
-                        "namespace": "dev"
-                    },
-                    "spec": {
-                        "selector": {
-                            "app": "bikesharingwebclone",
-                            "release": "bikesharing"
-                        }
-                    }
-                }
-            ]
-        }`);
-        const kubectlClient = new KubectlClient(`my/path/kubectl.exe`, commandRunnerMock.object, accountContextManagerMock.object, loggerMock.object);
+    it(`getServicesAsync when the kubectl command returns a set of various services`, async () => {
+        const returnString = `{
+                        "items": [
+                            {
+                                "metadata": {
+                                    "name": "bikes",
+                                    "namespace": "dev"
+                                },
+                                "spec": {
+                                    "selector": {
+                                        "app": "bikes",
+                                        "release": "bikesharing"
+                                    }
+                                }
+                            },
+                            {
+                                "metadata": {
+                                    "name": "routingmanager-service",
+                                    "namespace": "dev"
+                                },
+                                "spec": {
+                                    "selector": {
+                                        "app": "routingmanager-service",
+                                        "release": "routingmanager"
+                                    }
+                                }
+                            },
+                            {
+                                "metadata": {
+                                    "name": "bikesharingweb",
+                                    "namespace": "dev"
+                                },
+                                "spec": {
+                                    "selector": {
+                                        "app": "bikesharingweb",
+                                        "release": "bikesharing"
+                                    }
+                                }
+                            },
+                            {
+                                "metadata": {
+                                    "labels": {
+                                        "routing.visualstudio.io/generated": "true"
+                                    },
+                                    "name": "bikesharingwebclone",
+                                    "namespace": "dev"
+                                },
+                                "spec": {
+                                    "selector": {
+                                        "app": "bikesharingwebclone",
+                                        "release": "bikesharing"
+                                    }
+                                }
+                            }
+                        ]
+                    }`;
+        const commandRunnerStub = sinon.createStubInstance(CommandRunner);
+        commandRunnerStub.runAsync.resolves(returnString);
+        const kubectlClient = new KubectlClient(`my/path/kubectl.exe`, commandRunnerStub, accountContextManagerStub, loggerStub);
         const services: IKubernetesService[] = await kubectlClient.getServicesAsync();
 
-        assert.strictEqual(services.length, 2);
-        assert.strictEqual(services[0].name, `bikes`);
-        assert.strictEqual(services[0].namespace, `dev`);
-        assert.strictEqual(services[0].selector[`app`], `bikes`);
-        assert.strictEqual(services[0].selector[`release`], `bikesharing`);
-        assert.strictEqual(services[1].name, `bikesharingweb`);
-        assert.strictEqual(services[1].namespace, `dev`);
-        assert.strictEqual(services[1].selector[`app`], `bikesharingweb`);
-        assert.strictEqual(services[1].selector[`release`], `bikesharing`);
+        expect(services.length).to.equal(2);
+        expect(services[0].name).to.equal(`bikes`);
+        expect(services[0].namespace).to.equal(`dev`);
+        expect(services[0].selector[`app`]).to.equal(`bikes`);
+        expect(services[0].selector[`release`]).to.equal(`bikesharing`);
+        expect(services[1].name).to.equal(`bikesharingweb`);
+        expect(services[1].namespace).to.equal(`dev`);
+        expect(services[1].selector[`app`]).to.equal(`bikesharingweb`);
+        expect(services[1].selector[`release`]).to.equal(`bikesharing`);
     });
 
-    test(`getServicesAsync when the kubectl command returns services in system namespaces`, async () => {
-        const commandRunnerMock = Mock.ofType<CommandRunner>();
-        commandRunnerMock.setup(x => x.runAsync(It.isAnyString(), It.isAny(), It.isAny(), It.isAny(), It.isAny(), It.isAny())).returns(async () => `{
+    it(`getServicesAsync when the kubectl command returns no services`, async () => {
+        const returnString = `{ "items": [] }`;
+        const commandRunnerStub = sinon.createStubInstance(CommandRunner);
+        commandRunnerStub.runAsync.resolves(returnString);
+        const kubectlClient = new KubectlClient(`my/path/kubectl.exe`, commandRunnerStub, accountContextManagerStub, loggerStub);
+        const services: IKubernetesService[] = await kubectlClient.getServicesAsync();
+
+        expect(services.length).to.equal(0);
+    });
+
+    it(`getNamespacesAsync when the kubectl command returns a set of various namespaces`, async () => {
+        const returnString = `default kube-node-lease voting-app`;
+        const commandRunnerStub = sinon.createStubInstance(CommandRunner);
+        commandRunnerStub.runAsync.resolves(returnString);
+        const kubectlClient = new KubectlClient(`my/path/kubectl.exe`, commandRunnerStub, accountContextManagerStub, loggerStub);
+        const namespaces: string[] = await kubectlClient.getNamespacesAsync(`c:/users/alias/.kube/config`);
+
+        expect(namespaces.length).to.equal(3);
+        expect(namespaces[0]).to.equal(`default`);
+        expect(namespaces[1]).to.equal(`kube-node-lease`);
+        expect(namespaces[2]).to.equal(`voting-app`);
+    });
+    it(`getServicesAsync when the kubectl command returns services in system namespaces`, async () => {
+        const returnString = `{
             "items": [
                 {
                     "metadata": {
@@ -266,38 +292,17 @@ suite(`KubectlClient Test`, () => {
                     }
                 }
             ]
-        }`);
-        const kubectlClient = new KubectlClient(`my/path/kubectl.exe`, commandRunnerMock.object, accountContextManagerMock.object, loggerMock.object);
+        }`;
+        const commandRunnerStub = sinon.createStubInstance(CommandRunner);
+        commandRunnerStub.runAsync.resolves(returnString);
+        const kubectlClient = new KubectlClient(`my/path/kubectl.exe`, commandRunnerStub, accountContextManagerStub, loggerStub);
         const services: IKubernetesService[] = await kubectlClient.getServicesAsync();
 
         // Validate that the services in system namespaces have been filtered out properly.
-        assert.strictEqual(services.length, 1);
-        assert.strictEqual(services[0].name, `bikes`);
-        assert.strictEqual(services[0].namespace, `dev`);
-        assert.strictEqual(services[0].selector[`app`], `bikes`);
-        assert.strictEqual(services[0].selector[`release`], `bikesharing`);
-    });
-
-    test(`getServicesAsync when the kubectl command returns no services`, async () => {
-        const commandRunnerMock = Mock.ofType<CommandRunner>();
-        commandRunnerMock.setup(x => x.runAsync(It.isAnyString(), It.isAny(), It.isAny(), It.isAny(), It.isAny(), It.isAny())).returns(async () => `{
-            "items": []
-        }`);
-        const kubectlClient = new KubectlClient(`my/path/kubectl.exe`, commandRunnerMock.object, accountContextManagerMock.object, loggerMock.object);
-        const services: IKubernetesService[] = await kubectlClient.getServicesAsync();
-
-        assert.strictEqual(services.length, 0);
-    });
-
-    test(`getNamespacesAsync when the kubectl command returns a set of various namespacess`, async () => {
-        const commandRunnerMock = Mock.ofType<CommandRunner>();
-        commandRunnerMock.setup(x => x.runAsync(It.isAnyString(), It.isAny(), It.isAny(), It.isAny(), It.isAny(), It.isAny())).returns(async () => `default kube-node-lease voting-app`);
-        const kubectlClient = new KubectlClient(`my/path/kubectl.exe`, commandRunnerMock.object, accountContextManagerMock.object, loggerMock.object);
-        const namespaces: string[] = await kubectlClient.getNamespacesAsync(`c:/users/alias/.kube/config`);
-
-        assert.strictEqual(namespaces.length, 3);
-        assert.strictEqual(namespaces[0], `default`);
-        assert.strictEqual(namespaces[1], `kube-node-lease`);
-        assert.strictEqual(namespaces[2], `voting-app`);
+        expect(services.length).to.equal(1);
+        expect(services[0].name).to.equal(`bikes`);
+        expect(services[0].namespace).to.equal(`dev`);
+        expect(services[0].selector[`app`]).to.equal(`bikes`);
+        expect(services[0].selector[`release`]).to.equal(`bikesharing`);
     });
 });

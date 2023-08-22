@@ -6,7 +6,6 @@
 import { Fault, FaultType, Telemetry } from 'telaug';
 import * as vscode from 'vscode';
 
-import { Constants } from '../Constants';
 import { EnvironmentUtility } from '../utility/EnvironmentUtility';
 import { FileLogWriter } from './FileLogWriter';
 import { LogLevel } from './LogLevel';

@@ -43,7 +43,7 @@ describe('Redact Test', () => {
         // Now lets test the Invalid Json Erro when incorrect json is fed into the funct.
         const result = redactJsonObject(error);
         const containsInvalidJson = result.message.toString().includes("Invalid Json");
-        expect(containsInvalidJson).to.equal(true);
+        expect(containsInvalidJson).to.be.true;
     });
 });
 

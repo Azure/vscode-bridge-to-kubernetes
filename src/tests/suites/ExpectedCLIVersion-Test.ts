@@ -20,7 +20,7 @@ describe(`Expected CLI Tests`, () => {
       }
     }`);
     const expectedCLIVersion: string = await versionUtility.VersionUtility.getExpectedCliVersionAsync(packageJsonContent);
-    expect(expectedCLIVersion).to.equal(null);
+    expect(expectedCLIVersion).to.be.null;
   });
   it('should return BRIDGE_CLI_VERSION as expectedCLIVersion when BRIDGE_CLI_VERSION is set', async () => {
     let env = process.env;

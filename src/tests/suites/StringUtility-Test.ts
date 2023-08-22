@@ -9,14 +9,14 @@ import { StringUtility } from '../../utility/StringUtility';
 
 describe(`StringUtility Tests`, () => {
     it(`compareNoCase`, () => {
-        expect(StringUtility.compareNoCase(`hello`, `hello`)).to.equal(true);
-        expect(StringUtility.compareNoCase(`hello`, `hi`)).to.equal(false);
-        expect(StringUtility.compareNoCase(`hello`, undefined)).to.equal(false);
-        expect(StringUtility.compareNoCase(null, `hi`)).to.equal(false);
-        expect(StringUtility.compareNoCase(undefined, undefined)).to.equal(true);
-        expect(StringUtility.compareNoCase(null, null)).to.equal(true);
-        expect(StringUtility.compareNoCase(undefined, null)).to.equal(false);
-        expect(StringUtility.compareNoCase(`hello`, `HELLO`)).to.equal(true);
+        expect(StringUtility.compareNoCase(`hello`, `hello`)).to.be.true;
+        expect(StringUtility.compareNoCase(`hello`, `hi`)).to.be.false;
+        expect(StringUtility.compareNoCase(`hello`, undefined)).to.be.false;
+        expect(StringUtility.compareNoCase(null, `hi`)).to.be.false;
+        expect(StringUtility.compareNoCase(undefined, undefined)).to.be.true;
+        expect(StringUtility.compareNoCase(null, null)).to.be.true;
+        expect(StringUtility.compareNoCase(undefined, null)).to.be.false;
+        expect(StringUtility.compareNoCase(`hello`, `HELLO`)).to.be.true;
     });
 
     it(`generateRoutingHeaderAsync`, async () => {
@@ -49,25 +49,25 @@ describe(`StringUtility Tests`, () => {
 
         routingHeader = await StringUtility.generateRoutingHeaderAsync(`myverylongusername`);
         expect(routingHeader.length).to.equal(13);
-        expect(routingHeader.startsWith(`myverylo-`)).to.equal(true);
+        expect(routingHeader.startsWith(`myverylo-`)).to.be.true;
 
         routingHeader = await StringUtility.generateRoutingHeaderAsync(`alias`);
         expect(routingHeader.length).to.equal(10);
-        expect(routingHeader.startsWith(`alias-`)).to.equal(true);
+        expect(routingHeader.startsWith(`alias-`)).to.be.true;
 
         const routingHeader2 = await StringUtility.generateRoutingHeaderAsync(`alias`);
         expect(routingHeader2).not.to.equal(routingHeader);
 
         routingHeader = await StringUtility.generateRoutingHeaderAsync(` alias `);
         expect(routingHeader.length).to.equal(10);
-        expect(routingHeader.startsWith(`alias-`)).to.equal(true);
+        expect(routingHeader.startsWith(`alias-`)).to.be.true;
 
         routingHeader = await StringUtility.generateRoutingHeaderAsync(`ALIAS`);
         expect(routingHeader.length).to.equal(10);
-        expect(routingHeader.startsWith(`alias-`)).to.equal(true);
+        expect(routingHeader.startsWith(`alias-`)).to.be.true;
 
         routingHeader = await StringUtility.generateRoutingHeaderAsync(`My Username`);
         expect(routingHeader.length).to.equal(13);
-        expect(routingHeader.startsWith(`myuserna-`)).to.equal(true);
+        expect(routingHeader.startsWith(`myuserna-`)).to.be.true;
     });
 });

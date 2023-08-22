@@ -44,7 +44,7 @@ describe('dotNetClientProviderTest', () => {
         Object.defineProperty(process, 'platform', {
             value: 'msdos'
         });
-        const expectedCLIVersion = '7.0.7';
+        const expectedCLIVersion = '1.0.20220816.2';
         const binariesVersionClient: BinariesVersionClient = new BinariesVersionClient(expectedCLIVersion, null);
         const dotnetClientProvider: IClientProvider = new DotNetClientProvider(binariesVersionClient, new CommandRunner(null), loggerStub);
         try {
@@ -56,17 +56,18 @@ describe('dotNetClientProviderTest', () => {
     });
 
     it('should return the download directory name as dotnet', async () => {
-        const expectedCLIVersion = '7.0.7';
+        const expectedCLIVersion = '1.0.20220816.2';
         const binariesVersionClient: BinariesVersionClient = new BinariesVersionClient(expectedCLIVersion, null);
         const dotnetClientProvider: IClientProvider = new DotNetClientProvider(binariesVersionClient, new CommandRunner(null), loggerStub);
         expect(dotnetClientProvider.getDownloadDirectoryName()).to.equal('dotnet');
     });
 
     it('should return expected version', async () => {
-        const expectedCLIVersion = '7.0.7';
+        const expectedCLIVersion = '1.0.20220816.2';
+        const expecteddotnetVersion = '7.0.7';
         const binariesVersionClient: BinariesVersionClient = new BinariesVersionClient(expectedCLIVersion, null);
         const dotnetClientProvider: IClientProvider = new DotNetClientProvider(binariesVersionClient, new CommandRunner(null), loggerStub);
-        expect(dotnetClientProvider.getExpectedVersion()).to.equal(expectedCLIVersion);
+        expect(dotnetClientProvider.getExpectedVersion()).to.equal(expecteddotnetVersion);
     });
 
     after(() => {

@@ -101,6 +101,26 @@ export class KubectlClient implements IClient {
         }
     }
 
+    public async getContainersList(podName: string): Promise<string[]> {
+        const kubeconfigPath: string = await this._accountContextManager.getKubeconfigPathAsync();
+        const args: string[] = [`get`,`pod`, podName, `-o`, `jsonpath="{.spec['containers','initContainers'][*].name}"`];
+        const kubectlOutput: string = await this.runKubectlCommandAsync(args, kubeconfigPath);
+        const containersList:string[] = kubectlOutput.split(' ');
+        return containersList;
+    }
+
+    public async getPodName(serviceName: string): Promise<string> {
+        const kubeconfigPath: string = await this._accountContextManager.getKubeconfigPathAsync();
+        const args: string[] = [`get`,`ep`, serviceName, `-o`, `jsonpath='{.subsets[*].addresses[*].ip}'`];
+        const output = await this.runKubectlCommandAsync(args, kubeconfigPath);
+        const args2: string[] = [`get`,`pods`];
+        const fieldSelector = '--field-selector=status.podIP='.concat(output.split("'")[1]);
+        args2.push(fieldSelector);
+        args2.push("-o=name");
+        const finalOutput = await this.runKubectlCommandAsync(args2, kubeconfigPath);
+        return finalOutput.split("/")[1].split("\n")[0];
+    }
+
     public async getServicesAsync(namespace: string = null): Promise<IKubernetesService[]> {
         const kubeconfigPath: string = await this._accountContextManager.getKubeconfigPathAsync();
         const args: string[] = [ `get`, `services`, `-o`, `json` ];

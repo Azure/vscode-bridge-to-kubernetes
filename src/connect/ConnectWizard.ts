@@ -172,7 +172,7 @@ export class ConnectWizard {
         input: MultiStepInput,
         currentContext: IKubeconfigEnrichedContext,
         resourceType: ResourceType
-    ): Promise<(input: MultiStepInput) => Promise<(input: MultiStepInput) => Promise<(input: MultiStepInput) => Promise<void>>>> {
+    ) {
         const kubectlClient = await this._binariesUtility.tryGetKubectlAsync();
         if (kubectlClient == null) {
             return null;
@@ -202,8 +202,31 @@ export class ConnectWizard {
             activeItem: serviceChoices[0]
         });
         this._result.resourceName = pick.label;
+        // get the list of containers
+        const podName = await kubectlClient.getPodName(this._result.resourceName);
+        const containersList: string[] = await kubectlClient.getContainersList(podName);
+        if (containersList.length > 1) {
+            // show containers quick pick list
+            const containerChoices: vscode.QuickPickItem[] = containersList.map(containers => ({ label: containers }));
+            return (input: MultiStepInput) => this.inputContainersAsync(input, containerChoices, resourceType);
+        } else {
+            return (input: MultiStepInput) => this.inputPortsAsync(input, resourceType);
+        }
 
-        return (input: MultiStepInput): Promise<(input: MultiStepInput) => Promise<(input: MultiStepInput) => Promise<void>>> => this.inputPortsAsync(input, resourceType);
+        
+    }
+
+    private async inputContainersAsync(input: MultiStepInput, containerChoices: vscode.QuickPickItem[], resourceType: ResourceType) {
+        const pick = await input.showQuickPickAsync({
+            title: this.getInputTitle(),
+            step: 1,
+            totalSteps: this.NumberOfSteps,
+            placeholder: `Choose a container to redirect to your machine`,
+            items: containerChoices.sort((s1, s2) => s1.label < s2.label ? -1 : 1),
+            activeItem: containerChoices[0]
+        });
+        this._result.containerName = pick.label;
+        return (input: MultiStepInput) => this.inputPortsAsync(input, resourceType);
     }
 
     private async inputPortsAsync(input: MultiStepInput, resourceType: ResourceType): Promise<(input: MultiStepInput) => Promise<(input: MultiStepInput) => Promise<void>>> {

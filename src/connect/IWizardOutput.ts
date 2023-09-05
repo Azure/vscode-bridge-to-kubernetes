@@ -13,4 +13,5 @@ export interface IWizardOutput {
     isolateAs: string;
     targetCluster: string;
     targetNamespace: string;
+    containerName?: string;
 }

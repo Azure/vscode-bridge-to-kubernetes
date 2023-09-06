@@ -211,9 +211,7 @@ export class ConnectWizard {
             return (input: MultiStepInput) => this.inputContainersAsync(input, containerChoices, resourceType);
         } else {
             return (input: MultiStepInput) => this.inputPortsAsync(input, resourceType);
-        }
-
-        
+        } 
     }
 
     private async inputContainersAsync(input: MultiStepInput, containerChoices: vscode.QuickPickItem[], resourceType: ResourceType) {

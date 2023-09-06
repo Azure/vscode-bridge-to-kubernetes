@@ -102,11 +102,12 @@ export class KubectlClient implements IClient {
     }
 
     public async getContainersList(podName: string): Promise<string[]> {
+        const knownSideCars: string[] = ['linkerd-proxy', 'linkerd-init', 'istio-proxy','darpd','jaeger-agent', 'nginx-proxy'];
         const kubeconfigPath: string = await this._accountContextManager.getKubeconfigPathAsync();
         const args: string[] = [`get`,`pod`, podName, `-o`, `jsonpath="{.spec['containers','initContainers'][*].name}"`];
         const kubectlOutput: string = await this.runKubectlCommandAsync(args, kubeconfigPath);
-        const containersList:string[] = kubectlOutput.split(' ');
-        return containersList;
+        const containersList:string[]  = kubectlOutput.replace('"', '').replace('"','').split(' ');
+        return containersList.filter(s => !knownSideCars.find(knownSideCar => knownSideCar == s));
     }
 
     public async getPodName(serviceName: string): Promise<string> {

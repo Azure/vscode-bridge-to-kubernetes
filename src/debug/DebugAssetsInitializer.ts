@@ -109,7 +109,8 @@ export class DebugAssetsInitializer {
         launchConfigurationName: string,
         isolateAs: string,
         targetCluster: string,
-        targetNamespace: string): Promise</*connectDebugConfigurationName*/ string> {
+        targetNamespace: string,
+        containerName: string): Promise</*connectDebugConfigurationName*/ string> {
         const launchConfig: vscode.WorkspaceConfiguration = vscode.workspace.getConfiguration(`launch`, this._workspaceFolder.uri);
         let debugConfigurations: object[] = launchConfig.get<{}[]>(`configurations`, /*defaultValue*/ []);
         const tasksConfig: vscode.WorkspaceConfiguration = vscode.workspace.getConfiguration(`tasks`, this._workspaceFolder.uri);
@@ -144,6 +145,10 @@ export class DebugAssetsInitializer {
 
         if (isolateAs != null) {
             connectPreLaunchTask[`isolateAs`] = isolateAs;
+        }
+
+        if (containerName != null) {
+            connectPreLaunchTask[`targetContainer`] = containerName;
         }
 
         tasks = tasks.concat(connectPreLaunchTask);

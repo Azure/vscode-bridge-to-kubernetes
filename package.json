@@ -97,6 +97,9 @@
                     "targetNamespace": {
                         "type": "string"
                     },
+                    "targetContainer": {
+                        "type": "string"
+                    },
                     "useKubernetesServiceEnvironmentVariables": {
                         "type": "boolean"
                     }
@@ -122,6 +125,9 @@
                         "type": "string"
                     },
                     "targetNamespace": {
+                        "type": "string"
+                    },
+                    "targetContainer": {
                         "type": "string"
                     },
                     "useKubernetesServiceEnvironmentVariables": {

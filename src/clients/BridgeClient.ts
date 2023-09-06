@@ -192,6 +192,7 @@ export class BridgeClient implements IClient {
         parentProcessId: string,
         elevationRequests: IElevationRequest[],
         isolateAs: string,
+        containerName: string,
         currentNamespace: string,
         useKubernetesServiceEnvironmentVariables: boolean,
         experimentationService: IExperimentationService): Promise<void> {
@@ -215,7 +216,7 @@ export class BridgeClient implements IClient {
                 `--script`, scriptFilePath,
                 `--control-port`, controlPort.toString(),
                 `--ppid`, parentProcessId,
-                `--namespace`, currentNamespace
+                `--namespace`, currentNamespace,
             ];
 
             if (elevationRequests != null) {
@@ -228,6 +229,10 @@ export class BridgeClient implements IClient {
 
             if (useKubernetesServiceEnvironmentVariables) {
                 args.push(`--use-kubernetes-service-environment-variables`);
+            }
+
+            if (containerName != null) {
+                args.push(`--container`, containerName);
             }
 
             const routingManagerFeatureFlags = this.getRoutingManagerFeatureFlags(experimentationService);

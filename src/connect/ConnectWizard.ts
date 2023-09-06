@@ -102,7 +102,7 @@ export class ConnectWizard {
                 // Validate the current context against the selected resource
                 if (targetResourceNamespace != null && currentContext.namespace != null && currentContext.namespace !== targetResourceNamespace) {
                     throw new Error(`The ${targetResourceType} '${targetResourceName}' belongs to the namespace '${targetResourceNamespace}', `
-                                    + `but the current context targets namespace '${currentContext.namespace}'. Please update your kubeconfig to target the correct context.`);
+                        + `but the current context targets namespace '${currentContext.namespace}'. Please update your kubeconfig to target the correct context.`);
                 }
 
                 let namespaces: string[] = null;
@@ -147,6 +147,7 @@ export class ConnectWizard {
                 isolateAs: this._result.isolateAs,
                 targetCluster: this._result.targetCluster,
                 targetNamespace: this._result.targetNamespace,
+                containerName: this._result.containerName,
                 isCreatingNewLaunchConfiguration: this._isCreatingNewLaunchConfiguration
             });
             vscode.window.showErrorMessage(`Failed to configure ${Constants.ProductName}: ${error.message}`);
@@ -163,6 +164,7 @@ export class ConnectWizard {
             isIsolateAsSet: (this._result.isolateAs != null && this._result.isolateAs.length > 0).toString(),
             isTargetClusterSet: (this._result.targetCluster != null && this._result.targetCluster.length > 0).toString(),
             isTargetNamespaceSet: (this._result.targetNamespace != null && this._result.targetNamespace.length > 0).toString(),
+            isContainerNameSet: (this._result.containerName != null && this._result.containerName.length > 0).toString(),
             isCreatingNewLaunchConfiguration: this._isCreatingNewLaunchConfiguration
         });
         return this._isWizardComplete ? this._result as IWizardOutput : null;
@@ -205,13 +207,20 @@ export class ConnectWizard {
         // get the list of containers
         const podName = await kubectlClient.getPodName(this._result.resourceName);
         const containersList: string[] = await kubectlClient.getContainersList(podName);
-        if (containersList.length > 1) {
-            // show containers quick pick list
-            const containerChoices: vscode.QuickPickItem[] = containersList.map(containers => ({ label: containers }));
-            return (input: MultiStepInput) => this.inputContainersAsync(input, containerChoices, resourceType);
+        if (null != containersList) {
+            if (containersList.length > 1) {
+                // show containers quick pick list
+                const containerChoices: vscode.QuickPickItem[] = containersList.map(containers => ({ label: containers }));
+                return (input: MultiStepInput) => this.inputContainersAsync(input, containerChoices, resourceType);
+            } else {
+                // single container for the pod selected
+                this._result.containerName = containersList[0];
+                return (input: MultiStepInput) => this.inputPortsAsync(input, resourceType);
+            }
         } else {
             return (input: MultiStepInput) => this.inputPortsAsync(input, resourceType);
-        } 
+        }
+
     }
 
     private async inputContainersAsync(input: MultiStepInput, containerChoices: vscode.QuickPickItem[], resourceType: ResourceType) {
@@ -238,7 +247,7 @@ export class ConnectWizard {
         });
 
         // At this point, we know that the input is valid, as it passed the validateInput check.
-        this._result.ports = [ Number(value) ];
+        this._result.ports = [Number(value)];
 
         return (input: MultiStepInput): Promise<(input: MultiStepInput) => Promise<void>> => this.pickLaunchConfigurationAsync(input, resourceType);
     }
@@ -323,7 +332,7 @@ export class ConnectWizard {
             }
         };
 
-        const choices: vscode.QuickPickItem[] = [ noChoice, yesChoice, learnMoreChoice ];
+        const choices: vscode.QuickPickItem[] = [noChoice, yesChoice, learnMoreChoice];
 
         const pick = await input.showQuickPickAsync<IActionQuickPickItem, IQuickPickParameters<IActionQuickPickItem>>({
             title: this.getInputTitle(),
@@ -358,7 +367,7 @@ export class ConnectWizard {
 
     private getAvailableDebugConfigurations(): object[] {
         const launchConfig: vscode.WorkspaceConfiguration = vscode.workspace.getConfiguration(`launch`, this._workspaceFolder.uri);
-        const debugConfigurations: object[] = launchConfig.get<{}[]>(`configurations`, /*defaultValue*/ []);
+        const debugConfigurations: object[] = launchConfig.get<{}[]>(`configurations`, /*defaultValue*/[]);
         return debugConfigurations.filter(debugConfiguration =>
             !DebugAssetsInitializer.isConnectConfiguration(debugConfiguration[`type`])
             && !DebugAssetsInitializer.isTraditionalDevSpacesDebugConfiguration(debugConfiguration[`name`])

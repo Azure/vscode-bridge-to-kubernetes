@@ -6,7 +6,6 @@
 import * as dns from 'dns';
 
 import { ClientType } from '../clients/ClientType';
-import { Constants } from '../Constants';
 import { Logger } from '../logger/Logger';
 import { TelemetryEvent } from '../logger/TelemetryEvent';
 import { AccountContextManager } from '../models/context/AccountContextManager';
@@ -106,20 +105,34 @@ export class KubectlClient implements IClient {
         const kubeconfigPath: string = await this._accountContextManager.getKubeconfigPathAsync();
         const args: string[] = [`get`,`pod`, podName, `-o`, `jsonpath="{.spec['containers','initContainers'][*].name}"`];
         const kubectlOutput: string = await this.runKubectlCommandAsync(args, kubeconfigPath);
-        const containersList:string[]  = kubectlOutput.replace('"', '').replace('"','').split(' ');
-        return containersList.filter(s => !knownSideCars.find(knownSideCar => knownSideCar == s));
+        let containersList:string[];
+        if (kubectlOutput) {
+            containersList  = kubectlOutput.replace('"', '').replace('"','').split(' ');
+            return containersList.filter(s => !knownSideCars.find(knownSideCar => knownSideCar == s));
+        } else {
+            containersList = null;
+            return containersList;
+        }
     }
 
     public async getPodName(serviceName: string): Promise<string> {
         const kubeconfigPath: string = await this._accountContextManager.getKubeconfigPathAsync();
+        // find the pod ipaddress for the selected service
         const args: string[] = [`get`,`ep`, serviceName, `-o`, `jsonpath='{.subsets[*].addresses[*].ip}'`];
         const output = await this.runKubectlCommandAsync(args, kubeconfigPath);
+        // if there replicas and multiple pods, split it by apostrope, space ex value: '10.2.45.6 10.5.6.809'
+        // handles single value as well ex value: '10.56.78.90'
+        const ipaddress: string[] = output.split("'")[1].split(" ");
+        
+        // find the podname based on the first ip address
         const args2: string[] = [`get`,`pods`];
-        const fieldSelector = '--field-selector=status.podIP='.concat(output.split("'")[1]);
+        const fieldSelector = '--field-selector=status.podIP='.concat(ipaddress[0]);
         args2.push(fieldSelector);
         args2.push("-o=name");
         const finalOutput = await this.runKubectlCommandAsync(args2, kubeconfigPath);
-        return finalOutput.split("/")[1].split("\n")[0];
+        // split the output by forward slash and new line char at the end ex value: 'pod/stats-api-ff7d66c5b-4nc9x\n' 
+        // output is stats-api-ff7d66c5b-4nc9x
+        return finalOutput.indexOf("/") != -1 ? finalOutput.split("/")[1].split("\n")[0] : finalOutput.split("\n")[0];
     }
 
     public async getServicesAsync(namespace: string = null): Promise<IKubernetesService[]> {

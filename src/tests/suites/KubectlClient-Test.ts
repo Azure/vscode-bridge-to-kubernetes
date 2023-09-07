@@ -305,4 +305,76 @@ describe(`KubectlClient Test`, () => {
         expect(services[0].selector[`app`]).to.equal(`bikes`);
         expect(services[0].selector[`release`]).to.equal(`bikesharing`);
     });
+
+    it('getPodName for selected service name', async () => {
+        const commandRunnerStub = sinon.createStubInstance(CommandRunner);
+        commandRunnerStub.runAsync.onFirstCall().resolves("''10.244.0.106 10.244.2.183''")
+            .onSecondCall().resolves('pod/stats-api-ff7d66c5b-4nc9x\n');
+        const kubectlClient = new KubectlClient(`my/path/kubectl.exe`, commandRunnerStub, accountContextManagerStub, loggerStub);
+        const podName: string = await kubectlClient.getPodName(`dev`);
+        expect(podName).to.equal('stats-api-ff7d66c5b-4nc9x');
+
+    });
+
+    it('getPodName for selected service when single pod is returned', async () => {
+        const commandRunnerStub = sinon.createStubInstance(CommandRunner);
+        commandRunnerStub.runAsync.onFirstCall().resolves("''10.244.0.106''")
+            .onSecondCall().resolves('pod/stats-api-ff7d66c5b-4nc9x\n');
+        const kubectlClient = new KubectlClient(`my/path/kubectl.exe`, commandRunnerStub, accountContextManagerStub, loggerStub);
+        const podName: string = await kubectlClient.getPodName(`dev`);
+        expect(podName).to.equal('stats-api-ff7d66c5b-4nc9x');
+    });
+
+    it('getPodName for selected service when no ip address is returned', async () => {
+        const commandRunnerStub = sinon.createStubInstance(CommandRunner);
+        commandRunnerStub.runAsync.onFirstCall().resolves("");
+        const kubectlClient = new KubectlClient(`my/path/kubectl.exe`, commandRunnerStub, accountContextManagerStub, loggerStub);
+        const podName: string = await kubectlClient.getPodName(`dev`);
+        expect(podName).to.be.null;
+    });
+
+    it('getPodName for selected service when no pod is returned', async () => {
+        const commandRunnerStub = sinon.createStubInstance(CommandRunner);
+        commandRunnerStub.runAsync.onFirstCall().resolves("''10.244.0.106''")
+        .onSecondCall().resolves('');
+        const kubectlClient = new KubectlClient(`my/path/kubectl.exe`, commandRunnerStub, accountContextManagerStub, loggerStub);
+        const podName: string = await kubectlClient.getPodName(`dev`);
+        expect(podName).to.be.null;
+    });
+
+    it('getPodName for selected service when pod is returned without forward slash', async () => {
+        const commandRunnerStub = sinon.createStubInstance(CommandRunner);
+        commandRunnerStub.runAsync.onFirstCall().resolves("''10.244.0.106''")
+        .onSecondCall().resolves('stats-api-ff7d66c5b-4nc9x\n');
+        const kubectlClient = new KubectlClient(`my/path/kubectl.exe`, commandRunnerStub, accountContextManagerStub, loggerStub);
+        const podName: string = await kubectlClient.getPodName(`dev`);
+        expect(podName).to.equal('stats-api-ff7d66c5b-4nc9x');
+    });
+
+    it('getPodName for selected service when pod is returned without new line char', async () => {
+        const commandRunnerStub = sinon.createStubInstance(CommandRunner);
+        commandRunnerStub.runAsync.onFirstCall().resolves("''10.244.0.106''")
+        .onSecondCall().resolves('stats-api-ff7d66c5b-4nc9x');
+        const kubectlClient = new KubectlClient(`my/path/kubectl.exe`, commandRunnerStub, accountContextManagerStub, loggerStub);
+        const podName: string = await kubectlClient.getPodName(`dev`);
+        expect(podName).to.equal('stats-api-ff7d66c5b-4nc9x');
+    });
+    
+    it('getPodName for selected service when ip address is returned without apostrope', async () => {
+        const commandRunnerStub = sinon.createStubInstance(CommandRunner);
+        commandRunnerStub.runAsync.onFirstCall().resolves("10.244.0.106")
+        .onSecondCall().resolves('stats-api-ff7d66c5b-4nc9x');
+        const kubectlClient = new KubectlClient(`my/path/kubectl.exe`, commandRunnerStub, accountContextManagerStub, loggerStub);
+        const podName: string = await kubectlClient.getPodName(`dev`);
+        expect(podName).to.equal('stats-api-ff7d66c5b-4nc9x');
+    });
+
+    it('getPodName for selected service should throw error', async () => {
+        const commandRunnerStub = sinon.createStubInstance(CommandRunner);
+        commandRunnerStub.runAsync.onFirstCall().throws("error");
+        const kubectlClient = new KubectlClient(`my/path/kubectl.exe`, commandRunnerStub, accountContextManagerStub, loggerStub);
+        const podName: string = await kubectlClient.getPodName(`dev`);
+        expect(podName).to.be.null;
+
+    });
 });

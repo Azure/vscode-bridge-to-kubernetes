@@ -39,7 +39,7 @@ export class KubectlClient implements IClient {
         let kubectlOutput: string = null;
         try {
             kubeconfigPath = await this._accountContextManager.getKubeconfigPathAsync(/*shouldDisplayErrorIfNeeded*/ false);
-            kubectlOutput = await this.runKubectlCommandAsync([ `config`, `view`, `--minify`, `-o`, `json` ], kubeconfigPath, /*quiet*/ true);
+            kubectlOutput = await this.runKubectlCommandAsync([`config`, `view`, `--minify`, `-o`, `json`], kubeconfigPath, /*quiet*/ true);
         }
         catch (error) {
             if (error.message.includes(`error: current-context must exist in order to minify`) && kubeconfigPath != null) {
@@ -80,7 +80,7 @@ export class KubectlClient implements IClient {
     public async getAllFqdnsAsync(): Promise<string[]> {
         try {
             const kubeconfigPath: string = await this._accountContextManager.getKubeconfigPathAsync(/*shouldDisplayErrorIfNeeded*/ false);
-            const kubectlOutput: string = await this.runKubectlCommandAsync([ `config`, `view`, `-o`, `jsonpath={.clusters[*].cluster.server}` ], kubeconfigPath);
+            const kubectlOutput: string = await this.runKubectlCommandAsync([`config`, `view`, `-o`, `jsonpath={.clusters[*].cluster.server}`], kubeconfigPath);
             const servers: string[] = kubectlOutput.split(` `);
             const fqdns: string[] = servers.map((server: string) => {
                 try {
@@ -101,44 +101,70 @@ export class KubectlClient implements IClient {
     }
 
     public async getContainersList(podName: string): Promise<string[]> {
-        const knownSideCars: string[] = ['linkerd-proxy', 'linkerd-init', 'istio-proxy','darpd','jaeger-agent', 'nginx-proxy'];
-        const kubeconfigPath: string = await this._accountContextManager.getKubeconfigPathAsync();
-        const args: string[] = [`get`,`pod`, podName, `-o`, `jsonpath="{.spec['containers','initContainers'][*].name}"`];
-        const kubectlOutput: string = await this.runKubectlCommandAsync(args, kubeconfigPath);
-        let containersList:string[];
-        if (kubectlOutput) {
-            containersList  = kubectlOutput.replace('"', '').replace('"','').split(' ');
-            return containersList.filter(s => !knownSideCars.find(knownSideCar => knownSideCar == s));
-        } else {
-            containersList = null;
-            return containersList;
+        if (!podName) {
+            this._logger.error(TelemetryEvent.KubectlClient_GetPodNameError, new Error(`Pod name is null`));
+            return null;
         }
+        try {
+            const knownSideCars: string[] = ['linkerd-proxy', 'linkerd-init', 'istio-proxy', 'darpd', 'jaeger-agent', 'nginx-proxy'];
+            const kubeconfigPath: string = await this._accountContextManager.getKubeconfigPathAsync();
+            const args: string[] = [`get`, `pod`, podName, `-o`, `jsonpath="{.spec['containers','initContainers'][*].name}"`];
+            const kubectlOutput: string = await this.runKubectlCommandAsync(args, kubeconfigPath);
+            let containersList: string[];
+            if (kubectlOutput) {
+                containersList = kubectlOutput.replace('"', '').replace('"', '').split(' ');
+                return containersList.filter(s => !knownSideCars.find(knownSideCar => knownSideCar == s));
+            } else {
+                this._logger.error(TelemetryEvent.KubectlClient_GetContainerListError, new Error(`container list is null`));
+                return null;
+            }
+        } catch (error) {
+            this._logger.error(TelemetryEvent.KubectlClient_GetContainerListError, error);
+            return null;
+        }
+
     }
 
     public async getPodName(serviceName: string): Promise<string> {
-        const kubeconfigPath: string = await this._accountContextManager.getKubeconfigPathAsync();
-        // find the pod ipaddress for the selected service
-        const args: string[] = [`get`,`ep`, serviceName, `-o`, `jsonpath='{.subsets[*].addresses[*].ip}'`];
-        const output = await this.runKubectlCommandAsync(args, kubeconfigPath);
-        // if there replicas and multiple pods, split it by apostrope, space ex value: '10.2.45.6 10.5.6.809'
-        // handles single value as well ex value: '10.56.78.90'
-        const ipaddress: string[] = output.split("'")[1].split(" ");
-        
-        // find the podname based on the first ip address
-        const args2: string[] = [`get`,`pods`];
-        const fieldSelector = '--field-selector=status.podIP='.concat(ipaddress[0]);
-        args2.push(fieldSelector);
-        args2.push("-o=name");
-        const finalOutput = await this.runKubectlCommandAsync(args2, kubeconfigPath);
-        // split the output by forward slash and new line char at the end ex value: 'pod/stats-api-ff7d66c5b-4nc9x\n' 
-        // output is stats-api-ff7d66c5b-4nc9x
-        return finalOutput.indexOf("/") != -1 ? finalOutput.split("/")[1].split("\n")[0] : finalOutput.split("\n")[0];
+        try {
+            const kubeconfigPath: string = await this._accountContextManager.getKubeconfigPathAsync();
+            // find the pod ipaddress for the selected service
+            const args: string[] = [`get`, `ep`, serviceName, `-o`, `jsonpath='{.subsets[*].addresses[*].ip}'`];
+            let output = await this.runKubectlCommandAsync(args, kubeconfigPath);
+            // if there replicas and multiple pods, split it by apostrope, space example value: ''10.2.45.6 10.5.6.809''
+            // handles single value as well example value: ''10.56.78.90''
+            let ipaddress: string[];
+            if (output && output.length > 0) {
+                ipaddress = output.replace(/'/g, '').replace(/ /g, ',').split(',');
+            }
+
+            if (ipaddress.length > 0) {
+                // find the podname by looping the ip address
+                for (const ip in ipaddress) {
+                    const args2: string[] = [`get`, `pods`];
+                    const fieldSelector = '--field-selector=status.podIP='.concat(ipaddress[ip]);
+                    args2.push(fieldSelector);
+                    args2.push("-o=name");
+                    const finalOutput = await this.runKubectlCommandAsync(args2, kubeconfigPath);
+                    // split the output by forward slash and new line char at the end example value: 'pod/stats-api-ff7d66c5b-4nc9x\n' 
+                    // output is stats-api-ff7d66c5b-4nc9x
+                    if (finalOutput && finalOutput.length > 0) {
+                        return finalOutput.indexOf("/") != -1 ? finalOutput.split("/")[1].split("\n")[0] : finalOutput.split("\n")[0];
+                    }
+                }
+            }
+            return null;
+        } catch (error) {
+            this._logger.error(TelemetryEvent.KubectlClient_GetPodNameError, error);
+            // not throwing error to continue the flow
+            return null;
+        }
     }
 
     public async getServicesAsync(namespace: string = null): Promise<IKubernetesService[]> {
         const kubeconfigPath: string = await this._accountContextManager.getKubeconfigPathAsync();
-        const args: string[] = [ `get`, `services`, `-o`, `json` ];
-        args.push(...(namespace != null ? [ `-n`, namespace ] : [ `--all-namespaces` ]));
+        const args: string[] = [`get`, `services`, `-o`, `json`];
+        args.push(...(namespace != null ? [`-n`, namespace] : [`--all-namespaces`]));
         const kubectlOutput: string = await this.runKubectlCommandAsync(args, kubeconfigPath);
 
         const servicesItems: any[] = JSON.parse(kubectlOutput).items;
@@ -164,7 +190,7 @@ export class KubectlClient implements IClient {
     }
 
     public async getIngressesAsync(namespace: string, kubeconfigPath: string, quiet: boolean): Promise<IKubernetesIngress[]> {
-        const args: string[] = [ `get`, `ingress`, `-n`, namespace, `-o`, `json` ];
+        const args: string[] = [`get`, `ingress`, `-n`, namespace, `-o`, `json`];
         const kubectlOutput: string = await this.runKubectlCommandAsync(args, kubeconfigPath, quiet);
 
         const ingressesItems: any[] = JSON.parse(kubectlOutput).items;
@@ -218,7 +244,7 @@ export class KubectlClient implements IClient {
     }
 
     public async getLoadBalancerIngressesAsync(namespace: string, kubeconfigPath: string, quiet: boolean): Promise<IKubernetesIngress[]> {
-        const args: string[] = [ `get`, `services`, `-n`, namespace, `-o`, `json` ];
+        const args: string[] = [`get`, `services`, `-n`, namespace, `-o`, `json`];
         const kubectlOutput: string = await this.runKubectlCommandAsync(args, kubeconfigPath, quiet);
 
         const servicesItems: any[] = JSON.parse(kubectlOutput).items;
@@ -260,7 +286,7 @@ export class KubectlClient implements IClient {
 
     public async getNamespacesAsync(kubeconfigPath: string): Promise<string[]> {
         try {
-            const args: string[] = [ `get`, `namespaces`, `-o`, `jsonpath={.items[*].metadata.name}` ];
+            const args: string[] = [`get`, `namespaces`, `-o`, `jsonpath={.items[*].metadata.name}`];
             const kubectlOutput: string = await this.runKubectlCommandAsync(args, kubeconfigPath);
             const namespaces: string[] = kubectlOutput.split(` `);
             return namespaces;
@@ -280,7 +306,7 @@ export class KubectlClient implements IClient {
             // Adding retries to ensure the kubectl client is intialized properly
             // as this command is executed right after the download.
             const getVersionAsyncFn = async (): Promise<string> => {
-                const args: string[] = [ `version`, `--short`, `--client`, `-o`, `json` ];
+                const args: string[] = [`version`, `--short`, `--client`, `-o`, `json`];
                 const kubectlOutput: string = await this.runKubectlCommandAsync(args, /*kubeconfigPath*/ null, true);
                 const versionJson: object = JSON.parse(kubectlOutput);
                 let version: string = versionJson[`clientVersion`][`gitVersion`]; // Example: v1.16.8
@@ -308,9 +334,9 @@ export class KubectlClient implements IClient {
         });
 
         // We do not add the kubeconfigPath to args, as it is PII and we don't want it to be logged.
-        let argsWithKubeconfig: string[] = [ ...args ];
+        let argsWithKubeconfig: string[] = [...args];
         if (kubeconfigPath != null) {
-            argsWithKubeconfig = argsWithKubeconfig.concat([ `--kubeconfig`, kubeconfigPath ]);
+            argsWithKubeconfig = argsWithKubeconfig.concat([`--kubeconfig`, kubeconfigPath]);
         }
 
         try {

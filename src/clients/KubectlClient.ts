@@ -151,7 +151,7 @@ export class KubectlClient implements IClient {
                     const usesHttps: boolean = ingressItem.spec.tls != null && ingressItem.spec.tls.find(item => item != null && item.hosts != null && item.hosts.indexOf(ingressRule.host) > -1) != null;
 
                     for (const path of ingressRule.http.paths) {
-                        if (path == null || path.backend == null || path.backend.serviceName == null) {
+                        if (path == null || path.backend == null || path.backend.service == null || path.backend.service.name == null) {
                             continue;
                         }
 

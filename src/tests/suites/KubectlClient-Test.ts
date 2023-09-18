@@ -377,4 +377,70 @@ describe(`KubectlClient Test`, () => {
         expect(podName).to.be.null;
 
     });
+
+    it('getContainersList for selected pod', async () => {
+        const commandRunnerStub = sinon.createStubInstance(CommandRunner);
+        commandRunnerStub.runAsync.onFirstCall().resolves('"linkerd-proxy stats-api linkerd-init"');
+        const kubectlClient = new KubectlClient(`my/path/kubectl.exe`, commandRunnerStub, accountContextManagerStub, loggerStub);
+        const containersList: string[] = await kubectlClient.getContainersList(`dev`);
+        expect(containersList.length).not.to.equal(0);
+        expect(containersList[0]).to.equal('stats-api');
+    });
+
+    it('getContainersList for selected pod when no container is returned', async () => {
+        const commandRunnerStub = sinon.createStubInstance(CommandRunner);
+        commandRunnerStub.runAsync.onFirstCall().resolves('');
+        const kubectlClient = new KubectlClient(`my/path/kubectl.exe`, commandRunnerStub, accountContextManagerStub, loggerStub);
+        const containersList: string[] = await kubectlClient.getContainersList(`dev`);
+        expect(containersList).to.be.null;
+    });
+
+    it('getContainersList for selected pod when there is not multiple containers', async () => {
+        const commandRunnerStub = sinon.createStubInstance(CommandRunner);
+        commandRunnerStub.runAsync.onFirstCall().resolves('"stats-api"');
+        const kubectlClient = new KubectlClient(`my/path/kubectl.exe`, commandRunnerStub, accountContextManagerStub, loggerStub);
+        const containersList: string[] = await kubectlClient.getContainersList(`dev`);
+        expect(containersList[0]).to.equal('stats-api');
+    });
+
+    it('getContainersList for selected pod should return null for any error', async () => {
+        const commandRunnerStub = sinon.createStubInstance(CommandRunner);
+        commandRunnerStub.runAsync.onFirstCall().throws("error");
+        const kubectlClient = new KubectlClient(`my/path/kubectl.exe`, commandRunnerStub, accountContextManagerStub, loggerStub);
+        const containersList: string[] = await kubectlClient.getContainersList(`dev`);
+        expect(containersList).to.be.null;
+    });
+
+    it('getContainerLogs should return null if podName is null', async () => {
+        const commandRunnerStub = sinon.createStubInstance(CommandRunner);
+        const kubectlClient = new KubectlClient(`my/path/kubectl.exe`, commandRunnerStub, accountContextManagerStub, loggerStub);
+        const containersList: string[] = await kubectlClient.getContainersList(null);
+        expect(containersList).to.be.null;
+    });
+
+    it('getContainerLogs should return null if podName is empty', async () => {
+        const commandRunnerStub = sinon.createStubInstance(CommandRunner);
+        const kubectlClient = new KubectlClient(`my/path/kubectl.exe`, commandRunnerStub, accountContextManagerStub, loggerStub);
+        const containersList: string[] = await kubectlClient.getContainersList('');
+        expect(containersList).to.be.null;
+    });
+
+    it('getContainerLogs should handle output without double quotes', async () => {
+        const commandRunnerStub = sinon.createStubInstance(CommandRunner);
+        commandRunnerStub.runAsync.onFirstCall().resolves('linkerd-proxy stats-api linkerd-init logs');
+        const kubectlClient = new KubectlClient(`my/path/kubectl.exe`, commandRunnerStub, accountContextManagerStub, loggerStub);
+        const containersList: string[] = await kubectlClient.getContainersList('podName');
+        expect(containersList.length).to.equal(2);
+        expect(containersList[0]).to.equal('stats-api');
+        expect(containersList[1]).to.equal('logs');
+    });
+
+    it('getContainerLogs should handle output with spaces', async () => {
+        const commandRunnerStub = sinon.createStubInstance(CommandRunner);
+        commandRunnerStub.runAsync.onFirstCall().resolves('stats-api');
+        const kubectlClient = new KubectlClient(`my/path/kubectl.exe`, commandRunnerStub, accountContextManagerStub, loggerStub);
+        const containersList: string[] = await kubectlClient.getContainersList('podName');
+        expect(containersList.length).to.equal(1);
+        expect(containersList[0]).to.equal('stats-api');
+    });
 });

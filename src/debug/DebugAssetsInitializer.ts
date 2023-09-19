@@ -143,11 +143,11 @@ export class DebugAssetsInitializer {
             useKubernetesServiceEnvironmentVariables: false
         };
 
-        if (isolateAs != null) {
+        if (isolateAs?.length > 0) {
             connectPreLaunchTask[`isolateAs`] = isolateAs;
         }
 
-        if (containerName != null) {
+        if (containerName?.length > 0) {
             connectPreLaunchTask[`targetContainer`] = containerName;
         }
 

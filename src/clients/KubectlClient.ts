@@ -106,11 +106,14 @@ export class KubectlClient implements IClient {
             return null;
         }
         try {
+            // adding these decent amount of known sidecars to filter out the sidecars from the list
             const knownSideCars: string[] = ['linkerd-proxy', 'linkerd-init', 'istio-proxy', 'darpd', 'jaeger-agent', 'nginx-proxy'];
             const kubeconfigPath: string = await this._accountContextManager.getKubeconfigPathAsync();
             const args: string[] = [`get`, `pod`, podName, `-o`, `jsonpath="{.spec['containers','initContainers'][*].name}"`];
             const kubectlOutput: string = await this.runKubectlCommandAsync(args, kubeconfigPath);
             if (kubectlOutput) {
+                // replace the double quotes and split the string by space ex: "linkerd-proxy stats-api linkerd-init" to [linkerd-proxy, stats-api, linkerd-init]
+                // and filter out the known sidecars from the list ex: [stats-api]
                 return kubectlOutput.replace('"', '').replace('"', '').split(' ')
                     .filter(s => !knownSideCars.find(knownSideCar => knownSideCar == s));
             } else {
@@ -137,7 +140,7 @@ export class KubectlClient implements IClient {
                 ipaddressList = output.replace(/'/g, '').replace(/[\s,]+/g, ',').split(',');
             }
 
-            if (ipaddressList.length > 0) {
+            if (ipaddressList?.length > 0) {
                 // find the podname by looping the ip address
                 for (const ip in ipaddressList) {
                     const args2: string[] = [`get`, `pods`];
@@ -147,7 +150,7 @@ export class KubectlClient implements IClient {
                     const finalOutput = await this.runKubectlCommandAsync(args2, kubeconfigPath);
                     // split the output by forward slash and new line char at the end example value: 'pod/stats-api-ff7d66c5b-4nc9x\n' 
                     // output is stats-api-ff7d66c5b-4nc9x
-                    if (finalOutput && finalOutput.length > 0) {
+                    if (finalOutput?.length > 0) {
                         return finalOutput.indexOf("/") != -1 ? finalOutput.split("/")[1].split("\n")[0] : finalOutput.split("\n")[0];
                     }
                 }

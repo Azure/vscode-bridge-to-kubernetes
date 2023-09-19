@@ -216,14 +216,14 @@ export class BridgeClient implements IClient {
                 `--script`, scriptFilePath,
                 `--control-port`, controlPort.toString(),
                 `--ppid`, parentProcessId,
-                `--namespace`, currentNamespace,
+                `--namespace`, currentNamespace
             ];
 
-            if (elevationRequests != null) {
+            if (elevationRequests?.length > 0) {
                 args.push(`--elevation-requests`, JSON.stringify(elevationRequests));
             }
 
-            if (isolateAs != null) {
+            if (isolateAs?.length > 0) {
                 args.push(`--routing`, isolateAs);
             }
 
@@ -231,12 +231,12 @@ export class BridgeClient implements IClient {
                 args.push(`--use-kubernetes-service-environment-variables`);
             }
 
-            if (containerName != null) {
+            if (containerName?.length > 0) {
                 args.push(`--container`, containerName);
             }
 
             const routingManagerFeatureFlags = this.getRoutingManagerFeatureFlags(experimentationService);
-            if (routingManagerFeatureFlags != null) {
+            if (routingManagerFeatureFlags?.length > 0) {
                 routingManagerFeatureFlags.forEach((featureFlag: string) => {
                     args.push(`--routing-manager-feature-flag`, featureFlag);
                 });

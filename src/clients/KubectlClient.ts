@@ -268,11 +268,6 @@ export class KubectlClient implements IClient {
     }
 
     private async runKubectlCommandAsync(args: string[], kubeconfigPath: string, quiet: boolean = false): Promise<string> {
-        // Run the kubectl command.
-        this._logger.trace(TelemetryEvent.KubectlClient_Command, {
-            args: args.join(` `)
-        });
-
         // We do not add the kubeconfigPath to args, as it is PII and we don't want it to be logged.
         let argsWithKubeconfig: string[] = [ ...args ];
         if (kubeconfigPath != null) {

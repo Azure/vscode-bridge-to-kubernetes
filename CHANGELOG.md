@@ -7,6 +7,13 @@
 - [Enabe codecov and build badges for visibility](https://github.com/Azure/vscode-bridge-to-kubernetes/pull/63)
 Thank you @Eneuman,@Tatsinnit, @BartNetJS and @cxznmhdcxz for great contributions.
 
+## [2.0.120231009]
+- Updating to latest B2K CLI version. Please refer for release notes [here](https://github.com/Azure/Bridge-To-Kubernetes/pull/322)
+- [Update publish workflow to use updated nodejs](https://github.com/Azure/vscode-bridge-to-kubernetes/pull/67)
+- [Update deprecated packages](https://github.com/Azure/vscode-bridge-to-kubernetes/pull/68)
+- [Update support doc with correct links](https://github.com/Azure/vscode-bridge-to-kubernetes/pull/69)
+- [Change to service.name to show correct ingress url's](https://github.com/Azure/vscode-bridge-to-kubernetes/pull/72)
+
 ## [2.0.120230716]
 - Updating to latest B2k CLI version majorly for dotnet 7.0 upgrade. Please refer for release notes [here](https://github.com/Azure/Bridge-To-Kubernetes/blob/main/CHANGELOG.md#10202307061)
 ## [2.0.120230525]

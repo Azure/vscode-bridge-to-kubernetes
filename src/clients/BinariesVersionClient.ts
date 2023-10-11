@@ -92,11 +92,11 @@ export class BinariesVersionClient {
     private getOsString(): string {
         switch (process.platform) {
             case `win32`:
-                return `win`;
+                return process.arch && (process.arch === 'arm' || process.arch === 'arm64') ? `win` : `win_arm64`;
             case `darwin`:
-                return `osx`;
+                return process.arch && (process.arch === 'arm' || process.arch === 'arm64') ? `osx` : `osx_arm64`;
             case `linux`:
-                return `linux`;
+                return process.arch && (process.arch === 'arm' || process.arch === 'arm64') ? `linux` : `linux_arm64`;
             default:
                 const error = new Error(`Unsupported platform: ${process.platform}`);
                 this._logger.error(TelemetryEvent.UnexpectedError, error);

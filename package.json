@@ -2,7 +2,7 @@
     "name": "mindaro",
     "displayName": "Bridge to Kubernetes",
     "description": "Rapid Kubernetes development for teams",
-    "version": "2.0.120230817",
+    "version": "2.0.120231004",
     "icon": "images/bridge128.png",
     "preview": false,
     "publisher": "mindaro",
@@ -193,23 +193,26 @@
         "mindaro-dev.file-downloader"
     ],
     "devDependencies": {
+        "@types/chai": "^4.3.5",
         "@types/glob": "^7.1.1",
         "@types/got": "^9.6.12",
         "@types/mocha": "^10.0.1",
         "@types/node": "^18.11.17",
         "@types/node-fetch": "^2.6.2",
+        "@types/sinon": "^10.0.16",
         "@types/vscode": "1.74.0",
         "@vscode/test-electron": "^2.3.3",
         "@vscode/vsce": "^2.15.0",
         "c8": "^8.0.1",
+        "chai": "^4.3.7",
         "copy": "^0.0.1",
         "del-cli": "^5.0.0",
         "eslint": "^8.27.0",
         "glob": "^7.1.4",
         "mocha": "^10.2.0",
+        "sinon": "^15.2.0",
         "source-map-support": "^0.5.12",
         "ts-loader": "^9.4.2",
-        "typemoq": "^2.1.0",
         "typescript": "^5.1.3",
         "webpack": "^5.76.0",
         "webpack-cli": "^5.0.1"
@@ -246,6 +249,6 @@
         "url": "https://github.com/Azure/vscode-bridge-to-kubernetes"
     },
     "extensionMetadata": {
-        "expectedCLIVersion": "1.0.20230706.1"
+        "expectedCLIVersion": "1.0.20231003.1"
     }
 }

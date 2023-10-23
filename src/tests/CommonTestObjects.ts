@@ -3,12 +3,13 @@
 // ----------------------------------------------------------------------------
 'use strict';
 
-import { Mock } from 'typemoq';
 import * as vscode from 'vscode';
 
 import { Logger } from '../logger/Logger';
 import { AccountContextManager } from '../models/context/AccountContextManager';
+import Sinon = require('sinon');
 
-export const accountContextManagerMock = Mock.ofType<AccountContextManager>();
-export const loggerMock = Mock.ofType<Logger>();
+
+export const accountContextManagerStub = Sinon.createStubInstance(AccountContextManager);
+export const loggerStub = Sinon.createStubInstance(Logger);
 export const defaultWorkspaceFolder: vscode.WorkspaceFolder = { index: 0, name: `mywebapi`, uri: vscode.Uri.parse(`file://C:/projects/mywebapi`) };

@@ -38,16 +38,16 @@ export class AccountContextManager {
                 this._currentKubeconfigPath = kubeConfigPathResult.hostPath;
                 if (this._fsWatcher == null) {
                     this._fsWatcher = FileSystemWatcher.watch(this._currentKubeconfigPath);
-                    this._fsWatcher.on(`change`, path => {
-                        this._logger.trace(TelemetryEvent.AccountContextManager_KubeconfigChange);
-                        this._kubeconfigChanged.trigger();
-                    });
                 }
                 else {
                     this._fsWatcher.unwatch(oldKubeconfigPath);
                     this._fsWatcher.add(this._currentKubeconfigPath);
                 }
             }
+            // The kubeconfig file is watched for changes, and the event is triggered when the file is changed.
+            this._fsWatcher.on(`change`, (path) => {
+                this._kubeconfigChanged.trigger()
+            });
 
             return this._currentKubeconfigPath;
         }

@@ -5,7 +5,6 @@
 
 export enum TelemetryEvent {
     AccountContextManager_GetKubeconfigPathError = "account-context-manager-get-kubeconfig-path-error",
-    AccountContextManager_KubeconfigChange = "account-context-manager-kubeconfig-change",
     Activation = "activation",
     BinariesUtility_CheckIfBinaryExistsError = "binaries-utility-check-if-binary-exists-error",
     BinariesUtility_CleanUpBeforeDownloadError = "binaries-utility-cleanup-before-download-error",
@@ -98,7 +97,6 @@ export enum TelemetryEvent {
     KubeConfigCredentialsManager_RefreshCredentialsPerf = "kubeconfig-credentials-manager-refresh-credentials-perf",
     KubeConfigCredentialsManager_RefreshCredentialsSuccess = "kubeconfig-credentials-manager-refresh-credentials-success",
     KubectlClient_AllFqdnsRetrievalError = "kubectl-client-all-fqdns-retrieval-error",
-    KubectlClient_Command = "kubectl-client-command",
     KubectlClient_CommandError = "kubectl-client-command-error",
     KubectlClient_CommandSuccess = "kubectl-client-command-success",
     KubectlClient_CurrentContextRetrievalError = "kubectl-client-current-context-retrieval-error",

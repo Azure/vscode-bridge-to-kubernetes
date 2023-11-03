@@ -27,6 +27,7 @@ import { EventSource, IReadOnlyEventSource } from '../utility/Event';
 import { fileSystem } from '../utility/FileSystem';
 import { VersionUtility } from '../utility/VersionUtility';
 import { IBinariesUtility } from './IBinariesUtility';
+import { K8sClient } from '../clients/K8sClient';
 
 export class BinariesUtilityV2 implements IBinariesUtility {
     private readonly _binaryVersionsClient: BinariesVersionClient;
@@ -152,7 +153,7 @@ export class BinariesUtilityV2 implements IBinariesUtility {
      */
     private async runEnsureBinariesAsync(): Promise<[BridgeClient, KubectlClient]> {
         const bridgeClientProvider: IClientProvider = new BridgeClientProvider(this._binaryVersionsClient, this._expectedBridgeVersion, new CommandRunner(this._commandEnvironmentVariables), this._logger);
-        const kubectlClientProvider: IClientProvider = new KubectlClientProvider(this._binaryVersionsClient, new CommandRunner(this._commandEnvironmentVariables), this._accountContextManager, this._logger);
+        const kubectlClientProvider: IClientProvider = new KubectlClientProvider(this._binaryVersionsClient, new CommandRunner(this._commandEnvironmentVariables), this._accountContextManager, this._logger, new K8sClient());
         const dotNetClientProvider: IClientProvider = new DotNetClientProvider(this._binaryVersionsClient, new CommandRunner(this._commandEnvironmentVariables), this._logger);
 
         let bridgeClient: IClient;

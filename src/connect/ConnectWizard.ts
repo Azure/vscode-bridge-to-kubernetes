@@ -205,8 +205,8 @@ export class ConnectWizard {
         });
         this._result.resourceName = pick.label;
         // get the list of containers
-        const podName = await kubectlClient.getPodName(this._result.resourceName);
-        const containersList: string[] = await kubectlClient.getContainersList(podName);
+        const podName = await kubectlClient.getPodName(this._result.resourceName, this._result.targetNamespace);
+        const containersList: string[] = await kubectlClient.getContainersList(podName, this._result.targetNamespace);
         if (containersList?.length > 1) {
             // show containers quick pick list after filtering known sidecar containers
             const containerChoices: vscode.QuickPickItem[] = containersList.map(containers => ({ label: containers }));

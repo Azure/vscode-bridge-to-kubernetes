@@ -14,6 +14,7 @@ import { IKubernetesService } from '../models/IKubernetesService';
 import { RetryUtility } from '../utility/RetryUtility';
 import { CommandRunner } from './CommandRunner';
 import { IClient } from './IClient';
+import { K8sClient } from './K8sClient';
 
 export interface IKubeconfigEnrichedContext {
     cluster: string;
@@ -29,7 +30,8 @@ export class KubectlClient implements IClient {
         private readonly _executablePath: string,
         private readonly _commandRunner: CommandRunner,
         private readonly _accountContextManager: AccountContextManager,
-        private readonly _logger: Logger) {
+        private readonly _logger: Logger,
+        private readonly _k8sClient: K8sClient) {
     }
 
     public readonly Type: ClientType = ClientType.Kubectl;
@@ -100,26 +102,24 @@ export class KubectlClient implements IClient {
         }
     }
 
-    public async getContainersList(podName: string): Promise<string[]> {
-        if (!podName) {
-            this._logger.error(TelemetryEvent.KubectlClient_GetPodNameError, new Error(`Pod name is null`));
+    public async getContainersList(podNameList: string[], namespace: string): Promise<string[]> {
+        if (!podNameList || podNameList.length == 0) {
+            this._logger.error(TelemetryEvent.KubectlClient_GetPodNameError, new Error(`Pod name List is null`));
             return null;
         }
         try {
             // adding these decent amount of known sidecars to filter out the sidecars from the list
-            const knownSideCars: string[] = ['linkerd-proxy', 'linkerd-init', 'istio-proxy', 'darpd', 'jaeger-agent', 'nginx-proxy'];
-            const kubeconfigPath: string = await this._accountContextManager.getKubeconfigPathAsync();
-            const args: string[] = [`get`, `pod`, podName, `-o`, `jsonpath="{.spec['containers','initContainers'][*].name}"`];
-            const kubectlOutput: string = await this.runKubectlCommandAsync(args, kubeconfigPath);
-            if (kubectlOutput) {
-                // replace the double quotes and split the string by space ex: "linkerd-proxy stats-api linkerd-init" to [linkerd-proxy, stats-api, linkerd-init]
-                // and filter out the known sidecars from the list ex: [stats-api]
-                return kubectlOutput.replace('"', '').replace('"', '').split(' ')
-                    .filter(s => !knownSideCars.find(knownSideCar => knownSideCar == s));
-            } else {
-                this._logger.error(TelemetryEvent.KubectlClient_GetContainerListError, new Error(`container list is null`));
-                return null;
-            }
+            //const knownSideCars: string[] = ['linkerd-proxy', 'linkerd-init', 'istio-proxy', 'darpd', 'jaeger-agent', 'nginx-proxy'];
+            let containerList: string[] = [];
+            const response = await this._k8sClient.k8sApi.listNamespacedPod(namespace);
+            const pods = response.body.items;
+            podNameList.forEach(podName => {
+                const arr = pods.find(pod => pod.metadata.name === podName)
+                    .spec?.containers?.map(container => container.name);
+                containerList = containerList.concat(arr);
+            });
+
+            return [...new Set(containerList)]; // remove duplicates
         } catch (error) {
             this._logger.error(TelemetryEvent.KubectlClient_GetContainerListError, error);
             return null;
@@ -127,35 +127,18 @@ export class KubectlClient implements IClient {
 
     }
 
-    public async getPodName(serviceName: string): Promise<string> {
+    public async getPodName(serviceName: string, namespace: string): Promise<string[]> {
         try {
-            const kubeconfigPath: string = await this._accountContextManager.getKubeconfigPathAsync();
-            // find the pod ipaddressList for the selected service
-            const args: string[] = [`get`, `ep`, serviceName, `-o`, `jsonpath='{.subsets[*].addresses[*].ip}'`];
-            let output = await this.runKubectlCommandAsync(args, kubeconfigPath);
-            // if there replicas and multiple pods, split it by apostrope, space example value: ''10.2.45.6 10.5.6.809''
-            // handles single value as well example value: ''10.56.78.90''
-            let ipaddressList: string[];
-            if (output && output.length > 0) {
-                ipaddressList = output.replace(/'/g, '').replace(/[\s,]+/g, ',').split(',');
-            }
-
-            if (ipaddressList?.length > 0) {
-                // find the podname by looping the ip address
-                for (const ip in ipaddressList) {
-                    const args2: string[] = [`get`, `pods`];
-                    const fieldSelector = '--field-selector=status.podIP='.concat(ipaddressList[ip]);
-                    args2.push(fieldSelector);
-                    args2.push("-o=name");
-                    const finalOutput = await this.runKubectlCommandAsync(args2, kubeconfigPath);
-                    // split the output by forward slash and new line char at the end example value: 'pod/stats-api-ff7d66c5b-4nc9x\n' 
-                    // output is stats-api-ff7d66c5b-4nc9x
-                    if (finalOutput?.length > 0) {
-                        return finalOutput.indexOf("/") != -1 ? finalOutput.split("/")[1].split("\n")[0] : finalOutput.split("\n")[0];
-                    }
-                }
-            }
-            return null;
+            const resp = await this._k8sClient.k8sApi.listNamespacedEndpoints(namespace);
+            const endpoints = resp.body.items;
+            return endpoints
+            .filter(endpoint => endpoint?.metadata?.name === serviceName)
+            .filter(endpoint => endpoint?.subsets !== undefined)
+            .flatMap(endpoint => endpoint.subsets)
+            .filter(subset => subset?.addresses !== undefined)
+            .flatMap(subset => subset.addresses)
+            .filter(address => address?.targetRef !== undefined)
+            .flatMap(address => address.targetRef.name);
         } catch (error) {
             this._logger.error(TelemetryEvent.KubectlClient_GetPodNameError, error);
             // not throwing error to continue the flow

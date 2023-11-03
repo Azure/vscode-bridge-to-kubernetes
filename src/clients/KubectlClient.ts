@@ -114,9 +114,12 @@ export class KubectlClient implements IClient {
             const response = await this._k8sClient.k8sApi.listNamespacedPod(namespace);
             const pods = response.body.items;
             podNameList.forEach(podName => {
-                const arr = pods.find(pod => pod.metadata.name === podName)
-                    .spec?.containers?.map(container => container.name);
-                containerList = containerList.concat(arr);
+                const arr = pods
+                .find(pod => pod.metadata.name === podName)
+                ?.spec?.containers?.map(container => container.name);
+                if (arr && arr.length > 0) {
+                    containerList = containerList.concat(arr);
+                }
             });
 
             return [...new Set(containerList)]; // remove duplicates

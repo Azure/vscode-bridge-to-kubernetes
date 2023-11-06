@@ -10,6 +10,7 @@ import * as k8s from 'vscode-kubernetes-tools-api';
 import { Logger } from '../../logger/Logger';
 import { TelemetryEvent } from '../../logger/TelemetryEvent';
 import { EventSource, IReadOnlyEventSource } from '../../utility/Event';
+import * as k8sClient from '@kubernetes/client-node'; 
 
 export class AccountContextManager {
     private _currentKubeconfigPath: string;
@@ -19,6 +20,13 @@ export class AccountContextManager {
     public constructor(
         private readonly _logger: Logger) {
             this._kubeconfigChanged = new EventSource<void>();
+    }
+
+    public async getK8sClient(): Promise<k8sClient.CoreV1Api> {
+        const kc = new k8sClient.KubeConfig();
+        const kubeconfigPath = await this.getKubeconfigPathAsync();
+        kc.loadFromFile(kubeconfigPath);
+        return kc.makeApiClient(k8sClient.CoreV1Api);
     }
 
     public async getKubeconfigPathAsync(shouldDisplayErrorIfNeeded: boolean = true): Promise<string> {

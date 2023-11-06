@@ -8,15 +8,14 @@ import * as path from 'path';
 import { Constants } from "../../Constants";
 import { Logger } from "../../logger/Logger";
 import { TelemetryEvent } from "../../logger/TelemetryEvent";
-import { AccountContextManager } from "../../models/context/AccountContextManager";
 import { IBinariesDownloadInfo, IDownloadInfo } from "../../models/IBinariesDownloadInfo";
+import { AccountContextManager } from "../../models/context/AccountContextManager";
 import { BinariesVersionClient } from "../BinariesVersionClient";
 import { ClientType } from "../ClientType";
 import { CommandRunner } from "../CommandRunner";
 import { IClient } from "../IClient";
 import { KubectlClient } from "../KubectlClient";
 import { IClientProvider } from "./IClientProvider";
-import { K8sClient } from '../K8sClient';
 
 export class KubectlClientProvider implements IClientProvider {
 
@@ -24,8 +23,7 @@ export class KubectlClientProvider implements IClientProvider {
         private readonly _binaryVersionsClient: BinariesVersionClient,
         private readonly _commandRunner: CommandRunner,
         private readonly _accountContextManager: AccountContextManager,
-        private readonly _logger: Logger,
-        private readonly _k8sClient: K8sClient
+        private readonly _logger: Logger
     ) { }
 
     public Type: ClientType = ClientType.Kubectl;
@@ -50,7 +48,7 @@ export class KubectlClientProvider implements IClientProvider {
     }
 
     public getClient(executablePath: string, dotNetPath: string = null): IClient {
-        return new KubectlClient(executablePath, this._commandRunner, this._accountContextManager, this._logger, this._k8sClient);
+        return new KubectlClient(executablePath, this._commandRunner, this._accountContextManager, this._logger);
     }
 
     public getExpectedVersion(): string {

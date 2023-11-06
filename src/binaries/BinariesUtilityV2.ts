@@ -8,6 +8,7 @@ import * as path from 'path';
 import * as process from 'process';
 import * as vscode from 'vscode';
 
+import { Constants } from '../Constants';
 import { BinariesVersionClient } from '../clients/BinariesVersionClient';
 import { BridgeClient } from '../clients/BridgeClient';
 import { ClientType } from '../clients/ClientType';
@@ -18,16 +19,14 @@ import { BridgeClientProvider } from '../clients/Providers/BridgeClientProvider'
 import { DotNetClientProvider } from '../clients/Providers/DotNetClientProvider';
 import { IClientProvider } from '../clients/Providers/IClientProvider';
 import { KubectlClientProvider } from '../clients/Providers/KubectlClientProvider';
-import { Constants } from '../Constants';
 import { Logger } from '../logger/Logger';
 import { TelemetryEvent } from '../logger/TelemetryEvent';
-import { AccountContextManager } from '../models/context/AccountContextManager';
 import { IDownloadInfo } from '../models/IBinariesDownloadInfo';
+import { AccountContextManager } from '../models/context/AccountContextManager';
 import { EventSource, IReadOnlyEventSource } from '../utility/Event';
 import { fileSystem } from '../utility/FileSystem';
 import { VersionUtility } from '../utility/VersionUtility';
 import { IBinariesUtility } from './IBinariesUtility';
-import { K8sClient } from '../clients/K8sClient';
 
 export class BinariesUtilityV2 implements IBinariesUtility {
     private readonly _binaryVersionsClient: BinariesVersionClient;
@@ -153,7 +152,7 @@ export class BinariesUtilityV2 implements IBinariesUtility {
      */
     private async runEnsureBinariesAsync(): Promise<[BridgeClient, KubectlClient]> {
         const bridgeClientProvider: IClientProvider = new BridgeClientProvider(this._binaryVersionsClient, this._expectedBridgeVersion, new CommandRunner(this._commandEnvironmentVariables), this._logger);
-        const kubectlClientProvider: IClientProvider = new KubectlClientProvider(this._binaryVersionsClient, new CommandRunner(this._commandEnvironmentVariables), this._accountContextManager, this._logger, new K8sClient());
+        const kubectlClientProvider: IClientProvider = new KubectlClientProvider(this._binaryVersionsClient, new CommandRunner(this._commandEnvironmentVariables), this._accountContextManager, this._logger);
         const dotNetClientProvider: IClientProvider = new DotNetClientProvider(this._binaryVersionsClient, new CommandRunner(this._commandEnvironmentVariables), this._logger);
 
         let bridgeClient: IClient;

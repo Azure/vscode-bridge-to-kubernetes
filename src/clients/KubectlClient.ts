@@ -14,7 +14,6 @@ import { IKubernetesService } from '../models/IKubernetesService';
 import { RetryUtility } from '../utility/RetryUtility';
 import { CommandRunner } from './CommandRunner';
 import { IClient } from './IClient';
-import { K8sClient } from './K8sClient';
 
 export interface IKubeconfigEnrichedContext {
     cluster: string;
@@ -30,8 +29,7 @@ export class KubectlClient implements IClient {
         private readonly _executablePath: string,
         private readonly _commandRunner: CommandRunner,
         private readonly _accountContextManager: AccountContextManager,
-        private readonly _logger: Logger,
-        private readonly _k8sClient: K8sClient) {
+        private readonly _logger: Logger) {
     }
 
     public readonly Type: ClientType = ClientType.Kubectl;
@@ -111,7 +109,8 @@ export class KubectlClient implements IClient {
             // adding these decent amount of known sidecars to filter out the sidecars from the list
             //const knownSideCars: string[] = ['linkerd-proxy', 'linkerd-init', 'istio-proxy', 'darpd', 'jaeger-agent', 'nginx-proxy'];
             let containerList: string[] = [];
-            const response = await this._k8sClient.k8sApi.listNamespacedPod(namespace);
+            const k8sClient = await this._accountContextManager.getK8sClient();
+            const response = await k8sClient.listNamespacedPod(namespace);
             const pods = response.body.items;
             podNameList.forEach(podName => {
                 const arr = pods
@@ -132,7 +131,8 @@ export class KubectlClient implements IClient {
 
     public async getPodName(serviceName: string, namespace: string): Promise<string[]> {
         try {
-            const resp = await this._k8sClient.k8sApi.listNamespacedEndpoints(namespace);
+            const k8sClient = await this._accountContextManager.getK8sClient();
+            const resp = await k8sClient.listNamespacedEndpoints(namespace);
             const endpoints = resp.body.items;
             return endpoints
             .filter(endpoint => endpoint?.metadata?.name === serviceName)

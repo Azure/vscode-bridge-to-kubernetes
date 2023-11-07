@@ -3,6 +3,7 @@
 // ----------------------------------------------------------------------------
 'use strict';
 
+import * as k8s from '@kubernetes/client-node';
 import { expect } from 'chai';
 import { beforeEach, describe, it } from 'mocha';
 import * as sinon from 'sinon';
@@ -10,7 +11,8 @@ import { CommandRunner } from '../../clients/CommandRunner';
 import { KubectlClient } from '../../clients/KubectlClient';
 import { IKubernetesIngress } from '../../models/IKubernetesIngress';
 import { IKubernetesService } from '../../models/IKubernetesService';
-import { accountContextManagerStub, loggerStub } from '../CommonTestObjects';
+import { accountContextManagerStub, commandRunnerStub, loggerStub } from '../CommonTestObjects';
+import { AccountContextManager } from '../../models/context/AccountContextManager';
 
 describe(`KubectlClient Test`, () => {
     beforeEach(() => {
@@ -306,141 +308,166 @@ describe(`KubectlClient Test`, () => {
         expect(services[0].selector[`release`]).to.equal(`bikesharing`);
     });
 
-    it('getPodName for selected service name', async () => {
-        const commandRunnerStub = sinon.createStubInstance(CommandRunner);
-        commandRunnerStub.runAsync.onFirstCall().resolves("''10.244.0.106 10.244.2.183''")
-            .onSecondCall().resolves('pod/stats-api-ff7d66c5b-4nc9x\n');
-        const kubectlClient = new KubectlClient(`my/path/kubectl.exe`, commandRunnerStub, accountContextManagerStub, loggerStub);
-        const podName: string = await kubectlClient.getPodName(`dev`);
-        expect(podName).to.equal('stats-api-ff7d66c5b-4nc9x');
-
+    it('getPodNames for selected service name', async () => {
+        const acctContextManagerStubLocal = sinon.createStubInstance(AccountContextManager);
+        const k8sClientMock = {
+            k8sApi: sinon.createStubInstance(k8s.CoreV1Api)      
+        }
+        acctContextManagerStubLocal.getK8sClient.resolves(k8sClientMock.k8sApi);
+        k8sClientMock.k8sApi.readNamespacedEndpoints.resolves({
+            response: {},
+            body: {
+                metadata: {
+                    name: 'stats-api',
+                    namespace: 'namespace'
+                },
+                subsets: [{
+                    addresses: [{
+                        ip: 'sampleip',
+                        targetRef: {
+                            name: 'stats-api-ff7d66c5b-4nc9x'
+                        }
+                    }]
+                }]
+            }
+        }) 
+        const kubectlClient = new KubectlClient(`my/path/kubectl.exe`, commandRunnerStub, acctContextManagerStubLocal, loggerStub);
+        const podNames: string[] = await kubectlClient.getPodNames(`stats-api`, `namespace`);
+        expect(podNames[0]).to.equal('stats-api-ff7d66c5b-4nc9x');
     });
 
-    it('getPodName for selected service when single pod is returned', async () => {
-        const commandRunnerStub = sinon.createStubInstance(CommandRunner);
-        commandRunnerStub.runAsync.onFirstCall().resolves("''10.244.0.106''")
-            .onSecondCall().resolves('pod/stats-api-ff7d66c5b-4nc9x\n');
-        const kubectlClient = new KubectlClient(`my/path/kubectl.exe`, commandRunnerStub, accountContextManagerStub, loggerStub);
-        const podName: string = await kubectlClient.getPodName(`dev`);
-        expect(podName).to.equal('stats-api-ff7d66c5b-4nc9x');
+    it('getPodNames for selected service name when no pod is found', async () => {
+        const acctContextManagerStubLocal = sinon.createStubInstance(AccountContextManager);
+        const k8sClientMock = {
+            k8sApi: sinon.createStubInstance(k8s.CoreV1Api)      
+        }
+        acctContextManagerStubLocal.getK8sClient.resolves(k8sClientMock.k8sApi);
+        k8sClientMock.k8sApi.readNamespacedEndpoints.resolves({
+            response: {},
+            body: {
+                metadata: {
+                    name: 'stats-api',
+                    namespace: 'namespace'
+                },
+                subsets: [{
+                    addresses: []
+                }]
+            }
+        }) 
+        const kubectlClient = new KubectlClient(`my/path/kubectl.exe`, commandRunnerStub, acctContextManagerStubLocal, loggerStub);
+        const podNames: string[] = await kubectlClient.getPodNames(`stats-api`, `namespace`);
+        expect(podNames.length).to.equal(0);
     });
 
-    it('getPodName for selected service when no ip address is returned', async () => {
-        const commandRunnerStub = sinon.createStubInstance(CommandRunner);
-        commandRunnerStub.runAsync.onFirstCall().resolves("");
-        const kubectlClient = new KubectlClient(`my/path/kubectl.exe`, commandRunnerStub, accountContextManagerStub, loggerStub);
-        const podName: string = await kubectlClient.getPodName(`dev`);
-        expect(podName).to.be.null;
+    it('getPodNames for selected service name when multiple pods are found', async () => {
+        const acctContextManagerStubLocal = sinon.createStubInstance(AccountContextManager);
+        const k8sClientMock = {
+            k8sApi: sinon.createStubInstance(k8s.CoreV1Api)      
+        }
+        acctContextManagerStubLocal.getK8sClient.resolves(k8sClientMock.k8sApi);
+        k8sClientMock.k8sApi.readNamespacedEndpoints.resolves({
+            response: {},
+            body: {
+                metadata: {
+                    name: 'stats-api',
+                    namespace: 'namespace'
+                },
+                subsets: [{
+                    addresses: [{
+                        ip: 'sampleip',
+                        targetRef: {
+                            name: 'stats-api-ff7d66c5b-4nc9x'
+                        }
+                    },{
+                        ip: 'sampleip2',
+                        targetRef: {
+                            name: 'stats-api-ff7d66c5b-4nc5k'
+                        }
+                    }]
+                }]
+            }
+        }) 
+        const kubectlClient = new KubectlClient(`my/path/kubectl.exe`, commandRunnerStub, acctContextManagerStubLocal, loggerStub);
+        const podNames: string[] = await kubectlClient.getPodNames(`stats-api`, `namespace`);
+        expect(podNames[0]).to.equal('stats-api-ff7d66c5b-4nc9x');
+        expect(podNames[1]).to.equal('stats-api-ff7d66c5b-4nc5k');
     });
 
-    it('getPodName for selected service when no pod is returned', async () => {
-        const commandRunnerStub = sinon.createStubInstance(CommandRunner);
-        commandRunnerStub.runAsync.onFirstCall().resolves("''10.244.0.106''")
-        .onSecondCall().resolves('');
-        const kubectlClient = new KubectlClient(`my/path/kubectl.exe`, commandRunnerStub, accountContextManagerStub, loggerStub);
-        const podName: string = await kubectlClient.getPodName(`dev`);
-        expect(podName).to.be.null;
+    it('getPodNames for selected service name when readNamespacedEndpoints throws error', async () => {
+        const acctContextManagerStubLocal = sinon.createStubInstance(AccountContextManager);
+        const k8sClientMock = {
+            k8sApi: sinon.createStubInstance(k8s.CoreV1Api)      
+        }
+        acctContextManagerStubLocal.getK8sClient.resolves(k8sClientMock.k8sApi);
+        k8sClientMock.k8sApi.readNamespacedEndpoints.throws("error");
+        const kubectlClient = new KubectlClient(`my/path/kubectl.exe`, commandRunnerStub, acctContextManagerStubLocal, loggerStub);
+        const podNames: string[] = await kubectlClient.getPodNames(`stats-api`, `namespace`);
+        expect(podNames).to.be.null;
     });
 
-    it('getPodName for selected service when pod is returned without forward slash', async () => {
-        const commandRunnerStub = sinon.createStubInstance(CommandRunner);
-        commandRunnerStub.runAsync.onFirstCall().resolves("''10.244.0.106''")
-        .onSecondCall().resolves('stats-api-ff7d66c5b-4nc9x\n');
-        const kubectlClient = new KubectlClient(`my/path/kubectl.exe`, commandRunnerStub, accountContextManagerStub, loggerStub);
-        const podName: string = await kubectlClient.getPodName(`dev`);
-        expect(podName).to.equal('stats-api-ff7d66c5b-4nc9x');
+    it('getContainerNames for selected pod name', async () => {
+        const acctContextManagerStubLocal = sinon.createStubInstance(AccountContextManager);
+        const k8sClientMock = {
+            k8sApi: sinon.createStubInstance(k8s.CoreV1Api)      
+        }
+        acctContextManagerStubLocal.getK8sClient.resolves(k8sClientMock.k8sApi);
+        k8sClientMock.k8sApi.readNamespacedPod.resolves({
+            response: {},
+            body: {
+                metadata: {
+                    name: 'stats-api-ff7d66c5b-4nc9x',
+                    namespace: 'namespace'
+                },
+                spec: {
+                    containers: [{
+                        name: 'stats-api'
+                    }]
+                }
+            }
+        }); 
+        const kubectlClient = new KubectlClient(`my/path/kubectl.exe`, commandRunnerStub, acctContextManagerStubLocal, loggerStub);
+        const containerNames: string[] = await kubectlClient.getContainerNames('stats-api-ff7d66c5b-4nc9x', 'namespace');
+        expect(containerNames.length).not.to.equal(0);
+        expect(containerNames[0]).to.equal('stats-api');
     });
 
-    it('getPodName for selected service when pod is returned without new line char', async () => {
-        const commandRunnerStub = sinon.createStubInstance(CommandRunner);
-        commandRunnerStub.runAsync.onFirstCall().resolves("''10.244.0.106''")
-        .onSecondCall().resolves('stats-api-ff7d66c5b-4nc9x');
-        const kubectlClient = new KubectlClient(`my/path/kubectl.exe`, commandRunnerStub, accountContextManagerStub, loggerStub);
-        const podName: string = await kubectlClient.getPodName(`dev`);
-        expect(podName).to.equal('stats-api-ff7d66c5b-4nc9x');
-    });
-    
-    it('getPodName for selected service when ip address is returned without apostrope', async () => {
-        const commandRunnerStub = sinon.createStubInstance(CommandRunner);
-        commandRunnerStub.runAsync.onFirstCall().resolves("10.244.0.106")
-        .onSecondCall().resolves('stats-api-ff7d66c5b-4nc9x');
-        const kubectlClient = new KubectlClient(`my/path/kubectl.exe`, commandRunnerStub, accountContextManagerStub, loggerStub);
-        const podName: string = await kubectlClient.getPodName(`dev`);
-        expect(podName).to.equal('stats-api-ff7d66c5b-4nc9x');
-    });
-
-    it('getPodName for selected service should throw error', async () => {
-        const commandRunnerStub = sinon.createStubInstance(CommandRunner);
-        commandRunnerStub.runAsync.onFirstCall().throws("error");
-        const kubectlClient = new KubectlClient(`my/path/kubectl.exe`, commandRunnerStub, accountContextManagerStub, loggerStub);
-        const podName: string = await kubectlClient.getPodName(`dev`);
-        expect(podName).to.be.null;
-
-    });
-
-    it('getContainersList for selected pod', async () => {
-        const commandRunnerStub = sinon.createStubInstance(CommandRunner);
-        commandRunnerStub.runAsync.onFirstCall().resolves('"linkerd-proxy stats-api linkerd-init"');
-        const kubectlClient = new KubectlClient(`my/path/kubectl.exe`, commandRunnerStub, accountContextManagerStub, loggerStub);
-        const containersList: string[] = await kubectlClient.getContainersList(`dev`);
-        expect(containersList.length).not.to.equal(0);
-        expect(containersList[0]).to.equal('stats-api');
+    it('getContainerNames for selected pod name when multiple containers are found', async () => {
+        const acctContextManagerStubLocal = sinon.createStubInstance(AccountContextManager);
+        const k8sClientMock = {
+            k8sApi: sinon.createStubInstance(k8s.CoreV1Api)      
+        }
+        acctContextManagerStubLocal.getK8sClient.resolves(k8sClientMock.k8sApi);
+        k8sClientMock.k8sApi.readNamespacedPod.resolves({
+            response: {},
+            body: {
+                metadata: {
+                    name: 'stats-api-ff7d66c5b-4nc9x',
+                    namespace: 'namespace'
+                },
+                spec: {
+                    containers: [{
+                        name: 'stats-api'
+                    },
+                    {
+                        name: 'linkerd-proxy'
+                    }]
+                }
+            }
+        }); 
+        const kubectlClient = new KubectlClient(`my/path/kubectl.exe`, commandRunnerStub, acctContextManagerStubLocal, loggerStub);
+        const containerNames: string[] = await kubectlClient.getContainerNames('stats-api-ff7d66c5b-4nc9x', 'namespace');
+        expect(containerNames.length).to.equal(2);
     });
 
-    it('getContainersList for selected pod when no container is returned', async () => {
-        const commandRunnerStub = sinon.createStubInstance(CommandRunner);
-        commandRunnerStub.runAsync.onFirstCall().resolves('');
-        const kubectlClient = new KubectlClient(`my/path/kubectl.exe`, commandRunnerStub, accountContextManagerStub, loggerStub);
-        const containersList: string[] = await kubectlClient.getContainersList(`dev`);
-        expect(containersList).to.be.null;
-    });
-
-    it('getContainersList for selected pod when there is not multiple containers', async () => {
-        const commandRunnerStub = sinon.createStubInstance(CommandRunner);
-        commandRunnerStub.runAsync.onFirstCall().resolves('"stats-api"');
-        const kubectlClient = new KubectlClient(`my/path/kubectl.exe`, commandRunnerStub, accountContextManagerStub, loggerStub);
-        const containersList: string[] = await kubectlClient.getContainersList(`dev`);
-        expect(containersList[0]).to.equal('stats-api');
-    });
-
-    it('getContainersList for selected pod should return null for any error', async () => {
-        const commandRunnerStub = sinon.createStubInstance(CommandRunner);
-        commandRunnerStub.runAsync.onFirstCall().throws("error");
-        const kubectlClient = new KubectlClient(`my/path/kubectl.exe`, commandRunnerStub, accountContextManagerStub, loggerStub);
-        const containersList: string[] = await kubectlClient.getContainersList(`dev`);
-        expect(containersList).to.be.null;
-    });
-
-    it('getContainerLogs should return null if podName is null', async () => {
-        const commandRunnerStub = sinon.createStubInstance(CommandRunner);
-        const kubectlClient = new KubectlClient(`my/path/kubectl.exe`, commandRunnerStub, accountContextManagerStub, loggerStub);
-        const containersList: string[] = await kubectlClient.getContainersList(null);
-        expect(containersList).to.be.null;
-    });
-
-    it('getContainerLogs should return null if podName is empty', async () => {
-        const commandRunnerStub = sinon.createStubInstance(CommandRunner);
-        const kubectlClient = new KubectlClient(`my/path/kubectl.exe`, commandRunnerStub, accountContextManagerStub, loggerStub);
-        const containersList: string[] = await kubectlClient.getContainersList('');
-        expect(containersList).to.be.null;
-    });
-
-    it('getContainerLogs should handle output without double quotes', async () => {
-        const commandRunnerStub = sinon.createStubInstance(CommandRunner);
-        commandRunnerStub.runAsync.onFirstCall().resolves('linkerd-proxy stats-api linkerd-init logs');
-        const kubectlClient = new KubectlClient(`my/path/kubectl.exe`, commandRunnerStub, accountContextManagerStub, loggerStub);
-        const containersList: string[] = await kubectlClient.getContainersList('podName');
-        expect(containersList.length).to.equal(2);
-        expect(containersList[0]).to.equal('stats-api');
-        expect(containersList[1]).to.equal('logs');
-    });
-
-    it('getContainerLogs should handle output with spaces', async () => {
-        const commandRunnerStub = sinon.createStubInstance(CommandRunner);
-        commandRunnerStub.runAsync.onFirstCall().resolves('stats-api');
-        const kubectlClient = new KubectlClient(`my/path/kubectl.exe`, commandRunnerStub, accountContextManagerStub, loggerStub);
-        const containersList: string[] = await kubectlClient.getContainersList('podName');
-        expect(containersList.length).to.equal(1);
-        expect(containersList[0]).to.equal('stats-api');
+    it('getContainerNames for selected pod name when readNamespacedPod throws error', async () => {
+        const acctContextManagerStubLocal = sinon.createStubInstance(AccountContextManager);
+        const k8sClientMock = {
+            k8sApi: sinon.createStubInstance(k8s.CoreV1Api)      
+        }
+        acctContextManagerStubLocal.getK8sClient.resolves(k8sClientMock.k8sApi);
+        k8sClientMock.k8sApi.readNamespacedPod.throws("error");
+        const kubectlClient = new KubectlClient(`my/path/kubectl.exe`, commandRunnerStub, acctContextManagerStubLocal, loggerStub);
+        const containerNames: string[] = await kubectlClient.getContainerNames('stats-api-ff7d66c5b-4nc9x', 'namespace');
+        expect(containerNames).to.be.null
     });
 });

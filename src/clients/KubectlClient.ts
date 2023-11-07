@@ -100,62 +100,33 @@ export class KubectlClient implements IClient {
         }
     }
 
-    public async getContainersList(podName: string): Promise<string[]> {
+    public async getContainerNames(podName: string, namespace: string): Promise<string[]> {
         if (!podName) {
             this._logger.error(TelemetryEvent.KubectlClient_GetPodNameError, new Error(`Pod name is null`));
             return null;
         }
         try {
             // adding these decent amount of known sidecars to filter out the sidecars from the list
-            const knownSideCars: string[] = ['linkerd-proxy', 'linkerd-init', 'istio-proxy', 'darpd', 'jaeger-agent', 'nginx-proxy'];
-            const kubeconfigPath: string = await this._accountContextManager.getKubeconfigPathAsync();
-            const args: string[] = [`get`, `pod`, podName, `-o`, `jsonpath="{.spec['containers','initContainers'][*].name}"`];
-            const kubectlOutput: string = await this.runKubectlCommandAsync(args, kubeconfigPath);
-            if (kubectlOutput) {
-                // replace the double quotes and split the string by space ex: "linkerd-proxy stats-api linkerd-init" to [linkerd-proxy, stats-api, linkerd-init]
-                // and filter out the known sidecars from the list ex: [stats-api]
-                return kubectlOutput.replace('"', '').replace('"', '').split(' ')
-                    .filter(s => !knownSideCars.find(knownSideCar => knownSideCar == s));
-            } else {
-                this._logger.error(TelemetryEvent.KubectlClient_GetContainerListError, new Error(`container list is null`));
-                return null;
-            }
+            // commenting this for now to see users need this or not
+            //const knownSideCars: string[] = ['linkerd-proxy', 'linkerd-init', 'istio-proxy', 'darpd', 'jaeger-agent', 'nginx-proxy'];
+            const k8sClient = await this._accountContextManager.getK8sClient();
+            const response = await k8sClient.readNamespacedPod(podName, namespace);
+            return (response.body.spec?.containers || []).map(c => c.name);
         } catch (error) {
             this._logger.error(TelemetryEvent.KubectlClient_GetContainerListError, error);
             return null;
         }
-
     }
 
-    public async getPodName(serviceName: string): Promise<string> {
+    public async getPodNames(serviceName: string, namespace: string): Promise<string[]> {
         try {
-            const kubeconfigPath: string = await this._accountContextManager.getKubeconfigPathAsync();
-            // find the pod ipaddressList for the selected service
-            const args: string[] = [`get`, `ep`, serviceName, `-o`, `jsonpath='{.subsets[*].addresses[*].ip}'`];
-            let output = await this.runKubectlCommandAsync(args, kubeconfigPath);
-            // if there replicas and multiple pods, split it by apostrope, space example value: ''10.2.45.6 10.5.6.809''
-            // handles single value as well example value: ''10.56.78.90''
-            let ipaddressList: string[];
-            if (output && output.length > 0) {
-                ipaddressList = output.replace(/'/g, '').replace(/[\s,]+/g, ',').split(',');
-            }
-
-            if (ipaddressList?.length > 0) {
-                // find the podname by looping the ip address
-                for (const ip in ipaddressList) {
-                    const args2: string[] = [`get`, `pods`];
-                    const fieldSelector = '--field-selector=status.podIP='.concat(ipaddressList[ip]);
-                    args2.push(fieldSelector);
-                    args2.push("-o=name");
-                    const finalOutput = await this.runKubectlCommandAsync(args2, kubeconfigPath);
-                    // split the output by forward slash and new line char at the end example value: 'pod/stats-api-ff7d66c5b-4nc9x\n' 
-                    // output is stats-api-ff7d66c5b-4nc9x
-                    if (finalOutput?.length > 0) {
-                        return finalOutput.indexOf("/") != -1 ? finalOutput.split("/")[1].split("\n")[0] : finalOutput.split("\n")[0];
-                    }
-                }
-            }
-            return null;
+            const k8sClient = await this._accountContextManager.getK8sClient();
+            const resp = await k8sClient.readNamespacedEndpoints(serviceName, namespace);
+            return (resp.body.subsets || [])
+                .filter(subset => subset?.addresses !== undefined)
+                .flatMap(subset => subset.addresses)
+                .filter(address => address?.targetRef !== undefined)
+                .flatMap(address => address.targetRef.name);
         } catch (error) {
             this._logger.error(TelemetryEvent.KubectlClient_GetPodNameError, error);
             // not throwing error to continue the flow

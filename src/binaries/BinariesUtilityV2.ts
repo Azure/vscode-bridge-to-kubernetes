@@ -8,6 +8,7 @@ import * as path from 'path';
 import * as process from 'process';
 import * as vscode from 'vscode';
 
+import { Constants } from '../Constants';
 import { BinariesVersionClient } from '../clients/BinariesVersionClient';
 import { BridgeClient } from '../clients/BridgeClient';
 import { ClientType } from '../clients/ClientType';
@@ -18,11 +19,10 @@ import { BridgeClientProvider } from '../clients/Providers/BridgeClientProvider'
 import { DotNetClientProvider } from '../clients/Providers/DotNetClientProvider';
 import { IClientProvider } from '../clients/Providers/IClientProvider';
 import { KubectlClientProvider } from '../clients/Providers/KubectlClientProvider';
-import { Constants } from '../Constants';
 import { Logger } from '../logger/Logger';
 import { TelemetryEvent } from '../logger/TelemetryEvent';
-import { AccountContextManager } from '../models/context/AccountContextManager';
 import { IDownloadInfo } from '../models/IBinariesDownloadInfo';
+import { AccountContextManager } from '../models/context/AccountContextManager';
 import { EventSource, IReadOnlyEventSource } from '../utility/Event';
 import { fileSystem } from '../utility/FileSystem';
 import { VersionUtility } from '../utility/VersionUtility';

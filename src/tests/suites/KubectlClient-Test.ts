@@ -393,7 +393,7 @@ describe(`KubectlClient Test`, () => {
         expect(podNames[1]).to.equal('stats-api-ff7d66c5b-4nc5k');
     });
 
-    it('getPodNames for selected service name when listNamespacedEndpoints throws error', async () => {
+    it('getPodNames for selected service name when readNamespacedEndpoints throws error', async () => {
         const acctContextManagerStubLocal = sinon.createStubInstance(AccountContextManager);
         const k8sClientMock = {
             k8sApi: sinon.createStubInstance(k8s.CoreV1Api)      
@@ -459,7 +459,7 @@ describe(`KubectlClient Test`, () => {
         expect(containerNames.length).to.equal(2);
     });
 
-    it('getContainerNames for selected pod name when listNamedSpacedPod throws error', async () => {
+    it('getContainerNames for selected pod name when readNamespacedPod throws error', async () => {
         const acctContextManagerStubLocal = sinon.createStubInstance(AccountContextManager);
         const k8sClientMock = {
             k8sApi: sinon.createStubInstance(k8s.CoreV1Api)      

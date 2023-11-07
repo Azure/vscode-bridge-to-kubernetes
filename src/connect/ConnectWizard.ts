@@ -206,7 +206,7 @@ export class ConnectWizard {
         this._result.resourceName = pick.label;
         // get the list of containers
         const podNames = await kubectlClient.getPodNames(this._result.resourceName, this._result.targetNamespace);
-        if (podNames.length === 0) {
+        if (podNames?.length === 0) {
             this._result.containerName = undefined;
             return (input: MultiStepInput) => this.inputPortsAsync(input, resourceType);
         }
@@ -219,13 +219,13 @@ export class ConnectWizard {
         const podName = podNames[0];
         const containersList = await kubectlClient.getContainerNames(podName, this._result.targetNamespace);
 
-        if (containersList.length > 1) {
+        if (containersList?.length > 1) {
             // show containers quick pick list after filtering known sidecar containers
             const containerChoices: vscode.QuickPickItem[] = containersList.map(containers => ({ label: containers }));
             return (input: MultiStepInput) => this.inputContainersAsync(input, containerChoices, resourceType);
         } else {
             // single container for the service selected
-            this._result.containerName = containersList[0];
+            this._result.containerName = containersList?.[0];
             return (input: MultiStepInput) => this.inputPortsAsync(input, resourceType);
         }
     }

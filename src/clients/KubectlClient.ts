@@ -107,6 +107,7 @@ export class KubectlClient implements IClient {
         }
         try {
             // adding these decent amount of known sidecars to filter out the sidecars from the list
+            // commenting this for now to see users need this or not
             //const knownSideCars: string[] = ['linkerd-proxy', 'linkerd-init', 'istio-proxy', 'darpd', 'jaeger-agent', 'nginx-proxy'];
             const k8sClient = await this._accountContextManager.getK8sClient();
             const response = await k8sClient.readNamespacedPod(podName, namespace);

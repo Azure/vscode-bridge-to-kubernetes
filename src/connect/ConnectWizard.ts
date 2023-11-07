@@ -205,15 +205,27 @@ export class ConnectWizard {
         });
         this._result.resourceName = pick.label;
         // get the list of containers
-        const podName = await kubectlClient.getPodName(this._result.resourceName, this._result.targetNamespace);
-        const containersList: string[] = await kubectlClient.getContainersList(podName, this._result.targetNamespace);
-        if (containersList?.length > 1) {
+        const podNames = await kubectlClient.getPodNames(this._result.resourceName, this._result.targetNamespace);
+        if (podNames.length === 0) {
+            this._result.containerName = undefined;
+            return (input: MultiStepInput) => this.inputPortsAsync(input, resourceType);
+        }
+
+        // If the service is backed by more than one pod, Bridge will use the first result, see:
+        // https://github.com/Azure/Bridge-To-Kubernetes/blob/65a0527df3ad85525668c05e8737de71247087ab/src/library/Utilities/RemoteContainerConnectionDetailsResolver.cs#L102
+        // Since results are unordered, the resulting pod will be indeterminate, but we'll assume that
+        // if there are multiple pods, each one will have the same container configuration.
+        // So, we do the same as Bridge, and pick the first one here.
+        const podName = podNames[0];
+        const containersList = await kubectlClient.getContainerNames(podName, this._result.targetNamespace);
+
+        if (containersList.length > 1) {
             // show containers quick pick list after filtering known sidecar containers
             const containerChoices: vscode.QuickPickItem[] = containersList.map(containers => ({ label: containers }));
             return (input: MultiStepInput) => this.inputContainersAsync(input, containerChoices, resourceType);
         } else {
             // single container for the service selected
-            this._result.containerName = containersList?.[0];
+            this._result.containerName = containersList[0];
             return (input: MultiStepInput) => this.inputPortsAsync(input, resourceType);
         }
     }

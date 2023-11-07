@@ -100,48 +100,32 @@ export class KubectlClient implements IClient {
         }
     }
 
-    public async getContainersList(podNameList: string[], namespace: string): Promise<string[]> {
-        if (!podNameList || podNameList.length == 0) {
-            this._logger.error(TelemetryEvent.KubectlClient_GetPodNameError, new Error(`Pod name List is null`));
+    public async getContainerNames(podName: string, namespace: string): Promise<string[]> {
+        if (!podName) {
+            this._logger.error(TelemetryEvent.KubectlClient_GetPodNameError, new Error(`Pod name is null`));
             return null;
         }
         try {
             // adding these decent amount of known sidecars to filter out the sidecars from the list
             //const knownSideCars: string[] = ['linkerd-proxy', 'linkerd-init', 'istio-proxy', 'darpd', 'jaeger-agent', 'nginx-proxy'];
-            let containerList: string[] = [];
             const k8sClient = await this._accountContextManager.getK8sClient();
-            const response = await k8sClient.listNamespacedPod(namespace);
-            const pods = response.body.items;
-            podNameList.forEach(podName => {
-                const arr = pods
-                .find(pod => pod.metadata.name === podName)
-                ?.spec?.containers?.map(container => container.name);
-                if (arr && arr.length > 0) {
-                    containerList = containerList.concat(arr);
-                }
-            });
-
-            return [...new Set(containerList)]; // remove duplicates
+            const response = await k8sClient.readNamespacedPod(podName, namespace);
+            return (response.body.spec?.containers || []).map(c => c.name);
         } catch (error) {
             this._logger.error(TelemetryEvent.KubectlClient_GetContainerListError, error);
             return null;
         }
-
     }
 
-    public async getPodName(serviceName: string, namespace: string): Promise<string[]> {
+    public async getPodNames(serviceName: string, namespace: string): Promise<string[]> {
         try {
             const k8sClient = await this._accountContextManager.getK8sClient();
-            const resp = await k8sClient.listNamespacedEndpoints(namespace);
-            const endpoints = resp.body.items;
-            return endpoints
-            .filter(endpoint => endpoint?.metadata?.name === serviceName)
-            .filter(endpoint => endpoint?.subsets !== undefined)
-            .flatMap(endpoint => endpoint.subsets)
-            .filter(subset => subset?.addresses !== undefined)
-            .flatMap(subset => subset.addresses)
-            .filter(address => address?.targetRef !== undefined)
-            .flatMap(address => address.targetRef.name);
+            const resp = await k8sClient.readNamespacedEndpoints(serviceName, namespace);
+            return (resp.body.subsets || [])
+                .filter(subset => subset?.addresses !== undefined)
+                .flatMap(subset => subset.addresses)
+                .filter(address => address?.targetRef !== undefined)
+                .flatMap(address => address.targetRef.name);
         } catch (error) {
             this._logger.error(TelemetryEvent.KubectlClient_GetPodNameError, error);
             // not throwing error to continue the flow

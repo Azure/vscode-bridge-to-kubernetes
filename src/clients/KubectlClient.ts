@@ -184,7 +184,7 @@ export class KubectlClient implements IClient {
                     const usesHttps: boolean = ingressItem.spec.tls != null && ingressItem.spec.tls.find(item => item != null && item.hosts != null && item.hosts.indexOf(ingressRule.host) > -1) != null;
 
                     for (const path of ingressRule.http.paths) {
-                        if (path == null || path.backend == null || path.backend.serviceName == null) {
+                        if (path == null || path.backend == null || path.backend.service == null || path.backend.service.name == null) {
                             continue;
                         }
 
@@ -301,11 +301,6 @@ export class KubectlClient implements IClient {
     }
 
     private async runKubectlCommandAsync(args: string[], kubeconfigPath: string, quiet: boolean = false): Promise<string> {
-        // Run the kubectl command.
-        this._logger.trace(TelemetryEvent.KubectlClient_Command, {
-            args: args.join(` `)
-        });
-
         // We do not add the kubeconfigPath to args, as it is PII and we don't want it to be logged.
         let argsWithKubeconfig: string[] = [...args];
         if (kubeconfigPath != null) {

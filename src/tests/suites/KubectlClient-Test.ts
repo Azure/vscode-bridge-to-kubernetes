@@ -23,7 +23,7 @@ describe(`KubectlClient Test`, () => {
             "apiVersion": "v1",
             "items": [
                 {
-                    "apiVersion": "extensions/v1beta1",
+                    "apiVersion": "networking.k8s.io/v1",
                     "kind": "Ingress",
                     "metadata": {
                         "annotations": {
@@ -43,7 +43,6 @@ describe(`KubectlClient Test`, () => {
                         "name": "bikesharingweb",
                         "namespace": "dev",
                         "resourceVersion": "1314825",
-                        "selfLink": "/apis/extensions/v1beta1/namespaces/dev/ingresses/bikesharingweb",
                         "uid": "8044fe48-4e8c-454b-b8de-553d0988666e"
                     },
                     "spec": {
@@ -54,8 +53,12 @@ describe(`KubectlClient Test`, () => {
                                     "paths": [
                                         {
                                             "backend": {
-                                                "serviceName": "bikesharingweb",
-                                                "servicePort": "http"
+                                                "service": {
+                                                    "name": "bikesharingweb",
+                                                    "port": {
+                                                        "number": 80
+                                                    }
+                                                }
                                             },
                                             "path": "/"
                                         }
@@ -75,7 +78,7 @@ describe(`KubectlClient Test`, () => {
                     }
                 },
                 {
-                    "apiVersion": "extensions/v1beta1",
+                    "apiVersion": "networking.k8s.io/v1",
                     "kind": "Ingress",
                     "metadata": {
                         "annotations": {
@@ -95,7 +98,6 @@ describe(`KubectlClient Test`, () => {
                         "name": "gateway",
                         "namespace": "dev",
                         "resourceVersion": "1314824",
-                        "selfLink": "/apis/extensions/v1beta1/namespaces/dev/ingresses/gateway",
                         "uid": "0b61f6fa-f6ad-4a01-b1b2-89255bed41ca"
                     },
                     "spec": {
@@ -106,8 +108,12 @@ describe(`KubectlClient Test`, () => {
                                     "paths": [
                                         {
                                             "backend": {
-                                                "serviceName": "gateway",
-                                                "servicePort": "http"
+                                                "service": {
+                                                    "name": "gateway",
+                                                    "port": {
+                                                        "number": 80
+                                                    }
+                                                }
                                             },
                                             "path": "/"
                                         }
@@ -152,6 +158,118 @@ describe(`KubectlClient Test`, () => {
         const kubectlClient = new KubectlClient(`my/path/kubectl.exe`, commandRunnerStub, accountContextManagerStub, loggerStub);
         const ingresses: IKubernetesIngress[] = await kubectlClient.getIngressesAsync(`dev`, `c:/users/alias/.kube/config`, true);
 
+        expect(ingresses.length).to.equal(0);
+    });
+
+    it(`getIngressesAsync when the kubectl command returns ingresses without service`, async () => {
+        const returnString = `{
+            "apiVersion": "v1",
+            "items": [
+                {
+                    "apiVersion": "networking.k8s.io/v1",
+                    "kind": "Ingress",
+                    "metadata": {
+                        "annotations": {
+                            "kubernetes.io/ingress.class": "traefik",
+                            "meta.helm.sh/release-name": "bikesharingsampleapp",
+                            "meta.helm.sh/release-namespace": "dev"
+                        },
+                        "creationTimestamp": "2020-05-12T01:02:49Z",
+                        "generation": 1,
+                        "labels": {
+                            "app": "bikesharingweb",
+                            "app.kubernetes.io/managed-by": "Helm",
+                            "chart": "bikesharingweb-0.1.0",
+                            "heritage": "Helm",
+                            "release": "bikesharingsampleapp"
+                        },
+                        "name": "bikesharingweb",
+                        "namespace": "dev",
+                        "resourceVersion": "1314825",
+                        "uid": "8044fe48-4e8c-454b-b8de-553d0988666e"
+                    },
+                    "spec": {
+                        "rules": [
+                            {
+                                "host": "dev.bikesharingweb.j7l6v4gz8d.eus.mindaro.io",
+                                "http": {
+                                    "paths": [
+                                        {
+                                            "backend": {},
+                                            "path": "/"
+                                        }
+                                    ]
+                                }
+                            }
+                        ]
+                    },
+                    "status": {
+                        "loadBalancer": {
+                            "ingress": [
+                                {
+                                    "ip": "13.72.80.227"
+                                }
+                            ]
+                        }
+                    }
+                },
+                {
+                    "apiVersion": "networking.k8s.io/v1",
+                    "kind": "Ingress",
+                    "metadata": {
+                        "annotations": {
+                            "kubernetes.io/ingress.class": "traefik",
+                            "meta.helm.sh/release-name": "bikesharingsampleapp",
+                            "meta.helm.sh/release-namespace": "dev"
+                        },
+                        "creationTimestamp": "2020-05-12T01:02:49Z",
+                        "generation": 1,
+                        "labels": {
+                            "app": "gateway",
+                            "app.kubernetes.io/managed-by": "Helm",
+                            "chart": "gateway-0.1.0",
+                            "heritage": "Helm",
+                            "release": "bikesharingsampleapp"
+                        },
+                        "name": "gateway",
+                        "namespace": "dev",
+                        "resourceVersion": "1314824",
+                        "uid": "0b61f6fa-f6ad-4a01-b1b2-89255bed41ca"
+                    },
+                    "spec": {
+                        "rules": [
+                            {
+                                "host": "dev.gateway.j7l6v4gz8d.eus.mindaro.io",
+                                "http": {
+                                    "paths": [
+                                        {
+                                            "backend": {
+                                                "service": {}
+                                            },
+                                            "path": "/"
+                                        }
+                                    ]
+                                }
+                            }
+                        ]
+                    },
+                    "status": {
+                        "loadBalancer": {
+                            "ingress": [
+                                {
+                                    "ip": "13.72.80.227"
+                                }
+                            ]
+                        }
+                    }
+                }
+            ]
+        }`;
+        const commandRunnerStub = sinon.createStubInstance(CommandRunner);
+        commandRunnerStub.runAsync.resolves(returnString);
+        const kubectlClient = new KubectlClient(`my/path/kubectl.exe`, commandRunnerStub, accountContextManagerStub, loggerStub);
+        let ingresses: IKubernetesIngress[];
+        ingresses = await kubectlClient.getIngressesAsync(`dev`, `c:/users/alias/.kube/config`, false);
         expect(ingresses.length).to.equal(0);
     });
 

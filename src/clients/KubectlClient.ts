@@ -14,6 +14,7 @@ import { IKubernetesService } from '../models/IKubernetesService';
 import { RetryUtility } from '../utility/RetryUtility';
 import { CommandRunner } from './CommandRunner';
 import { IClient } from './IClient';
+import { asError } from '../utility/Errors';
 
 export interface IKubeconfigEnrichedContext {
     cluster: string;
@@ -100,7 +101,7 @@ export class KubectlClient implements IClient {
         }
     }
 
-    public async getContainerNames(podName: string, namespace: string): Promise<string[]> {
+    public async getContainerNames(podName: string, namespace: string): Promise<string[] | null> {
         if (!podName) {
             this._logger.error(TelemetryEvent.KubectlClient_GetPodNameError, new Error(`Pod name is null`));
             return null;
@@ -113,22 +114,22 @@ export class KubectlClient implements IClient {
             const response = await k8sClient.readNamespacedPod(podName, namespace);
             return (response.body.spec?.containers || []).map(c => c.name);
         } catch (error) {
-            this._logger.error(TelemetryEvent.KubectlClient_GetContainerListError, error);
+            this._logger.error(TelemetryEvent.KubectlClient_GetContainerListError, asError(error));
             return null;
         }
     }
 
-    public async getPodNames(serviceName: string, namespace: string): Promise<string[]> {
+    public async getPodNames(serviceName: string, namespace: string): Promise<string[] | null> {
         try {
             const k8sClient = await this._accountContextManager.getK8sClient();
             const resp = await k8sClient.readNamespacedEndpoints(serviceName, namespace);
             return (resp.body.subsets || [])
                 .filter(subset => subset?.addresses !== undefined)
                 .flatMap(subset => subset.addresses)
-                .filter(address => address?.targetRef !== undefined)
-                .flatMap(address => address.targetRef.name);
+                .filter(address => address?.targetRef?.name !== undefined)
+                .flatMap(address => address!.targetRef!.name!);
         } catch (error) {
-            this._logger.error(TelemetryEvent.KubectlClient_GetPodNameError, error);
+            this._logger.error(TelemetryEvent.KubectlClient_GetPodNameError, asError(error));
             // not throwing error to continue the flow
             return null;
         }

@@ -257,17 +257,7 @@ export class ConnectWizard {
         // if there are multiple pods, each one will have the same container configuration.
         // So, we do the same as Bridge, and pick the first one here.
         const podName = podNames[0];
-        const containersList = await kubectlClient.getContainerNames(podName, this._result.targetNamespace);
-
-        if (containersList?.length > 1) {
-            // show containers quick pick list to select the container to debug
-            const containerChoices: vscode.QuickPickItem[] = containersList.map(containers => ({ label: containers }));
-            return (input: MultiStepInput) => this.inputContainersAsync(input, containerChoices, resourceType);
-        }
-
-        // single container for the service selected
-        this._result.containerName = containersList?.[0];
-        return (input: MultiStepInput) => this.inputPortsAsync(input, resourceType);
+        return await this.getContainerSelection(podName, resourceType, kubectlClient);
     }
 
     private async inputContainersAsync(input: MultiStepInput, containerChoices: vscode.QuickPickItem[], resourceType: ResourceType) {

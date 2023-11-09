@@ -102,10 +102,6 @@ export class KubectlClient implements IClient {
     }
 
     public async getContainerNames(podName: string, namespace: string): Promise<string[] | null> {
-        if (!podName) {
-            this._logger.error(TelemetryEvent.KubectlClient_GetPodNameError, new Error(`Pod name is null`));
-            return null;
-        }
         try {
             // adding these decent amount of known sidecars to filter out the sidecars from the list
             // commenting this for now to see users need this or not

@@ -104,6 +104,7 @@ export enum TelemetryEvent {
     KubectlClient_GetVersionError = "kubectl-client-get-version-error",
     KubectlClient_GetVersionSuccess = "kubectl-client-get-version-success",
     KubectlClient_GetPodNameError = "kubectl-client-get-pod-name-error",
+    KubectlClient_GetNamespaceError = "kubectl-client-get-namespace-error",
     KubectlClient_GetContainerListError = "kubectl-client-get-container-list-error",
     KubernetesPanelCustomizer_ApiUnavailableError = "kubernetes-panel-customizer-api-unavailable-error",
     KubernetesPanelCustomizer_SupportedFqdnEvaluation = "kubernetes-panel-customizer-supported-fqdn-evaluation",

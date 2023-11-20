@@ -28,6 +28,7 @@ export class ConnectServiceTaskTerminal extends TaskTerminalBase {
         private readonly _resourceType: ResourceType,
         private readonly _ports: number[],
         private readonly _isolateAs: string,
+        private readonly _containerName: string,
         private readonly _targetCluster: string,
         private readonly _targetNamespace: string,
         private readonly _useKubernetesServiceEnvironmentVariables: boolean,
@@ -47,7 +48,8 @@ export class ConnectServiceTaskTerminal extends TaskTerminalBase {
                 && connectionTarget.ports.every((value: number, index: number) => value === this._ports[index])
                 && connectionTarget.isolateAs === this._isolateAs
                 && connectionTarget.targetCluster === this._targetCluster
-                && connectionTarget.targetNamespace === this._targetNamespace) {
+                && connectionTarget.targetNamespace === this._targetNamespace
+                && connectionTarget.containerName === this._containerName) {
                 this._writeLine(`Kubernetes ${this._resourceType} ${this._resourceName} is redirected successfully to your machine.`);
                 this._logger.trace(`A Connect terminal was started despite the Connect connection status being already 'Connected'. Ignoring the new call.`);
                 this._connectStartedCallback(/*alreadyConnected*/ true);
@@ -103,6 +105,7 @@ export class ConnectServiceTaskTerminal extends TaskTerminalBase {
                 this._resourceType,
                 this._ports,
                 this._isolateAs,
+                this._containerName,
                 this._targetCluster,
                 this._targetNamespace,
                 this._useKubernetesServiceEnvironmentVariables,

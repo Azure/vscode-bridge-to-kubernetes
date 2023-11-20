@@ -312,6 +312,7 @@ export class WorkspaceFolderManager {
         const isolateAs: string = task.definition[`isolateAs`];
         const targetCluster: string = task.definition[`targetCluster`];
         const targetNamespace: string = task.definition[`targetNamespace`];
+        const containerName: string = task.definition[`targetContainer`];
         const useKubernetesServiceEnvironmentVariablesValue: any = task.definition[`useKubernetesServiceEnvironmentVariables`];
         const useKubernetesServiceEnvironmentVariables: boolean = useKubernetesServiceEnvironmentVariablesValue != null ? useKubernetesServiceEnvironmentVariablesValue : false;
 
@@ -328,6 +329,7 @@ export class WorkspaceFolderManager {
                     resourceType,
                     ports,
                     isolateAs,
+                    containerName,
                     targetCluster,
                     targetNamespace,
                     useKubernetesServiceEnvironmentVariables,
@@ -509,7 +511,8 @@ export class WorkspaceFolderManager {
             wizardOutput.launchConfigurationName,
             wizardOutput.isolateAs,
             wizardOutput.targetCluster,
-            wizardOutput.targetNamespace
+            wizardOutput.targetNamespace,
+            wizardOutput.containerName
         );
 
         if (wizardOutput.launchConfigurationName == null) {

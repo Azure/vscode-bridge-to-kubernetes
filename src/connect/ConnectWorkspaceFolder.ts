@@ -39,6 +39,7 @@ export interface IConnectionTarget {
     resourceType: ResourceType;
     ports: number[];
     isolateAs: string;
+    containerName?: string;
     targetCluster: string;
     targetNamespace: string;
 }
@@ -156,6 +157,7 @@ export class ConnectWorkspaceFolder extends WorkspaceFolderBase {
         resourceType: ResourceType,
         ports: number[],
         isolateAs: string,
+        containerName: string,
         targetCluster: string,
         targetNamespace: string,
         useKubernetesServiceEnvironmentVariables: boolean,
@@ -260,6 +262,7 @@ export class ConnectWorkspaceFolder extends WorkspaceFolderBase {
                     resourceType: resourceType,
                     ports: ports,
                     isolateAs: isolateAs,
+                    containerName: containerName,
                     targetCluster: targetCluster,
                     targetNamespace: targetNamespace
                 };
@@ -339,6 +342,7 @@ export class ConnectWorkspaceFolder extends WorkspaceFolderBase {
                     /*parentProcessId*/ process.ppid.toString(),
                     consentedElevationRequests,
                     isolateAs,
+                    containerName,
                     kubeconfig.namespace,
                     useKubernetesServiceEnvironmentVariables,
                     experimentationService);

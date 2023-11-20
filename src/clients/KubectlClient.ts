@@ -6,7 +6,6 @@
 import * as dns from 'dns';
 
 import { ClientType } from '../clients/ClientType';
-import { Constants } from '../Constants';
 import { Logger } from '../logger/Logger';
 import { TelemetryEvent } from '../logger/TelemetryEvent';
 import { AccountContextManager } from '../models/context/AccountContextManager';
@@ -15,6 +14,7 @@ import { IKubernetesService } from '../models/IKubernetesService';
 import { RetryUtility } from '../utility/RetryUtility';
 import { CommandRunner } from './CommandRunner';
 import { IClient } from './IClient';
+import { asError } from '../utility/Errors';
 
 export interface IKubeconfigEnrichedContext {
     cluster: string;
@@ -40,7 +40,7 @@ export class KubectlClient implements IClient {
         let kubectlOutput: string = null;
         try {
             kubeconfigPath = await this._accountContextManager.getKubeconfigPathAsync(/*shouldDisplayErrorIfNeeded*/ false);
-            kubectlOutput = await this.runKubectlCommandAsync([ `config`, `view`, `--minify`, `-o`, `json` ], kubeconfigPath, /*quiet*/ true);
+            kubectlOutput = await this.runKubectlCommandAsync([`config`, `view`, `--minify`, `-o`, `json`], kubeconfigPath, /*quiet*/ true);
         }
         catch (error) {
             if (error.message.includes(`error: current-context must exist in order to minify`) && kubeconfigPath != null) {
@@ -81,7 +81,7 @@ export class KubectlClient implements IClient {
     public async getAllFqdnsAsync(): Promise<string[]> {
         try {
             const kubeconfigPath: string = await this._accountContextManager.getKubeconfigPathAsync(/*shouldDisplayErrorIfNeeded*/ false);
-            const kubectlOutput: string = await this.runKubectlCommandAsync([ `config`, `view`, `-o`, `jsonpath={.clusters[*].cluster.server}` ], kubeconfigPath);
+            const kubectlOutput: string = await this.runKubectlCommandAsync([`config`, `view`, `-o`, `jsonpath={.clusters[*].cluster.server}`], kubeconfigPath);
             const servers: string[] = kubectlOutput.split(` `);
             const fqdns: string[] = servers.map((server: string) => {
                 try {
@@ -101,10 +101,40 @@ export class KubectlClient implements IClient {
         }
     }
 
+    public async getContainerNames(podName: string, namespace: string): Promise<string[] | null> {
+        try {
+            // adding these decent amount of known sidecars to filter out the sidecars from the list
+            // commenting this for now to see users need this or not
+            //const knownSideCars: string[] = ['linkerd-proxy', 'linkerd-init', 'istio-proxy', 'darpd', 'jaeger-agent', 'nginx-proxy'];
+            const k8sClient = await this._accountContextManager.getK8sClient();
+            const response = await k8sClient.readNamespacedPod(podName, namespace);
+            return (response.body.spec?.containers || []).map(c => c.name);
+        } catch (error) {
+            this._logger.error(TelemetryEvent.KubectlClient_GetContainerListError, asError(error));
+            return null;
+        }
+    }
+
+    public async getPodNames(serviceName: string, namespace: string): Promise<string[] | null> {
+        try {
+            const k8sClient = await this._accountContextManager.getK8sClient();
+            const resp = await k8sClient.readNamespacedEndpoints(serviceName, namespace);
+            return (resp.body.subsets || [])
+                .filter(subset => subset?.addresses !== undefined)
+                .flatMap(subset => subset.addresses)
+                .filter(address => address?.targetRef?.name !== undefined)
+                .flatMap(address => address!.targetRef!.name!);
+        } catch (error) {
+            this._logger.error(TelemetryEvent.KubectlClient_GetPodNameError, asError(error));
+            // not throwing error to continue the flow
+            return null;
+        }
+    }
+
     public async getServicesAsync(namespace: string = null): Promise<IKubernetesService[]> {
         const kubeconfigPath: string = await this._accountContextManager.getKubeconfigPathAsync();
-        const args: string[] = [ `get`, `services`, `-o`, `json` ];
-        args.push(...(namespace != null ? [ `-n`, namespace ] : [ `--all-namespaces` ]));
+        const args: string[] = [`get`, `services`, `-o`, `json`];
+        args.push(...(namespace != null ? [`-n`, namespace] : [`--all-namespaces`]));
         const kubectlOutput: string = await this.runKubectlCommandAsync(args, kubeconfigPath);
 
         const servicesItems: any[] = JSON.parse(kubectlOutput).items;
@@ -130,7 +160,7 @@ export class KubectlClient implements IClient {
     }
 
     public async getIngressesAsync(namespace: string, kubeconfigPath: string, quiet: boolean): Promise<IKubernetesIngress[]> {
-        const args: string[] = [ `get`, `ingress`, `-n`, namespace, `-o`, `json` ];
+        const args: string[] = [`get`, `ingress`, `-n`, namespace, `-o`, `json`];
         const kubectlOutput: string = await this.runKubectlCommandAsync(args, kubeconfigPath, quiet);
 
         const ingressesItems: any[] = JSON.parse(kubectlOutput).items;
@@ -184,7 +214,7 @@ export class KubectlClient implements IClient {
     }
 
     public async getLoadBalancerIngressesAsync(namespace: string, kubeconfigPath: string, quiet: boolean): Promise<IKubernetesIngress[]> {
-        const args: string[] = [ `get`, `services`, `-n`, namespace, `-o`, `json` ];
+        const args: string[] = [`get`, `services`, `-n`, namespace, `-o`, `json`];
         const kubectlOutput: string = await this.runKubectlCommandAsync(args, kubeconfigPath, quiet);
 
         const servicesItems: any[] = JSON.parse(kubectlOutput).items;
@@ -226,7 +256,7 @@ export class KubectlClient implements IClient {
 
     public async getNamespacesAsync(kubeconfigPath: string): Promise<string[]> {
         try {
-            const args: string[] = [ `get`, `namespaces`, `-o`, `jsonpath={.items[*].metadata.name}` ];
+            const args: string[] = [`get`, `namespaces`, `-o`, `jsonpath={.items[*].metadata.name}`];
             const kubectlOutput: string = await this.runKubectlCommandAsync(args, kubeconfigPath);
             const namespaces: string[] = kubectlOutput.split(` `);
             return namespaces;
@@ -246,7 +276,7 @@ export class KubectlClient implements IClient {
             // Adding retries to ensure the kubectl client is intialized properly
             // as this command is executed right after the download.
             const getVersionAsyncFn = async (): Promise<string> => {
-                const args: string[] = [ `version`, `--short`, `--client`, `-o`, `json` ];
+                const args: string[] = [`version`, `--short`, `--client`, `-o`, `json`];
                 const kubectlOutput: string = await this.runKubectlCommandAsync(args, /*kubeconfigPath*/ null, true);
                 const versionJson: object = JSON.parse(kubectlOutput);
                 let version: string = versionJson[`clientVersion`][`gitVersion`]; // Example: v1.16.8
@@ -269,9 +299,9 @@ export class KubectlClient implements IClient {
 
     private async runKubectlCommandAsync(args: string[], kubeconfigPath: string, quiet: boolean = false): Promise<string> {
         // We do not add the kubeconfigPath to args, as it is PII and we don't want it to be logged.
-        let argsWithKubeconfig: string[] = [ ...args ];
+        let argsWithKubeconfig: string[] = [...args];
         if (kubeconfigPath != null) {
-            argsWithKubeconfig = argsWithKubeconfig.concat([ `--kubeconfig`, kubeconfigPath ]);
+            argsWithKubeconfig = argsWithKubeconfig.concat([`--kubeconfig`, kubeconfigPath]);
         }
 
         try {

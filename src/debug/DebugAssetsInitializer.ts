@@ -109,7 +109,8 @@ export class DebugAssetsInitializer {
         launchConfigurationName: string,
         isolateAs: string,
         targetCluster: string,
-        targetNamespace: string): Promise</*connectDebugConfigurationName*/ string> {
+        targetNamespace: string,
+        containerName: string): Promise</*connectDebugConfigurationName*/ string> {
         const launchConfig: vscode.WorkspaceConfiguration = vscode.workspace.getConfiguration(`launch`, this._workspaceFolder.uri);
         let debugConfigurations: object[] = launchConfig.get<{}[]>(`configurations`, /*defaultValue*/ []);
         const tasksConfig: vscode.WorkspaceConfiguration = vscode.workspace.getConfiguration(`tasks`, this._workspaceFolder.uri);
@@ -142,8 +143,12 @@ export class DebugAssetsInitializer {
             useKubernetesServiceEnvironmentVariables: false
         };
 
-        if (isolateAs != null) {
+        if (isolateAs?.length > 0) {
             connectPreLaunchTask[`isolateAs`] = isolateAs;
+        }
+
+        if (containerName?.length > 0) {
+            connectPreLaunchTask[`targetContainer`] = containerName;
         }
 
         tasks = tasks.concat(connectPreLaunchTask);

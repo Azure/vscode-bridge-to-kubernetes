@@ -8,7 +8,7 @@ import * as usernameGetter from 'username';
 import * as vscode from 'vscode';
 
 import { IBinariesUtility } from '../binaries/IBinariesUtility';
-import { IKubeconfigEnrichedContext } from '../clients/KubectlClient';
+import { IKubeconfigEnrichedContext, KubectlClient } from '../clients/KubectlClient';
 import { Constants } from '../Constants';
 import { DebugAssetsInitializer } from '../debug/DebugAssetsInitializer';
 import { Logger } from '../logger/Logger';
@@ -16,11 +16,13 @@ import { TelemetryEvent } from '../logger/TelemetryEvent';
 import { IKubernetesService } from '../models/IKubernetesService';
 import { CheckExtensionSupport } from '../utility/CheckExtensionSupport';
 import { KubeconfigCredentialsManager } from '../utility/KubeconfigCredentialsManager';
-import { IActionQuickPickItem, IQuickPickParameters, MultiStepInput } from '../utility/MultiStepInput';
+import { IActionQuickPickItem, IQuickPickParameters, InputStep, MultiStepInput } from '../utility/MultiStepInput';
 import { StringUtility } from '../utility/StringUtility';
 import { UrlUtility } from '../utility/UrlUtility';
 import { IWizardOutput } from './IWizardOutput';
 import { ResourceType } from './ResourceType';
+import { BridgeClient } from '../clients/BridgeClient';
+import { asError } from '../utility/Errors';
 
 export class ConnectWizard {
     private NumberOfSteps = 4; // Update this number if you add/remove any steps in the wizard
@@ -36,10 +38,10 @@ export class ConnectWizard {
 
     public async runAsync(
         wizardReason: string,
-        targetResourceName: string = null,
-        targetResourceNamespace: string = null,
+        targetResourceName: string | null,
+        targetResourceNamespace: string | null,
         targetResourceType: ResourceType = ResourceType.Service
-    ): Promise<IWizardOutput> {
+    ): Promise<IWizardOutput | null> {
         const prerequisitesAlertCallback = CheckExtensionSupport.validatePrerequisites(this._logger, /*validatePostDownloadPrerequisites*/ false);
         if (prerequisitesAlertCallback != null) {
             prerequisitesAlertCallback();
@@ -51,94 +53,26 @@ export class ConnectWizard {
             type: targetResourceType
         });
 
-        if (targetResourceType.toLowerCase() === `pod`) {
-            // We skip the isolation step when debugging pods
-            this.NumberOfSteps = 3;
+        const kubectlClient = await this._binariesUtility.tryGetKubectlAsync();
+        const bridgeClient = await this._binariesUtility.tryGetBridgeAsync();
+        if (kubectlClient == null || bridgeClient == null) {
+            return null;
         }
+        const currentContext: IKubeconfigEnrichedContext = await kubectlClient.getCurrentContextAsync();
 
         try {
-            await MultiStepInput.runAsync(async (input) => {
-                // Start displaying the placeholder quickpick as soon as possible, so that the users
-                // see immediately that their actions were taken into account.
-                // TODO: Refactor the placeholder mechanism so that it works in a more generic way.
-                let placeholderMessage = `Choose a ${targetResourceType} to redirect to your machine`;
-                if (targetResourceName != null) {
-                    placeholderMessage = `Redirecting ${targetResourceType} '${targetResourceName}' to your machine...`;
-                }
-
-                input.showPlaceHolderQuickPick({
-                    title: this.getInputTitle(),
-                    step: 1,
-                    totalSteps: this.NumberOfSteps,
-                    placeholder: placeholderMessage,
-                    items: []
-                });
-
-                const kubectlClient = await this._binariesUtility.tryGetKubectlAsync();
-                const bridgeClient = await this._binariesUtility.tryGetBridgeAsync();
-                let currentContext: IKubeconfigEnrichedContext = null;
-                if (kubectlClient != null) {
-                    currentContext = await kubectlClient.getCurrentContextAsync();
-                }
-
-                if (kubectlClient == null || bridgeClient == null || currentContext == null) {
-                    return null;
-                }
-
-                if (!await KubeconfigCredentialsManager.refreshCredentialsAsync(currentContext.kubeconfigPath, currentContext.namespace, bridgeClient, this._logger)) {
-                    return null;
-                }
-
-                if (targetResourceName == null) {
-                    // Note: This will only happen when the Configuration flow is activated through the Command Palette. The Command Palette currently only allows
-                    // you to select services to debug.
-                    if (targetResourceType !== ResourceType.Service) {
-                        throw new Error(`Target resource name cannot be unset for resource type ${targetResourceType}`);
-                    }
-                    return this.pickServiceAsync(input, currentContext, targetResourceType);
-                }
-
-                // A target resource was passed in, so we can can skip some configuration steps.
-                // Validate the current context against the selected resource
-                if (targetResourceNamespace != null && currentContext.namespace != null && currentContext.namespace !== targetResourceNamespace) {
-                    throw new Error(`The ${targetResourceType} '${targetResourceName}' belongs to the namespace '${targetResourceNamespace}', `
-                                    + `but the current context targets namespace '${currentContext.namespace}'. Please update your kubeconfig to target the correct context.`);
-                }
-
-                let namespaces: string[] = null;
-                try {
-                    namespaces = await kubectlClient.getNamespacesAsync(currentContext.kubeconfigPath);
-                }
-                catch (error) {
-                    // We want to recover if for some reason the user isn't able to list namespaces.
-                    this._logger.warning(`Failed to list namespaces`, error);
-                }
-                if (namespaces != null && !namespaces.includes(targetResourceNamespace)) {
-                    // In practice, this error should happen rarely, as the K8s cluster explorer only allows interaction with resources from the current cluster
-                    throw new Error(`Failed to find the namespace '${targetResourceNamespace}' in cluster '${currentContext.cluster}'`);
-                }
-
-                let resourceNameToPersist: string = targetResourceName;
-                if (targetResourceType === ResourceType.Pod) {
-                    // Because the specific pod name changes, we persist only the first segments of the name, e.g. <deployment name>-<deployment guid>-.
-                    const split: string[] = targetResourceName.split(`-`);
-                    if (split.length > 1) {
-                        // Delete last segment
-                        split.splice(-1, 1);
-                        resourceNameToPersist = `${split.join(`-`)}`;
-                    }
-                }
-
-                this._result.resourceName = resourceNameToPersist;
-                this._result.targetCluster = currentContext.cluster;
-                this._result.targetNamespace = targetResourceNamespace;
-                this._result.resourceType = targetResourceType;
-
-                return (input: MultiStepInput): Promise<(input: MultiStepInput) => Promise<(input: MultiStepInput) => Promise<void>>> => this.inputPortsAsync(input, targetResourceType);
-            });
-        }
-        catch (error) {
-            this._logger.error(TelemetryEvent.Connect_WizardError, error, {
+            switch (targetResourceType) {
+                case ResourceType.Pod:
+                    await this.handlePodResourceType(targetResourceName, targetResourceNamespace, currentContext, bridgeClient, kubectlClient);
+                    break;
+                case ResourceType.Service:
+                    await this.handleServiceResourceType(targetResourceName, targetResourceNamespace, currentContext, bridgeClient, kubectlClient);
+                    break;
+                default:
+                    throw new Error(`Unexpected resource type ${targetResourceType}`);
+            }
+        } catch (error) {
+            this._logger.error(TelemetryEvent.Connect_WizardError, asError(error), {
                 wizardReason: wizardReason,
                 type: targetResourceType,
                 resourceName: this._result.resourceName,
@@ -147,35 +81,158 @@ export class ConnectWizard {
                 isolateAs: this._result.isolateAs,
                 targetCluster: this._result.targetCluster,
                 targetNamespace: this._result.targetNamespace,
+                containerName: this._result.containerName,
                 isCreatingNewLaunchConfiguration: this._isCreatingNewLaunchConfiguration
             });
-            vscode.window.showErrorMessage(`Failed to configure ${Constants.ProductName}: ${error.message}`);
+            vscode.window.showErrorMessage(`Failed to configure ${Constants.ProductName}: ${asError(error).message}`);
+        } finally {
+            this._logger.trace(TelemetryEvent.Connect_WizardStop, {
+                wizardReason: wizardReason,
+                type: targetResourceType,
+                isWizardComplete: this._isWizardComplete,
+                isResourceNameSet: (this._result.resourceName != null && this._result.resourceName.length > 0).toString(),
+                ports: this._result.ports != null ? this._result.ports.join(`,`) : undefined,
+                launchConfigurationName: this._result.launchConfigurationName,
+                isIsolateAsSet: (this._result.isolateAs != null && this._result.isolateAs.length > 0).toString(),
+                isTargetClusterSet: (this._result.targetCluster != null && this._result.targetCluster.length > 0).toString(),
+                isTargetNamespaceSet: (this._result.targetNamespace != null && this._result.targetNamespace.length > 0).toString(),
+                isContainerNameSet: (this._result.containerName != null && this._result.containerName.length > 0).toString(),
+                isCreatingNewLaunchConfiguration: this._isCreatingNewLaunchConfiguration
+            });
+            return this._isWizardComplete ? this._result as IWizardOutput : null;
+        }
+    }
+
+    private async prevalidateAsync(targetResourceType: string,
+        targetResourceName: string | null,
+        targetResourceNamespace: string | null,
+        currentContext: IKubeconfigEnrichedContext,
+        bridgeClient: BridgeClient,
+        kubectlClient: KubectlClient,
+        input: MultiStepInput): Promise<void | null> {
+        // Start displaying the placeholder quickpick as soon as possible, so that the users
+        // see immediately that their actions were taken into account.
+        // TODO: Refactor the placeholder mechanism so that it works in a more generic way.
+        let placeholderMessage = `Choose a ${targetResourceType} to redirect to your machine`;
+        if (targetResourceName != null) {
+            placeholderMessage = `Redirecting ${targetResourceType} '${targetResourceName}' to your machine...`;
+        }
+
+        input.showPlaceHolderQuickPick({
+            title: this.getInputTitle(),
+            step: 1,
+            totalSteps: this.NumberOfSteps,
+            placeholder: placeholderMessage,
+            items: []
+        });
+
+        if (!await KubeconfigCredentialsManager.refreshCredentialsAsync(currentContext.kubeconfigPath, currentContext.namespace, bridgeClient, this._logger)) {
             return null;
         }
 
-        this._logger.trace(TelemetryEvent.Connect_WizardStop, {
-            wizardReason: wizardReason,
-            type: targetResourceType,
-            isWizardComplete: this._isWizardComplete,
-            isResourceNameSet: (this._result.resourceName != null && this._result.resourceName.length > 0).toString(),
-            ports: this._result.ports != null ? this._result.ports.join(`,`) : undefined,
-            launchConfigurationName: this._result.launchConfigurationName,
-            isIsolateAsSet: (this._result.isolateAs != null && this._result.isolateAs.length > 0).toString(),
-            isTargetClusterSet: (this._result.targetCluster != null && this._result.targetCluster.length > 0).toString(),
-            isTargetNamespaceSet: (this._result.targetNamespace != null && this._result.targetNamespace.length > 0).toString(),
-            isCreatingNewLaunchConfiguration: this._isCreatingNewLaunchConfiguration
-        });
-        return this._isWizardComplete ? this._result as IWizardOutput : null;
+        // this would be null in case of targetResourceType === 'service' and none of the below code will be executed
+        if (targetResourceName == null || targetResourceNamespace == null) {
+            return null;
+        }
+
+        // A target resource was passed in, so we can can skip some configuration steps.
+        // Validate the current context against the selected resource
+        if (targetResourceNamespace != null && currentContext.namespace != null && currentContext.namespace !== targetResourceNamespace) {
+            throw new Error(`The ${targetResourceType} '${targetResourceName}' belongs to the namespace '${targetResourceNamespace}', `
+                + `but the current context targets namespace '${currentContext.namespace}'. Please update your kubeconfig to target the correct context.`);
+        }
+
+        let namespaces: string[] | null = null;
+        try {
+            namespaces = await kubectlClient.getNamespacesAsync(currentContext.kubeconfigPath);
+        }
+        catch (error) {
+            // We want to recover if for some reason the user isn't able to list namespaces.
+            this._logger.warning(`Failed to list namespaces`, asError(error));
+        }
+        if (namespaces != null && !namespaces.includes(targetResourceNamespace)) {
+            // In practice, this error should happen rarely, as the K8s cluster explorer only allows interaction with resources from the current cluster
+            throw new Error(`Failed to find the namespace '${targetResourceNamespace}' in cluster '${currentContext.cluster}'`);
+        }
     }
+
+    private async handlePodResourceType(targetResourceName: string | null, targetResourceNamespace: string | null, currentContext: IKubeconfigEnrichedContext, bridgeClient: BridgeClient, kubectlClient: KubectlClient) {
+        if (targetResourceName === null) {
+            // Note: This will only happen when the Configuration flow is activated through the Command Palette. The Command Palette currently only allows
+            // you to select services to debug.
+            throw new Error(`Target resource name cannot be unset for resource type pod`);
+        }
+
+        // We skip the isolation step when debugging pods
+        this.NumberOfSteps = 3;
+        await MultiStepInput.runAsync(async (input) => {
+            await this.prevalidateAsync(ResourceType.Pod, targetResourceName, targetResourceNamespace, currentContext, bridgeClient, kubectlClient, input);
+            let resourceNameToPersist: string = targetResourceName;
+            // Because the specific pod name changes, we persist only the first segments of the name, e.g. <deployment name>-<deployment guid>-.
+            const split: string[] = targetResourceName.split(`-`);
+            if (split.length > 1) {
+                // Delete last segment
+                split.splice(-1, 1);
+                resourceNameToPersist = `${split.join(`-`)}`;
+            }
+
+            this._result.resourceName = resourceNameToPersist;
+            this._result.targetCluster = currentContext.cluster;
+            this._result.targetNamespace = targetResourceNamespace;
+            this._result.resourceType = ResourceType.Pod;
+
+            return await this.getContainerSelection(targetResourceName, ResourceType.Pod, kubectlClient);
+        });
+    }
+
+    private async handleServiceResourceType(targetResourceName: string | null, targetResourceNamespace: string | null, currentContext: IKubeconfigEnrichedContext, bridgeClient: any, kubectlClient: any) {
+        await MultiStepInput.runAsync(async (input) => {
+            await this.prevalidateAsync(ResourceType.Service, targetResourceName, targetResourceNamespace, currentContext, bridgeClient, kubectlClient, input);
+            return this.pickServiceAsync(input, currentContext, ResourceType.Service);
+        });
+    }
+
+
+    private async getContainerSelection(targetResourceName: string | null, targetResourceType: ResourceType, kubectlClient: KubectlClient): Promise<(input: MultiStepInput) => Promise<any>> {
+        this._result.containerName = undefined;
+        const nextStep = (input: MultiStepInput) => this.inputPortsAsync(input, targetResourceType);
+
+        if (!targetResourceName) {
+            this._logger.error(TelemetryEvent.KubectlClient_GetPodNameError, new Error(`Pod name is not set`));
+            return nextStep;
+        }
+
+        if (!this._result.targetNamespace) {
+            this._logger.error(TelemetryEvent.KubectlClient_GetNamespaceError, new Error(`Namespace is not set`));
+            return nextStep;
+        }
+
+        // get the list of containers
+        const containersList: string[] | null = await kubectlClient.getContainerNames(targetResourceName, this._result.targetNamespace);
+        if (containersList === null) {
+            return nextStep;
+        }
+
+        if (containersList.length > 1) {
+            // show containers quick pick list to select the container to debug
+            const containerChoices: vscode.QuickPickItem[] = containersList.map((containers: any) => ({ label: containers }));
+            return (input: MultiStepInput) => this.inputContainersAsync(input, containerChoices, targetResourceType, nextStep);
+        }
+
+        // single container for the service selected
+        this._result.containerName = containersList[0];
+        return nextStep;
+    }
+
 
     private async pickServiceAsync(
         input: MultiStepInput,
         currentContext: IKubeconfigEnrichedContext,
         resourceType: ResourceType
-    ): Promise<(input: MultiStepInput) => Promise<(input: MultiStepInput) => Promise<(input: MultiStepInput) => Promise<void>>>> {
+    ): Promise<InputStep | void> {
         const kubectlClient = await this._binariesUtility.tryGetKubectlAsync();
         if (kubectlClient == null) {
-            return null;
+            return;
         }
 
         // Store the target cluster/namespace so that we can validate the users are using the right context.
@@ -202,8 +259,33 @@ export class ConnectWizard {
             activeItem: serviceChoices[0]
         });
         this._result.resourceName = pick.label;
+        // get the list of containers
+        const podNames = await kubectlClient.getPodNames(this._result.resourceName, this._result.targetNamespace);
+        if (podNames === null || podNames.length === 0) {
+            this._result.containerName = undefined;
+            return (input: MultiStepInput) => this.inputPortsAsync(input, resourceType);
+        }
 
-        return (input: MultiStepInput): Promise<(input: MultiStepInput) => Promise<(input: MultiStepInput) => Promise<void>>> => this.inputPortsAsync(input, resourceType);
+        // If the service is backed by more than one pod, Bridge will use the first result, see:
+        // https://github.com/Azure/Bridge-To-Kubernetes/blob/65a0527df3ad85525668c05e8737de71247087ab/src/library/Utilities/RemoteContainerConnectionDetailsResolver.cs#L102
+        // Since results are unordered, the resulting pod will be indeterminate, but we'll assume that
+        // if there are multiple pods, each one will have the same container configuration.
+        // So, we do the same as Bridge, and pick the first one here.
+        const podName = podNames[0];
+        return await this.getContainerSelection(podName, resourceType, kubectlClient);
+    }
+
+    private async inputContainersAsync(input: MultiStepInput, containerChoices: vscode.QuickPickItem[], resourceType: ResourceType, nextStep: InputStep) {
+        const pick = await input.showQuickPickAsync({
+            title: this.getInputTitle(),
+            step: 1,
+            totalSteps: this.NumberOfSteps,
+            placeholder: `Choose a container to redirect to your machine`,
+            items: containerChoices.sort((s1, s2) => s1.label < s2.label ? -1 : 1),
+            activeItem: containerChoices[0]
+        });
+        this._result.containerName = pick.label;
+        return nextStep;
     }
 
     private async inputPortsAsync(input: MultiStepInput, resourceType: ResourceType): Promise<(input: MultiStepInput) => Promise<(input: MultiStepInput) => Promise<void>>> {
@@ -217,7 +299,7 @@ export class ConnectWizard {
         });
 
         // At this point, we know that the input is valid, as it passed the validateInput check.
-        this._result.ports = [ Number(value) ];
+        this._result.ports = [Number(value)];
 
         return (input: MultiStepInput): Promise<(input: MultiStepInput) => Promise<void>> => this.pickLaunchConfigurationAsync(input, resourceType);
     }
@@ -302,7 +384,7 @@ export class ConnectWizard {
             }
         };
 
-        const choices: vscode.QuickPickItem[] = [ noChoice, yesChoice, learnMoreChoice ];
+        const choices: vscode.QuickPickItem[] = [noChoice, yesChoice, learnMoreChoice];
 
         const pick = await input.showQuickPickAsync<IActionQuickPickItem, IQuickPickParameters<IActionQuickPickItem>>({
             title: this.getInputTitle(),
@@ -337,7 +419,7 @@ export class ConnectWizard {
 
     private getAvailableDebugConfigurations(): object[] {
         const launchConfig: vscode.WorkspaceConfiguration = vscode.workspace.getConfiguration(`launch`, this._workspaceFolder.uri);
-        const debugConfigurations: object[] = launchConfig.get<{}[]>(`configurations`, /*defaultValue*/ []);
+        const debugConfigurations: object[] = launchConfig.get<{}[]>(`configurations`, /*defaultValue*/[]);
         return debugConfigurations.filter(debugConfiguration =>
             !DebugAssetsInitializer.isConnectConfiguration(debugConfiguration[`type`])
             && !DebugAssetsInitializer.isTraditionalDevSpacesDebugConfiguration(debugConfiguration[`name`])

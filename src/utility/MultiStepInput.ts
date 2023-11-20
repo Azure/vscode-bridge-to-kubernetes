@@ -23,7 +23,7 @@ export interface IActionQuickPickItem extends QuickPickItem {
     action?: () => void;
 }
 
-type InputStep = (input: MultiStepInput) => Thenable<InputStep | void>;
+export type InputStep = (input: MultiStepInput) => Thenable<InputStep | void>;
 
 export interface IQuickPickParameters<T extends QuickPickItem> {
     title: string;

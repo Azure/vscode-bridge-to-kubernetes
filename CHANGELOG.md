@@ -14,6 +14,15 @@ Thank you @Eneuman,@Tatsinnit, @BartNetJS and @cxznmhdcxz for great contribution
 - [Update support doc with correct links](https://github.com/Azure/vscode-bridge-to-kubernetes/pull/69)
 - [Change to service.name to show correct ingress url's](https://github.com/Azure/vscode-bridge-to-kubernetes/pull/72)
 
+## [2.0.120231128]
+- Updating to latest B2K CLI version(will update the link)
+- [Update deprecated packages](https://github.com/Azure/vscode-bridge-to-kubernetes/pull/64)
+- [Update support debugging with multi container pods](https://github.com/Azure/vscode-bridge-to-kubernetes/pull/71)
+- [Added Unit tests to increase the code coverage](https://github.com/Azure/vscode-bridge-to-kubernetes/pull/73)
+- [Remove the logged telemetry events which aren't used much](https://github.com/Azure/vscode-bridge-to-kubernetes/pull/74)
+- [Support for downloading arm/arm64 binaries, Update minimum kubectl version to 1.27.3](https://github.com/Azure/vscode-bridge-to-kubernetes/pull/76)
+- Address [Updated the unit tests for expected kubectl minimum version](https://github.com/Azure/vscode-bridge-to-kubernetes/pull/78)
+
 ## [2.0.120230716]
 - Updating to latest B2k CLI version majorly for dotnet 7.0 upgrade. Please refer for release notes [here](https://github.com/Azure/Bridge-To-Kubernetes/blob/main/CHANGELOG.md#10202307061)
 ## [2.0.120230525]

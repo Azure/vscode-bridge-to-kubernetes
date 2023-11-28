@@ -7,6 +7,7 @@ import { IClientProvider } from '../../clients/Providers/IClientProvider';
 import { accountContextManagerStub, loggerStub } from '../CommonTestObjects';
 import { BinariesVersionClient } from '../../clients/BinariesVersionClient';
 import { KubectlClientProvider } from '../../clients/Providers/KubectlClientProvider';
+import { Constants } from '../../Constants';
 
 describe('KubectlClientProviderTest', () => {
     const originalPlatform = Object.getOwnPropertyDescriptor(process, 'platform');
@@ -80,7 +81,7 @@ describe('KubectlClientProviderTest', () => {
 
     it('should return expected version', async () => {
         const expectedCLIVersion = '1.0.20220816.2';
-        const expectedkubectlVersion = '1.21.2';
+        const expectedkubectlVersion = Constants.KubectlMinVersion;
         const commandRunnerStub = sinon.createStubInstance(CommandRunner);
         commandRunnerStub.runAsync.resolves(null);
         const binariesVersionClient: BinariesVersionClient = new BinariesVersionClient(expectedCLIVersion, null);

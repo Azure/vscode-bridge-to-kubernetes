@@ -21,7 +21,7 @@ Thank you @Eneuman,@Tatsinnit, @BartNetJS and @cxznmhdcxz for great contribution
 - [Added Unit tests to increase the code coverage](https://github.com/Azure/vscode-bridge-to-kubernetes/pull/73)
 - [Remove the logged telemetry events which aren't used much](https://github.com/Azure/vscode-bridge-to-kubernetes/pull/74)
 - [Support for downloading arm/arm64 binaries, Update minimum kubectl version to 1.27.3](https://github.com/Azure/vscode-bridge-to-kubernetes/pull/76)
-- Address [Updated the unit tests for expected kubectl minimum version](https://github.com/Azure/vscode-bridge-to-kubernetes/pull/78)
+- [Updated the unit tests for expected kubectl minimum version](https://github.com/Azure/vscode-bridge-to-kubernetes/pull/78)
 
 ## [2.0.120230716]
 - Updating to latest B2k CLI version majorly for dotnet 7.0 upgrade. Please refer for release notes [here](https://github.com/Azure/Bridge-To-Kubernetes/blob/main/CHANGELOG.md#10202307061)

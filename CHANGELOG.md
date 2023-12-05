@@ -15,7 +15,7 @@ Thank you @Eneuman,@Tatsinnit, @BartNetJS and @cxznmhdcxz for great contribution
 - [Change to service.name to show correct ingress url's](https://github.com/Azure/vscode-bridge-to-kubernetes/pull/72)
 
 ## [2.0.120231128]
-- Updating to latest B2K CLI version(will update the link)
+- Updating to latest B2K CLI version. Please refer for release notes [here](https://github.com/Azure/Bridge-To-Kubernetes/blob/main/CHANGELOG.md#10202311273)
 - [Update deprecated packages](https://github.com/Azure/vscode-bridge-to-kubernetes/pull/64)
 - [Update support debugging with multi container pods](https://github.com/Azure/vscode-bridge-to-kubernetes/pull/71)
 - [Added Unit tests to increase the code coverage](https://github.com/Azure/vscode-bridge-to-kubernetes/pull/73)

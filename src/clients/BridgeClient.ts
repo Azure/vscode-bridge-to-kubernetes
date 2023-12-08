@@ -61,6 +61,31 @@ export class BridgeClient implements IClient {
                 this._logger.trace(TelemetryEvent.BridgeClient_GetVersionSuccess);
                 return bridgeVersion;
             };
+            const codesignAsyncFn = async (): Promise<string> => {
+                const args: string[] = [ `-s`, `-` ];
+                args.push(this._executablePath);
+                const output: string = await this._commandRunner.runAsync(
+                    `/usr/bin/codesign`, //todo check if this exists on mac arm64
+                    args,
+                    null /* currentWorkingDirectory */,
+                    null /* customEnvironmentVariables */);
+                    return output;
+            };
+            if (process.platform === `darwin` && process.arch === `arm64`) {
+                //codesign the bridge binaries to make it executable on arm64 macs
+                try {
+                    const output = await RetryUtility.retryAsync<string>(codesignAsyncFn, /*retries*/1, /*delayInMs*/100);
+                    if (output.includes(`is already signed`)) {
+                        return; //codesigning is already done
+                    }
+                } catch (error) {
+                    if (error.message.includes(`is already signed`)) {
+                        return;
+                    }
+                    throw error;
+                }
+                
+            }
             return await RetryUtility.retryAsync<string>(getVersionAsyncFn, /*retries*/3, /*delayInMs*/100);
         }
         catch (error) {

@@ -74,12 +74,6 @@ export class BinariesVersionClient {
             this._logger.error(TelemetryEvent.BinariesVersionClient_GetDownloadInfoError, error);
             throw error;
         }
-        finally {
-            this._logger.trace(TelemetryEvent.BinariesVersionClient_GetDownloadInfoStatus, /*properties*/ {
-                binariesVersionsDownloadTimeInMilliseconds: new Date().getTime() - downloadStartTime.getTime(),
-                binariesVersionsDownloadSucceeded: downloadSucceeded
-            });
-        }
     }
 
     private getDownloadInfo(client: ClientType, binariesDownloadInfo: object): IDownloadInfo {

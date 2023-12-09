@@ -123,10 +123,6 @@ export class WorkspaceFolderManager {
 
         vscode.debug.onDidStartDebugSession(async (debugSession: vscode.DebugSession) => {
             if (DebugAssetsInitializer.isConnectTask(debugSession.configuration[`preLaunchTask`])) {
-                this._logger.trace(TelemetryEvent.Connect_DebugSessionStarted, {
-                    launchConfigurationName: debugSession[`name`]
-                });
-
                 // Make sure that Connect is actually running. In rare cases, the Connect task might be skipped.
                 // In such case, restarting the debug session is enough to be back to a normal state.
                 await this._connectWorkspaceFoldersInitializationPromise;
@@ -152,10 +148,6 @@ export class WorkspaceFolderManager {
             this._connectDebugSessions.delete(debugSession);
 
             const disconnectAfterDebugging: boolean = vscode.workspace.getConfiguration(Constants.SettingsConfigurationName).get<boolean>(`disconnectAfterDebugging`, true);
-            this._logger.trace(TelemetryEvent.Connect_DebugSessionTerminated, {
-                launchConfigurationName: debugSession[`name`],
-                disconnectAfterDebugging: disconnectAfterDebugging
-            });
 
             const connectWorkspaceFolder: ConnectWorkspaceFolder = this._connectWorkspaceFolderMap.get(debugSession.workspaceFolder);
             if (connectWorkspaceFolder == null) {

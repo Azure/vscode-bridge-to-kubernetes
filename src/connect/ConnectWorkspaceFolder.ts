@@ -116,7 +116,6 @@ export class ConnectWorkspaceFolder extends WorkspaceFolderBase {
         if (this._connectEnvFilePath != null && await fileSystem.existsAsync(this._connectEnvFilePath)) {
             const content: string = await fileSystem.readFileAsync(this._connectEnvFilePath, `utf8`);
             const env: any = JSON.parse(content);
-            this._logger.trace(TelemetryEvent.Connect_DebugConfigApplied);
             for (const key of Object.keys(env)) {
                 debugConfiguration.env[key] = env[key];
             }
@@ -416,11 +415,8 @@ export class ConnectWorkspaceFolder extends WorkspaceFolderBase {
             }
 
             this.setConnectStatus(ConnectionStatus.Disconnected);
-            this._logger.trace(TelemetryEvent.Connect_DisconnectSuccessful);
         }
         catch (error) {
-            this._logger.error(TelemetryEvent.Connect_DisconnectError, error);
-
             if (previousStatus !== ConnectionStatus.Connected && error.code === `ECONNREFUSED`) {
                 // We weren't connected to the cluster, so we ignore the error.
                 this.setConnectStatus(ConnectionStatus.Disconnected);
@@ -521,7 +517,6 @@ export class ConnectWorkspaceFolder extends WorkspaceFolderBase {
                         }
                         await ThenableUtility.ToPromise(vscode.tasks.executeTask(connectTask));
                         vscode.window.showInformationMessage(`Once connected to the cluster, run your code manually to start debugging.`);
-                        this._logger.trace(TelemetryEvent.Connect_StatusBarMenuConnectSuccess);
                     }
                     catch (error) {
                         this._logger.error(TelemetryEvent.Connect_StatusBarMenuConnectError, error);

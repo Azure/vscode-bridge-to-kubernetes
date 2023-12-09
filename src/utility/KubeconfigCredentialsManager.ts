@@ -16,12 +16,10 @@ export class KubeconfigCredentialsManager {
         let result = false;
         try {
             await bridgeClient.refreshCredentialsAsync(kubeconfigPath, namespace, (authenticationTarget: IAuthenticationTarget) => {
-                logger.trace(TelemetryEvent.KubeConfigCredentialsManager_RefreshCredentialsNecessary);
                 vscode.window.showErrorMessage(`The kubeconfig token needs to be refreshed. To sign in, use a web browser to open the page [${authenticationTarget.url}](${authenticationTarget.url}) and enter the code ${authenticationTarget.authenticationCode} to authenticate.`);
                 refreshWasNecessary = true;
             });
             if (refreshWasNecessary) {
-                logger.trace(TelemetryEvent.KubeConfigCredentialsManager_RefreshCredentialsSuccess);
                 vscode.window.showInformationMessage(`The token was refreshed successfully.`);
             }
             result = true;
@@ -30,14 +28,6 @@ export class KubeconfigCredentialsManager {
             logger.error(TelemetryEvent.KubeConfigCredentialsManager_RefreshCredentialsError, error);
             vscode.window.showErrorMessage(`Failed to refresh the kubeconfig token: ${error.message}`);
             result = false;
-        }
-        finally {
-            const endTime = Date.now();
-            logger.trace(TelemetryEvent.KubeConfigCredentialsManager_RefreshCredentialsPerf, {
-                success: result,
-                refreshRequired: refreshWasNecessary,
-                durationMs: endTime - startTime
-            });
         }
         return result;
     }
@@ -51,13 +41,6 @@ export class KubeconfigCredentialsManager {
         }
         catch (error) {
             result = false;
-        }
-        finally {
-            const endTime = Date.now();
-            logger.trace(TelemetryEvent.KubeConfigCredentialsManager_CheckCredentialsPerf, {
-            success: result,
-            durationMs: endTime - startTime
-            });
         }
         return result;
     }

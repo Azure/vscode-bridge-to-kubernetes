@@ -43,10 +43,6 @@ export class Initializer {
                 this._outputChannel,
                 this._binariesUtility);
 
-            this._logger.trace(TelemetryEvent.ConnectInitializationSuccess, {
-                workspacesCommonId: this._workspacesCommonId.toString()
-            });
-
             return connectWorkspaceFolder;
         }
         catch (error) {
@@ -63,11 +59,6 @@ export class Initializer {
             const debugAssetsInitializer = new DebugAssetsInitializer(this._workspaceFolder, this._logger);
             const debugConfigurationName: string = await debugAssetsInitializer.retrieveBridgeConfigurationDebugAssetsAsync(reason, /*shouldCreateDebugAssetsIfMissing*/ !wereDebugAssetsEverCreated);
             this._context.workspaceState.update(Constants.ConnectDebugAssetsCreationIdentifier, wereDebugAssetsEverCreated || debugConfigurationName != null);
-
-            this._logger.trace(TelemetryEvent.Connect_EnsureConfigurationPresentSuccess, {
-                checkReason: reason,
-                wereDebugAssetsCreated: debugConfigurationName != null
-            });
 
             return debugConfigurationName;
         }

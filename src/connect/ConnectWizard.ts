@@ -48,11 +48,6 @@ export class ConnectWizard {
             return null;
         }
 
-        this._logger.trace(TelemetryEvent.Connect_WizardStart, {
-            wizardReason: wizardReason,
-            type: targetResourceType
-        });
-
         const kubectlClient = await this._binariesUtility.tryGetKubectlAsync();
         const bridgeClient = await this._binariesUtility.tryGetBridgeAsync();
         if (kubectlClient == null || bridgeClient == null) {
@@ -86,19 +81,6 @@ export class ConnectWizard {
             });
             vscode.window.showErrorMessage(`Failed to configure ${Constants.ProductName}: ${asError(error).message}`);
         } finally {
-            this._logger.trace(TelemetryEvent.Connect_WizardStop, {
-                wizardReason: wizardReason,
-                type: targetResourceType,
-                isWizardComplete: this._isWizardComplete,
-                isResourceNameSet: (this._result.resourceName != null && this._result.resourceName.length > 0).toString(),
-                ports: this._result.ports != null ? this._result.ports.join(`,`) : undefined,
-                launchConfigurationName: this._result.launchConfigurationName,
-                isIsolateAsSet: (this._result.isolateAs != null && this._result.isolateAs.length > 0).toString(),
-                isTargetClusterSet: (this._result.targetCluster != null && this._result.targetCluster.length > 0).toString(),
-                isTargetNamespaceSet: (this._result.targetNamespace != null && this._result.targetNamespace.length > 0).toString(),
-                isContainerNameSet: (this._result.containerName != null && this._result.containerName.length > 0).toString(),
-                isCreatingNewLaunchConfiguration: this._isCreatingNewLaunchConfiguration
-            });
             return this._isWizardComplete ? this._result as IWizardOutput : null;
         }
     }

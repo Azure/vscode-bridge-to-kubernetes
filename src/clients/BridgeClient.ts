@@ -19,12 +19,14 @@ import { RetryUtility } from '../utility/RetryUtility';
 import { ClientType } from './ClientType';
 import { CommandRunner } from './CommandRunner';
 import { IClient } from './IClient';
+import { fileSystem } from '../utility/FileSystem';
 
 // Surfaces available Bridge commands.
 // NOTE: because there is only a single instance of CommandRunner in this class, with the same outputEmitted event,
 // a different instance of this class should be use for different commands
 export class BridgeClient implements IClient {
     private readonly _dotNetDirectory: string;
+    private readonly codesignPath: string = `/usr/bin/codesign`;
 
     public constructor(
         dotNetPath: string,
@@ -62,29 +64,28 @@ export class BridgeClient implements IClient {
                 return bridgeVersion;
             };
             const codesignAsyncFn = async (): Promise<string> => {
-                const args: string[] = [ `-s`, `-` ];
-                args.push(this._executablePath);
-                const output: string = await this._commandRunner.runAsync(
-                    `/usr/bin/codesign`, //todo check if this exists on mac arm64
+                const args: string[] = [ `-s`, `-`, this._executablePath ];
+                return await this._commandRunner.runAsync(
+                    this.codesignPath,
                     args,
-                    null /* currentWorkingDirectory */,
-                    null /* customEnvironmentVariables */);
-                    return output;
+                    null, // currentWorkingDirectory
+                    null  // customEnvironmentVariables
+                );
             };
-            if (process.platform === `darwin` && process.arch === `arm64`) {
-                //codesign the bridge binaries to make it executable on arm64 macs
+
+            if (process.platform === `darwin` 
+                && process.arch === `arm64` 
+                && await fileSystem.existsAsync(this.codesignPath)) {
                 try {
-                    const output = await RetryUtility.retryAsync<string>(codesignAsyncFn, /*retries*/1, /*delayInMs*/100);
+                    const output = await RetryUtility.retryAsync<string>(codesignAsyncFn, 1, 100);
                     if (output.includes(`is already signed`)) {
                         return; //codesigning is already done
                     }
                 } catch (error) {
-                    if (error.message.includes(`is already signed`)) {
-                        return;
+                    if (!error.message.includes(`is already signed`)) {
+                        throw error;
                     }
-                    throw error;
                 }
-                
             }
             return await RetryUtility.retryAsync<string>(getVersionAsyncFn, /*retries*/3, /*delayInMs*/100);
         }

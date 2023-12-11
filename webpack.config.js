@@ -30,6 +30,7 @@ const config = {
             '@opentelemetry/tracing': '@opentelemetry/tracing',
             '@opentelemetry/instrumentation': '@opentelemetry/instrumentation',
             '@azure/opentelemetry-instrumentation-azure-sdk': '@azure/opentelemetry-instrumentation-azure-sdk',
+            '@azure/functions-core': '@azure/functions-core',
     },
     resolve: {
         extensions: ['.ts', '.js']

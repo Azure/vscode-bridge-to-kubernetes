@@ -38,7 +38,6 @@ export class BinariesVersionClient {
     }
 
     private async getBinariesDownloadInfoAsync(): Promise<IBinariesDownloadInfo> {
-        const downloadStartTime = new Date();
         let downloadSucceeded = false;
 
         try {

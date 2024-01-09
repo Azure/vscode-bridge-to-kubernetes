@@ -1,5 +1,10 @@
 # Change Log
 
+## [2.0.120240111]
+- Updating to latest B2K CLI version. Please refer for release notes [here](TBD)
+- [Addressing module not found error](https://github.com/Azure/vscode-bridge-to-kubernetes/pull/85)
+- [Bump Axios and Xml2js dependencies for dependant bot alerts](https://github.com/Azure/vscode-bridge-to-kubernetes/pull/87)
+
 ## [2.0.120231128]
 - Updating to latest B2K CLI version. Please refer for release notes [here](https://github.com/Azure/Bridge-To-Kubernetes/blob/main/CHANGELOG.md#10202311273)
 - [Update deprecated packages](https://github.com/Azure/vscode-bridge-to-kubernetes/pull/64)

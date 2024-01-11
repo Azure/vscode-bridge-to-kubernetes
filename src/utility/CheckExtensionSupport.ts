@@ -62,7 +62,6 @@ export class CheckExtensionSupport {
                 if (!this.isUseKubernetesServiceEnvironmentVariablesTaskPropertyEnabled(workspaceFolder)) {
                     vscode.window.showWarningMessage(Constants.RemoteDevelopmentLearnMoreMessage, learnMore).then((selectedValue: string) => {
                         if (selectedValue === learnMore) {
-                            logger.trace(TelemetryEvent.RemoteDevelopment_LearnMoreClicked);
                             UrlUtility.openUrl(`https://aka.ms/use-k8s-svc-env-vars`);
                         }
                     });

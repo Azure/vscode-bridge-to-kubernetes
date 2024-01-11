@@ -38,7 +38,6 @@ export class LocalTunnelDebuggingManager {
 
     // Main entrypoint through the k8s.LocalTunnelDebugProvider API
     private async startDebugSessionAsync(target?: any): Promise<void> {
-        this._logger.trace(TelemetryEvent.DebugLocalTunnel_SessionStarted);
         const clusterExplorer = await k8s.extension.clusterExplorer.v1;
 
         // Can't do `!clusterExplorer.available`, since for some reason the compiler complains about accessing the `reason` field below if we do.

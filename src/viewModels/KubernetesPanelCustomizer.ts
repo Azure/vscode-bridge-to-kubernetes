@@ -90,12 +90,6 @@ export class KubernetesPanelCustomizer implements k8s.ClusterExplorerV1.NodeUICu
         for (const fqdn of fqdns) {
             fqdnDomains.push(this.getFqdnDomain(fqdn));
         }
-
-        this._logger.trace(TelemetryEvent.KubernetesPanelCustomizer_SupportedFqdnEvaluation, {
-            currentFqdnDomain: currentFqdnDomain,
-            clustersCount: fqdnDomains.length,
-            fqdnDomains: fqdnDomains.join(`,`)
-        });
     }
 
     private getFqdnDomain(fqdn: string): string {

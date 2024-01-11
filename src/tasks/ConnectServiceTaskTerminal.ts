@@ -148,16 +148,13 @@ export class ConnectServiceTaskTerminal extends TaskTerminalBase {
         });
 
         if (showUseKubernetesServiceEnvironmentVariablesPrompt) {
-            this._logger.trace(TelemetryEvent.UseKubernetesServiceEnvironmentVariables_PromptShown);
             const learnMore = `Learn More`;
             const neverShowAgain = `Never Show Again`;
             vscode.window.showInformationMessage(`Consider trying Kubernetes service environment variables to avoid seeing errors with ${Constants.EndpointManagerName} or freeing ports.`, learnMore, neverShowAgain).then((selectedValue: string) => {
                 if (selectedValue === learnMore) {
-                    this._logger.trace(TelemetryEvent.UseKubernetesServiceEnvironmentVariablesPrompt_LearnMoreClicked);
                     UrlUtility.openUrl(`https://aka.ms/use-k8s-svc-env-vars`);
                 }
                 else if (selectedValue === neverShowAgain) {
-                    this._logger.trace(TelemetryEvent.UseKubernetesServiceEnvironmentVariables_PromptDisabled);
                     this._context.globalState.update(this.UseKubernetesServiceEnvironmentVariablesDisabled, true);
                 }
             });

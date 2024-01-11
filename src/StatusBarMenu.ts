@@ -317,7 +317,6 @@ export class StatusBarMenu {
             this._prerequisitesAlertCallback = (): void => {
                 vscode.window.showErrorMessage(`Failed to validate the prerequisites required to use ${Constants.ProductName}: ${error.message}`);
             };
-            this._logger.error(TelemetryEvent.StatusBar_ValidatePrerequisitesError, error);
             return false;
         }
 
@@ -359,7 +358,6 @@ export class StatusBarMenu {
 
         this._isMenuOpened = true;
         this.refreshStatusItem();
-        this._logger.trace(TelemetryEvent.StatusBar_MenuOpened);
     }
 
     private async refreshCurrentKubeconfigContextAsync(promptUser: boolean = false): Promise<boolean> {

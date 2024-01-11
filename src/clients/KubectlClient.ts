@@ -281,8 +281,6 @@ export class KubectlClient implements IClient {
                 const versionJson: object = JSON.parse(kubectlOutput);
                 let version: string = versionJson[`clientVersion`][`gitVersion`]; // Example: v1.16.8
                 version = version.replace(/v/g, ``); // Remove the occurence of 'v' from the version
-                this._logger.trace(TelemetryEvent.KubectlClient_GetVersionSuccess);
-
                 return version;
             };
             return await RetryUtility.retryAsync<string>(getVersionAsyncFn, /*retries*/3, /*delayInMs*/100);
@@ -313,11 +311,6 @@ export class KubectlClient implements IClient {
                 /*detached*/ false,
                 quiet
             );
-
-            this._logger.trace(TelemetryEvent.KubectlClient_CommandSuccess, {
-                args: args.join(` `)
-            });
-
             return outputData;
         }
         catch (error) {

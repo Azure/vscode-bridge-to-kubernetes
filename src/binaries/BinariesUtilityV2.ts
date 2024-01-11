@@ -86,10 +86,6 @@ export class BinariesUtilityV2 implements IBinariesUtility {
             this._binariesPromise = this.runEnsureBinariesAsync();
             this._binariesPromise.then(() => {
                 this._binariesPromiseIsResolved = true;
-                this._logger.trace(TelemetryEvent.BinariesUtility_EnsureBinariesSuccess, {
-                    isUsingLocalBinaries: (process.env.BRIDGE_BUILD_PATH != null).toString(),
-                    isUsingLocalDotNet: (process.env.DOTNET_ROOT != null).toString()
-                });
             }).catch(error => {
                 this._binariesPromise = null;
                 this._logger.error(TelemetryEvent.BinariesUtility_EnsureBinariesError, error, {
@@ -126,7 +122,6 @@ export class BinariesUtilityV2 implements IBinariesUtility {
         if (this._binariesPromiseIsResolved) {
             try {
                 const binaries = await this._binariesPromise;
-                this._logger.trace(TelemetryEvent.BinariesUtility_TryGetBinariesSuccess);
                 return binaries;
             }
             catch (error) {
@@ -240,7 +235,6 @@ export class BinariesUtilityV2 implements IBinariesUtility {
                 const legacyBridgeDownloadDirectoryName: string = path.dirname(bridgePath).replace(bridgeDownloadDirectoryRegExp, Constants.LegacyBridgeDownloadDirectoryName);
                 if (await fileSystem.existsAsync(legacyBridgeDownloadDirectoryName)) {
                     await fileSystem.rmdirAsync(legacyBridgeDownloadDirectoryName, { recursive: true });
-                    this._logger.trace(TelemetryEvent.BinariesUtility_DeleteLegacyBridgeDownloadDirectorySuccess);
                 }
             }
             catch (error) {
@@ -319,7 +313,6 @@ export class BinariesUtilityV2 implements IBinariesUtility {
         const fileDownloader: FileDownloader = await this.validateAndGetFileDownloaderApiAsync();
         let unzipDirectory: vscode.Uri;
         try {
-            this._logger.trace(TelemetryEvent.BinariesUtility_DownloadStart, downloadProperties);
             unzipDirectory = await fileDownloader.downloadFile(
                 vscode.Uri.parse(downloadInfo.downloadUrl),
                 clientProvider.getDownloadDirectoryName(),
@@ -334,8 +327,6 @@ export class BinariesUtilityV2 implements IBinariesUtility {
 
             const binaryPath = path.join(unzipDirectory.fsPath, clientProvider.getExecutableFilePath());
             await fileSystem.accessAsync(binaryPath);
-            this._logger.trace(TelemetryEvent.BinariesUtility_DownloadSuccess, downloadProperties);
-
             return binaryPath;
         }
         catch (error) {
@@ -430,7 +421,6 @@ export class BinariesUtilityV2 implements IBinariesUtility {
             if (bridgeOrKubectlClientDownloaded || !await checkKubectlExistsWithRequiredVersionCallBack()) {
                 await fileSystem.mkdirAsync(path.dirname(kubectlExecutableFilePathForBridge), { recursive: true });
                 await fileSystem.copyFileAsync(kubectlPath, kubectlExecutableFilePathForBridge);
-                this._logger.trace(TelemetryEvent.BinariesUtility_CopyKubectlToBridgeFolderSuccess);
             }
         }
         catch (error) {
@@ -448,9 +438,6 @@ export class BinariesUtilityV2 implements IBinariesUtility {
             }
             const oldBridgeClient = new BridgeClient(dotNetPath, bridgeExecutablePath, commandRunner, this._expectedBridgeVersion, this._logger);
             await oldBridgeClient.cleanLocalConnectAsync();
-            this._logger.trace(TelemetryEvent.BinariesUtility_CleanUpBeforeDownloadSuccess, /*properties*/ {
-                clientType: ClientType.Bridge
-            });
         }
         catch (error) {
             this._logger.warning(`Error occured while performing clean up before download. Error: ${error.message}`);

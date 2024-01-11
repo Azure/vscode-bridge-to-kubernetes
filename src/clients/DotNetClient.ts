@@ -28,7 +28,6 @@ export class DotNetClient implements IClient {
                 const output: string = await this._commandRunner.runAsync(this._executablePath, args);
                 const dotNetRuntimeInfo: string = output.trim();
                 const dotNetVersion = this.parseVersionFromRuntimeInfo(dotNetRuntimeInfo);
-                this._logger.trace(TelemetryEvent.DotNetClient_GetVersionSuccess);
                 return dotNetVersion;
             };
             return await RetryUtility.retryAsync<string>(getVersionAsyncFn, /*retries*/3, /*delayInMs*/100);

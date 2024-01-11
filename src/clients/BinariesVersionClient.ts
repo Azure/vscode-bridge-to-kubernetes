@@ -38,7 +38,6 @@ export class BinariesVersionClient {
     }
 
     private async getBinariesDownloadInfoAsync(): Promise<IBinariesDownloadInfo> {
-        const downloadStartTime = new Date();
         let downloadSucceeded = false;
 
         try {
@@ -73,12 +72,6 @@ export class BinariesVersionClient {
         catch (error) {
             this._logger.error(TelemetryEvent.BinariesVersionClient_GetDownloadInfoError, error);
             throw error;
-        }
-        finally {
-            this._logger.trace(TelemetryEvent.BinariesVersionClient_GetDownloadInfoStatus, /*properties*/ {
-                binariesVersionsDownloadTimeInMilliseconds: new Date().getTime() - downloadStartTime.getTime(),
-                binariesVersionsDownloadSucceeded: downloadSucceeded
-            });
         }
     }
 

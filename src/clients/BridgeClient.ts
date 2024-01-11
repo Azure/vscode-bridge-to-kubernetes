@@ -58,7 +58,6 @@ export class BridgeClient implements IClient {
                 // for prod, dev, staging and "0.1.0.11071149-username" or "0.1.0.11071149" for local builds.
                 const bridgeVersion: string = output.trim();
 
-                this._logger.trace(TelemetryEvent.BridgeClient_GetVersionSuccess);
                 return bridgeVersion;
             };
             return await RetryUtility.retryAsync<string>(getVersionAsyncFn, /*retries*/3, /*delayInMs*/100);
@@ -86,7 +85,6 @@ export class BridgeClient implements IClient {
             this._logger.error(TelemetryEvent.BridgeClient_CheckCredentialsError, error);
             throw error;
         }
-        this._logger.trace(TelemetryEvent.BridgeClient_CheckCredentialsSuccess);
     }
 
     public async refreshCredentialsAsync(kubeconfigPath: string, namespace: string, authenticationTargetCallback: (target: IAuthenticationTarget) => any): Promise<void> {
@@ -169,8 +167,6 @@ export class BridgeClient implements IClient {
             // Bug 1359701: We should fix this in the CLI rather than pushing the problem on the extension.
             const trimmedOutput = output.substring(output.indexOf(`[`), output.lastIndexOf(`]`) + 1);
             const requests = JSON.parse(trimmedOutput.replace(/[\r\n]/g, ``));
-
-            this._logger.trace(TelemetryEvent.BridgeClient_PrepConnectSuccess);
 
             return requests;
         }
@@ -256,8 +252,6 @@ export class BridgeClient implements IClient {
                 currentWorkingDirectory,
                 customEnvironmentVariables
             );
-
-            this._logger.trace(TelemetryEvent.BridgeClient_ConnectSuccess);
         }
         catch (error) {
             this._logger.error(TelemetryEvent.BridgeClient_ConnectError, redactJsonObject(error));
@@ -273,7 +267,6 @@ export class BridgeClient implements IClient {
                 args,
                 null /* currentWorkingDirectory */,
                 this.getRequiredEnvironmentVariables());
-            this._logger.trace(TelemetryEvent.BridgeClient_CleanLocalConnectSuccess);
         }
         catch (error) {
             if (error.message.includes(`Failed to load kubeconfig`)) {

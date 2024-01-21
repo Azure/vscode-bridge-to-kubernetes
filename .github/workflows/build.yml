@@ -11,6 +11,11 @@ on:
 jobs:
   build:
     runs-on: ${{ matrix.os }}
+    permissions:
+      actions: read
+      contents: read
+      deployments: read
+      packages: none
     strategy:
       matrix:
         os: [macos-latest, ubuntu-latest, windows-latest]

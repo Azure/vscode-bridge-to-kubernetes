@@ -5,6 +5,11 @@ jobs:
   build:
     name: release
     runs-on: ubuntu-latest
+    permissions:
+      actions: read
+      contents: write
+      deployments: read
+      packages: none
 
     steps:
     - name: Checkout

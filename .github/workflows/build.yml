@@ -8,6 +8,9 @@ on:
     branches:
       - main
 
+permissions:
+  contents: read
+
 jobs:
   build:
     runs-on: ${{ matrix.os }}
@@ -20,10 +23,15 @@ jobs:
       matrix:
         os: [macos-latest, ubuntu-latest, windows-latest]
     steps:
+    - name: Harden Runner
+      uses: step-security/harden-runner@eb238b55efaa70779f274895e782ed17c84f2895 # v2.6.1
+      with:
+        egress-policy: audit
+
     - name: Checkout Branch
-      uses: actions/checkout@v1
+      uses: actions/checkout@50fbc622fc4ef5163becd7fab6573eac35f8462e # v1.2.0
     - name: Setup Node.js
-      uses: actions/setup-node@v3
+      uses: actions/setup-node@1a4442cacd436585916779262731d5b162bc6ec7 # v3.8.2
       with:
         node-version: '16.20.1'
     - name: Build Extension
@@ -52,7 +60,7 @@ jobs:
         mv *.vsix vsix
     - name: Archive Extension
       if: matrix.os == 'ubuntu-latest'
-      uses: actions/upload-artifact@v1
+      uses: actions/upload-artifact@3446296876d12d4e3a0f3145a3c87e67bf0a16b5 # v1.0.0
       with:
         name: vsix
         path: vsix

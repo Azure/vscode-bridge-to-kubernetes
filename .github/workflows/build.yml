@@ -60,7 +60,7 @@ jobs:
         mv *.vsix vsix
     - name: Archive Extension
       if: matrix.os == 'ubuntu-latest'
-      uses: actions/upload-artifact@3446296876d12d4e3a0f3145a3c87e67bf0a16b5 # v1.0.0
+      uses: actions/upload-artifact@26f96dfa697d77e81fd5907df203aa23a56210a8 # v4.3.0
       with:
         name: vsix
         path: vsix

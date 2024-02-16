@@ -9,8 +9,6 @@ import { DotNetClientProvider } from '../../clients/Providers/DotNetClientProvid
 describe('dotNetClientProviderTest', () => {
     const originalPlatform = Object.getOwnPropertyDescriptor(process, 'platform');
     it('should always return dotnet for linux', async () => {
-        loggerStub.trace.reset();
-        loggerStub.trace.onCall(0).returns();
         Object.defineProperty(process, 'platform', {
             value: 'linux'
         });
@@ -19,8 +17,6 @@ describe('dotNetClientProviderTest', () => {
     });
 
     it('should always return dotnet for windows', async () => {
-        loggerStub.trace.reset();
-        loggerStub.trace.onCall(0).returns();
         Object.defineProperty(process, 'platform', {
             value: 'win32'
         });
@@ -29,8 +25,6 @@ describe('dotNetClientProviderTest', () => {
     });
 
     it('should always return dotnet for darwin', async () => {
-        loggerStub.trace.reset();
-        loggerStub.trace.onCall(0).returns();
         Object.defineProperty(process, 'platform', {
             value: 'darwin'
         });
@@ -39,8 +33,6 @@ describe('dotNetClientProviderTest', () => {
     });
 
     it('should return unknown for unknown platform', async () => {
-        loggerStub.trace.reset();
-        loggerStub.trace.onCall(0).returns();
         Object.defineProperty(process, 'platform', {
             value: 'msdos'
         });

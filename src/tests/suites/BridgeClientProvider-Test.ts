@@ -1,4 +1,3 @@
-import { expect } from 'chai';
 import { after, describe, it } from 'mocha';
 import * as process from 'process';
 import { BinariesVersionClient } from '../../clients/BinariesVersionClient';
@@ -17,7 +16,9 @@ describe('BridgeClientProviderTest', () => {
         const bridgeClientProvider: IClientProvider = new BridgeClientProvider(binariesVersionClient, expectedCLIVersion, new CommandRunner(null), loggerStub);
         const binariesName = bridgeClientProvider.getExecutableFilePath();
         const expectedName = 'dsc';
-        expect(binariesName).to.equal(expectedName);
+        import('chai')
+            .then(chai => chai.expect(binariesName).to.equal(expectedName))
+            .catch(chai => chai.expect.fail('this is chai error message, should not happen'));
     });
 
     it('should return binaries name as dsc always for windows', async () => {
@@ -29,7 +30,9 @@ describe('BridgeClientProviderTest', () => {
         const bridgeClientProvider: IClientProvider = new BridgeClientProvider(binariesVersionClient, expectedCLIVersion, new CommandRunner(null), loggerStub);
         const binariesName = bridgeClientProvider.getExecutableFilePath();
         const expectedName = 'dsc.exe';
-        expect(binariesName).to.equal(expectedName);
+        import('chai')
+            .then(chai => chai.expect(binariesName).to.equal(expectedName))
+            .catch(chai => chai.expect.fail('this is chai error message, should not happen'));
     });
 
     it('should return binaries name as dsc always for darwin', async () => {
@@ -41,7 +44,9 @@ describe('BridgeClientProviderTest', () => {
         const bridgeClientProvider: IClientProvider = new BridgeClientProvider(binariesVersionClient, expectedCLIVersion, new CommandRunner(null), loggerStub);
         const binariesName = bridgeClientProvider.getExecutableFilePath();
         const expectedName = 'dsc';
-        expect(binariesName).to.equal(expectedName);
+        import('chai')
+            .then(chai => chai.expect(binariesName).to.equal(expectedName))
+            .catch(chai => chai.expect.fail('this is chai error message, should not happen'));
     });
 
     it('should return binaries as unknown for unknown platform', async () => {
@@ -53,9 +58,13 @@ describe('BridgeClientProviderTest', () => {
         const bridgeClientProvider: IClientProvider = new BridgeClientProvider(binariesVersionClient, expectedCLIVersion, new CommandRunner(null), loggerStub);
         try {
             bridgeClientProvider.getExecutableFilePath();
-            expect.fail('Should have thrown an error');
+            import('chai')
+                .then(chai => chai.expect.fail('Should have thrown an error'))
+                .catch(chai => chai.expect.fail('this is chai error message, should not happen'));
         } catch (error) {
-            expect(error.message).to.equal('Unsupported platform to get bridge executable path: msdos');
+            import('chai')
+                .then(chai => chai.expect(error.message).to.equal('Unsupported platform to get bridge executable path: msdos'))
+                .catch(chai => chai.expect.fail('this is chai error message, should not happen'));
         }
     });
 
@@ -63,14 +72,18 @@ describe('BridgeClientProviderTest', () => {
         const expectedCLIVersion = '1.0.20220816.2';
         const binariesVersionClient: BinariesVersionClient = new BinariesVersionClient(expectedCLIVersion, null);
         const bridgeClientProvider: IClientProvider = new BridgeClientProvider(binariesVersionClient, expectedCLIVersion, new CommandRunner(null), loggerStub);
-        expect(bridgeClientProvider.getDownloadDirectoryName()).to.equal('bridge');
+        import('chai')
+            .then(chai => chai.expect(bridgeClientProvider.getDownloadDirectoryName()).to.equal('bridge'))
+            .catch(chai => chai.expect.fail('this is chai error message, should not happen'));
     });
 
     it('should return expected version', async () => {
         const expectedCLIVersion = '1.0.20220816.2';
         const binariesVersionClient: BinariesVersionClient = new BinariesVersionClient(expectedCLIVersion, null);
         const bridgeClientProvider: IClientProvider = new BridgeClientProvider(binariesVersionClient, expectedCLIVersion, new CommandRunner(null), loggerStub);
-        expect(bridgeClientProvider.getExpectedVersion()).to.equal(expectedCLIVersion);
+        import('chai')
+            .then(chai => chai.expect(bridgeClientProvider.getExpectedVersion()).to.equal(expectedCLIVersion))
+            .catch(chai => chai.expect.fail('this is chai error message, should not happen'));
     });
 
     after(() => {

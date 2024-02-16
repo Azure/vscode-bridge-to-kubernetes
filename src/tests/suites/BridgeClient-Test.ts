@@ -1,4 +1,3 @@
-import { expect } from "chai";
 import { describe, it } from 'mocha';
 import * as sinon from 'sinon';
 import { BridgeClient } from "../../clients/BridgeClient";
@@ -13,11 +12,19 @@ describe('BridgeClient Tests', () => {
         const bridgeClient = new BridgeClient("", "", commandRunnerStub, "", loggerStub);
         await bridgeClient.connectAsync("test", "testKubeConfigPath", "testResource", ResourceType.Service, [3001], 4001,
             "testEnvFilePath", "testScriptPath", "testParentPrcId", null, "testIsolateAs", "testContainer", "testNamespace", false, null);
-        expect(commandRunnerStub.runAsync.calledOnce).to.be.true;
-        expect(commandRunnerStub.runAsync.getCall(0).args[1].length).not.to.equal(0);
+        import('chai')
+            .then(chai => chai.expect(commandRunnerStub.runAsync.calledOnce).to.be.true)
+            .catch(chai => chai.expect.fail('this is chai error message, should not happen'));
+        import('chai')
+            .then(chai => chai.expect(commandRunnerStub.runAsync.getCall(0).args[1].length).not.to.equal(0))
+            .catch(chai => chai.expect.fail('this is chai error message, should not happen'));
         const args = commandRunnerStub.runAsync.getCall(0).args[1];
-        expect(args.indexOf("--container")).not.to.equal(-1);
-        expect(args.indexOf("testContainer")).not.to.equal(-1);
+        import('chai')
+            .then(chai => chai.expect(args.indexOf("--container")).not.to.equal(-1))
+            .catch(chai => chai.expect.fail('this is chai error message, should not happen'));
+        import('chai')
+            .then(chai => chai.expect(args.indexOf("testContainer")).not.to.equal(-1))
+            .catch(chai => chai.expect.fail('this is chai error message, should not happen'));
     });
 
     it('connectAsync should work when container name is empty', async () => {
@@ -26,10 +33,16 @@ describe('BridgeClient Tests', () => {
         const bridgeClient = new BridgeClient("", "", commandRunnerStub, "", loggerStub);
         await bridgeClient.connectAsync("test", "testKubeConfigPath", "testResource", ResourceType.Service, [3001], 4001,
             "testEnvFilePath", "testScriptPath", "testParentPrcId", null, "testIsolateAs", "", "testNamespace", false, null);
-        expect(commandRunnerStub.runAsync.calledOnce).to.be.true;
-        expect(commandRunnerStub.runAsync.getCall(0).args[1].length).not.to.equal(0);
+        import('chai')
+            .then(chai => chai.expect(commandRunnerStub.runAsync.calledOnce).to.be.true)
+            .catch(chai => chai.expect.fail('this is chai error message, should not happen'));
+        import('chai')
+            .then(chai => chai.expect(commandRunnerStub.runAsync.getCall(0).args[1].length).not.to.equal(0))
+            .catch(chai => chai.expect.fail('this is chai error message, should not happen'));
         const args = commandRunnerStub.runAsync.getCall(0).args[1];
-        expect(args.indexOf("--container")).to.equal(-1);
+        import('chai')
+            .then(chai => chai.expect(args.indexOf("--container")).to.equal(-1))
+            .catch(chai => chai.expect.fail('this is chai error message, should not happen'));
     });
 
     it('connectAsync should work when container name is null', async () => {
@@ -38,10 +51,16 @@ describe('BridgeClient Tests', () => {
         const bridgeClient = new BridgeClient("", "", commandRunnerStub, "", loggerStub);
         await bridgeClient.connectAsync("test", "testKubeConfigPath", "testResource", ResourceType.Service, [3001], 4001,
             "testEnvFilePath", "testScriptPath", "testParentPrcId", null, "testIsolateAs", null, "testNamespace", false, null);
-        expect(commandRunnerStub.runAsync.calledOnce).to.be.true;
-        expect(commandRunnerStub.runAsync.getCall(0).args[1].length).not.to.equal(0);
+        import('chai')
+            .then(chai => chai.expect(commandRunnerStub.runAsync.calledOnce).to.be.true)
+            .catch(chai => chai.expect.fail('this is chai error message, should not happen'));
+        import('chai')
+            .then(chai => chai.expect(commandRunnerStub.runAsync.getCall(0).args[1].length).not.to.equal(0))
+            .catch(chai => chai.expect.fail('this is chai error message, should not happen'));
         const args = commandRunnerStub.runAsync.getCall(0).args[1];
-        expect(args.indexOf("--container")).to.equal(-1);
+        import('chai')
+            .then(chai => chai.expect(args.indexOf("--container")).to.equal(-1))
+            .catch(chai => chai.expect.fail('this is chai error message, should not happen'));
     });
 
     it('connectAsync should work when container name is undefined', async () => {
@@ -50,9 +69,15 @@ describe('BridgeClient Tests', () => {
         const bridgeClient = new BridgeClient("", "", commandRunnerStub, "", loggerStub);
         await bridgeClient.connectAsync("test", "testKubeConfigPath", "testResource", ResourceType.Service, [3001], 4001,
             "testEnvFilePath", "testScriptPath", "testParentPrcId", null, "testIsolateAs", undefined, "testNamespace", false, null);
-        expect(commandRunnerStub.runAsync.calledOnce).to.be.true;
-        expect(commandRunnerStub.runAsync.getCall(0).args[1].length).not.to.equal(0);
+        import('chai')
+            .then(chai => chai.expect(commandRunnerStub.runAsync.calledOnce).to.be.true)
+            .catch(chai => chai.expect.fail('this is chai error message, should not happen'));
+        import('chai')
+            .then(chai => chai.expect(commandRunnerStub.runAsync.getCall(0).args[1].length).not.to.equal(0))
+            .catch(chai => chai.expect.fail('this is chai error message, should not happen'));
         const args = commandRunnerStub.runAsync.getCall(0).args[1];
-        expect(args.indexOf("--container")).to.equal(-1);
+        import('chai')
+            .then(chai => chai.expect(args.indexOf("--container")).to.equal(-1))
+            .catch(chai => chai.expect.fail('this is chai error message, should not happen'));
     });
 });

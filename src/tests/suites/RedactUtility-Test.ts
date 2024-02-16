@@ -1,7 +1,6 @@
 import * as assert from 'assert';
 import { redactJsonObject } from '../../utility/Redact';
 import { describe, it } from 'mocha';
-import { expect } from 'chai';
 
 describe('Redact Test', () => {
     it('should return redacted secrets always', async () => {
@@ -20,8 +19,12 @@ describe('Redact Test', () => {
         `);
 
         const result = redactJsonObject(error);
-       expect(JSON.parse(result.message)["extra"]["clientsecret"]).to.equal("[REDACTED]");
-       expect(JSON.parse(result.message)["clientsecret"]).to.equal("[REDACTED]");
+        import('chai')
+            .then(chai => chai.expect(JSON.parse(result.message)["extra"]["clientsecret"]).to.equal("[REDACTED]"))
+            .catch(chai => chai.expect.fail('this is chai error message, should not happen'));
+        import('chai')
+            .then(chai => chai.expect(JSON.parse(result.message)["clientsecret"]).to.equal("[REDACTED]"))
+            .catch(chai => chai.expect.fail('this is chai error message, should not happen'));
     });
     it('should return invalid json error when supplied with malformed json', async () => {
         const error = new Error(`
@@ -43,7 +46,9 @@ describe('Redact Test', () => {
         // Now lets test the Invalid Json Erro when incorrect json is fed into the funct.
         const result = redactJsonObject(error);
         const containsInvalidJson = result.message.toString().includes("Invalid Json");
-        expect(containsInvalidJson).to.be.true;
+        import('chai')
+            .then(chai => chai.expect(containsInvalidJson).to.be.true)
+            .catch(chai => chai.expect.fail('this is chai error message, should not happen'));
     });
 });
 

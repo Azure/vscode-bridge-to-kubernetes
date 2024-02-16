@@ -1,4 +1,3 @@
-import { expect } from 'chai';
 import { after, describe, it } from 'mocha';
 import * as process from 'process';
 import sinon = require('sinon');
@@ -22,7 +21,9 @@ describe('KubectlClientProviderTest', () => {
         const kubectlClientProvide: IClientProvider = new KubectlClientProvider(binariesVersionClient, commandRunnerStub, accountContextManagerStub, loggerStub)
         const kubectlName = kubectlClientProvide.getExecutableFilePath();
         const expectedName = 'linux/kubectl';
-        expect(kubectlName).to.equal(expectedName);
+        import('chai')
+            .then(chai => chai.expect(kubectlName).to.equal(expectedName))
+            .catch(chai => chai.expect.fail('this is chai error message, should not happen'));
     });
 
     it('should always return win/kubectl for windows', async () => {
@@ -36,7 +37,9 @@ describe('KubectlClientProviderTest', () => {
         const kubectlClientProvide: IClientProvider = new KubectlClientProvider(binariesVersionClient, commandRunnerStub, accountContextManagerStub, loggerStub)
         const kubectlName = kubectlClientProvide.getExecutableFilePath();
         const expectedName = 'win/kubectl.exe';
-        expect(kubectlName).to.equal(expectedName);
+        import('chai')
+            .then(chai => chai.expect(kubectlName).to.equal(expectedName))
+            .catch(chai => chai.expect.fail('this is chai error message, should not happen'));
     });
 
     it('should always return osx/kubectl for darwin', async () => {
@@ -50,7 +53,9 @@ describe('KubectlClientProviderTest', () => {
         const kubectlClientProvide: IClientProvider = new KubectlClientProvider(binariesVersionClient, commandRunnerStub, accountContextManagerStub, loggerStub)
         const kubectlName = kubectlClientProvide.getExecutableFilePath();
         const expectedName = 'osx/kubectl';
-        expect(kubectlName).to.equal(expectedName);
+        import('chai')
+            .then(chai => chai.expect(kubectlName).to.equal(expectedName))
+            .catch(chai => chai.expect.fail('this is chai error message, should not happen'));
     });
 
     it('should return unknown for unknown platform', async () => {
@@ -64,9 +69,13 @@ describe('KubectlClientProviderTest', () => {
         const kubectlClientProvide: IClientProvider = new KubectlClientProvider(binariesVersionClient, commandRunnerStub, accountContextManagerStub, loggerStub)
         try {
             kubectlClientProvide.getExecutableFilePath();
-            expect.fail('Should have thrown an error');
+            import('chai')
+                .then(chai => chai.expect.fail('Should have thrown an error'))
+                .catch(chai => chai.expect.fail('this is chai error message, should not happen'));
         } catch (error) {
-            expect(error.message).to.equal('Unsupported platform to get kubectl executable path: msdos');
+            import('chai')
+                .then(chai => chai.expect(error.message).to.equal('Unsupported platform to get kubectl executable path: msdos'))
+                .catch(chai => chai.expect.fail('this is chai error message, should not happen'));
         }
     });
 
@@ -76,7 +85,9 @@ describe('KubectlClientProviderTest', () => {
         commandRunnerStub.runAsync.resolves(null);
         const binariesVersionClient: BinariesVersionClient = new BinariesVersionClient(expectedCLIVersion, null);
         const kubectlClientProvide: IClientProvider = new KubectlClientProvider(binariesVersionClient, commandRunnerStub, accountContextManagerStub, loggerStub)
-        expect(kubectlClientProvide.getDownloadDirectoryName()).to.equal('kubectl');
+        import('chai')
+            .then(chai => chai.expect(kubectlClientProvide.getDownloadDirectoryName()).to.equal('kubectl'))
+            .catch(chai => chai.expect.fail('this is chai error message, should not happen'));
     });
 
     it('should return expected version', async () => {
@@ -86,7 +97,9 @@ describe('KubectlClientProviderTest', () => {
         commandRunnerStub.runAsync.resolves(null);
         const binariesVersionClient: BinariesVersionClient = new BinariesVersionClient(expectedCLIVersion, null);
         const kubectlClientProvide: IClientProvider = new KubectlClientProvider(binariesVersionClient, commandRunnerStub, accountContextManagerStub, loggerStub)
-        expect(kubectlClientProvide.getExpectedVersion()).to.equal(expectedkubectlVersion);
+        import('chai')
+            .then(chai => chai.expect(kubectlClientProvide.getExpectedVersion()).to.equal(expectedkubectlVersion))
+            .catch(chai => chai.expect.fail('this is chai error message, should not happen'));
     });
 
     after(() => {

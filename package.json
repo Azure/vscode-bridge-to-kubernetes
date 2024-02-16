@@ -199,7 +199,7 @@
         "mindaro-dev.file-downloader"
     ],
     "devDependencies": {
-        "@types/chai": "^4.3.5",
+        "@types/chai": "^4.3.11",
         "@types/glob": "^7.1.1",
         "@types/got": "^9.6.12",
         "@types/mocha": "^10.0.1",

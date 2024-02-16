@@ -4,15 +4,14 @@
 'use strict';
 
 import * as k8s from '@kubernetes/client-node';
-import { expect } from 'chai';
 import { beforeEach, describe, it } from 'mocha';
 import * as sinon from 'sinon';
 import { CommandRunner } from '../../clients/CommandRunner';
 import { KubectlClient } from '../../clients/KubectlClient';
 import { IKubernetesIngress } from '../../models/IKubernetesIngress';
 import { IKubernetesService } from '../../models/IKubernetesService';
-import { accountContextManagerStub, commandRunnerStub, loggerStub } from '../CommonTestObjects';
 import { AccountContextManager } from '../../models/context/AccountContextManager';
+import { accountContextManagerStub, commandRunnerStub, loggerStub } from '../CommonTestObjects';
 
 describe(`KubectlClient Test`, () => {
     beforeEach(() => {
@@ -140,15 +139,33 @@ describe(`KubectlClient Test`, () => {
         let ingresses: IKubernetesIngress[];
         ingresses = await kubectlClient.getIngressesAsync(`dev`, `c:/users/alias/.kube/config`, true);
 
-        expect(ingresses.length).to.equal(2);
-        expect(ingresses[0].name).to.equal(`bikesharingweb`);
-        expect(ingresses[0].namespace).to.equal(`dev`);
-        expect(ingresses[0].host).to.equal(`dev.bikesharingweb.j7l6v4gz8d.eus.mindaro.io`);
-        expect(ingresses[0].protocol).to.equal(`http`);
-        expect(ingresses[1].name).to.equal(`gateway`);
-        expect(ingresses[1].namespace).to.equal(`dev`);
-        expect(ingresses[1].host).to.equal(`dev.gateway.j7l6v4gz8d.eus.mindaro.io`);
-        expect(ingresses[1].protocol).to.equal(`http`);
+        import('chai')
+            .then(chai => chai.expect(ingresses.length).to.equal(2))
+            .catch(chai => chai.expect.fail('this is chai error message, should not happen'));
+        import('chai')
+            .then(chai => chai.expect(ingresses[0].name).to.equal(`bikesharingweb`))
+            .catch(chai => chai.expect.fail('this is chai error message, should not happen'));
+        import('chai')
+            .then(chai => chai.expect(ingresses[0].namespace).to.equal(`dev`))
+            .catch(chai => chai.expect.fail('this is chai error message, should not happen'));
+        import('chai')
+            .then(chai => chai.expect(ingresses[0].host).to.equal(`dev.bikesharingweb.j7l6v4gz8d.eus.mindaro.io`))
+            .catch(chai => chai.expect.fail('this is chai error message, should not happen'));
+        import('chai')
+            .then(chai => chai.expect(ingresses[0].protocol).to.equal(`http`))
+            .catch(chai => chai.expect.fail('this is chai error message, should not happen'));
+        import('chai')
+            .then(chai => chai.expect(ingresses[1].name).to.equal(`gateway`))
+            .catch(chai => chai.expect.fail('this is chai error message, should not happen'));
+        import('chai')
+            .then(chai => chai.expect(ingresses[1].namespace).to.equal(`dev`))
+            .catch(chai => chai.expect.fail('this is chai error message, should not happen'));
+        import('chai')
+            .then(chai => chai.expect(ingresses[1].host).to.equal(`dev.gateway.j7l6v4gz8d.eus.mindaro.io`))
+            .catch(chai => chai.expect.fail('this is chai error message, should not happen'));
+        import('chai')
+            .then(chai => chai.expect(ingresses[1].protocol).to.equal(`http`))
+            .catch(chai => chai.expect.fail('this is chai error message, should not happen'));
     });
 
     it(`getIngressesAsync when the kubectl command returns no ingresses`, async () => {
@@ -158,7 +175,9 @@ describe(`KubectlClient Test`, () => {
         const kubectlClient = new KubectlClient(`my/path/kubectl.exe`, commandRunnerStub, accountContextManagerStub, loggerStub);
         const ingresses: IKubernetesIngress[] = await kubectlClient.getIngressesAsync(`dev`, `c:/users/alias/.kube/config`, true);
 
-        expect(ingresses.length).to.equal(0);
+        import('chai')
+            .then(chai => chai.expect(ingresses.length).to.equal(0))
+            .catch(chai => chai.expect.fail('this is chai error message, should not happen'));
     });
 
     it(`getIngressesAsync when the kubectl command returns ingresses without service`, async () => {
@@ -270,7 +289,9 @@ describe(`KubectlClient Test`, () => {
         const kubectlClient = new KubectlClient(`my/path/kubectl.exe`, commandRunnerStub, accountContextManagerStub, loggerStub);
         let ingresses: IKubernetesIngress[];
         ingresses = await kubectlClient.getIngressesAsync(`dev`, `c:/users/alias/.kube/config`, false);
-        expect(ingresses.length).to.equal(0);
+        import('chai')
+            .then(chai => chai.expect(ingresses.length).to.equal(0))
+            .catch(chai => chai.expect.fail('this is chai error message, should not happen'));
     });
 
     it(`getServicesAsync when the kubectl command returns a set of various services`, async () => {
@@ -334,15 +355,33 @@ describe(`KubectlClient Test`, () => {
         const kubectlClient = new KubectlClient(`my/path/kubectl.exe`, commandRunnerStub, accountContextManagerStub, loggerStub);
         const services: IKubernetesService[] = await kubectlClient.getServicesAsync();
 
-        expect(services.length).to.equal(2);
-        expect(services[0].name).to.equal(`bikes`);
-        expect(services[0].namespace).to.equal(`dev`);
-        expect(services[0].selector[`app`]).to.equal(`bikes`);
-        expect(services[0].selector[`release`]).to.equal(`bikesharing`);
-        expect(services[1].name).to.equal(`bikesharingweb`);
-        expect(services[1].namespace).to.equal(`dev`);
-        expect(services[1].selector[`app`]).to.equal(`bikesharingweb`);
-        expect(services[1].selector[`release`]).to.equal(`bikesharing`);
+        import('chai')
+            .then(chai => chai.expect(services.length).to.equal(2))
+            .catch(chai => chai.expect.fail('this is chai error message, should not happen'));
+        import('chai')
+            .then(chai => chai.expect(services[0].name).to.equal(`bikes`))
+            .catch(chai => chai.expect.fail('this is chai error message, should not happen'));
+        import('chai')
+            .then(chai => chai.expect(services[0].namespace).to.equal(`dev`))
+            .catch(chai => chai.expect.fail('this is chai error message, should not happen'));
+        import('chai')
+            .then(chai => chai.expect(services[0].selector[`app`]).to.equal(`bikes`))
+            .catch(chai => chai.expect.fail('this is chai error message, should not happen'));
+        import('chai')
+            .then(chai => chai.expect(services[0].selector[`release`]).to.equal(`bikesharing`))
+            .catch(chai => chai.expect.fail('this is chai error message, should not happen'));
+        import('chai')
+            .then(chai => chai.expect(services[1].name).to.equal(`bikesharingweb`))
+            .catch(chai => chai.expect.fail('this is chai error message, should not happen'));
+        import('chai')
+            .then(chai => chai.expect(services[1].namespace).to.equal(`dev`))
+            .catch(chai => chai.expect.fail('this is chai error message, should not happen'));
+        import('chai')
+            .then(chai => chai.expect(services[1].selector[`app`]).to.equal(`bikesharingweb`))
+            .catch(chai => chai.expect.fail('this is chai error message, should not happen'));
+        import('chai')
+            .then(chai => chai.expect(services[1].selector[`release`]).to.equal(`bikesharing`))
+            .catch(chai => chai.expect.fail('this is chai error message, should not happen'));
     });
 
     it(`getServicesAsync when the kubectl command returns no services`, async () => {
@@ -352,7 +391,9 @@ describe(`KubectlClient Test`, () => {
         const kubectlClient = new KubectlClient(`my/path/kubectl.exe`, commandRunnerStub, accountContextManagerStub, loggerStub);
         const services: IKubernetesService[] = await kubectlClient.getServicesAsync();
 
-        expect(services.length).to.equal(0);
+        import('chai')
+            .then(chai => chai.expect(services.length).to.equal(0))
+            .catch(chai => chai.expect.fail('this is chai error message, should not happen'));
     });
 
     it(`getNamespacesAsync when the kubectl command returns a set of various namespaces`, async () => {
@@ -362,10 +403,18 @@ describe(`KubectlClient Test`, () => {
         const kubectlClient = new KubectlClient(`my/path/kubectl.exe`, commandRunnerStub, accountContextManagerStub, loggerStub);
         const namespaces: string[] = await kubectlClient.getNamespacesAsync(`c:/users/alias/.kube/config`);
 
-        expect(namespaces.length).to.equal(3);
-        expect(namespaces[0]).to.equal(`default`);
-        expect(namespaces[1]).to.equal(`kube-node-lease`);
-        expect(namespaces[2]).to.equal(`voting-app`);
+        import('chai')
+            .then(chai => chai.expect(namespaces.length).to.equal(3))
+            .catch(chai => chai.expect.fail('this is chai error message, should not happen'));
+        import('chai')
+            .then(chai => chai.expect(namespaces[0]).to.equal(`default`))
+            .catch(chai => chai.expect.fail('this is chai error message, should not happen'));
+        import('chai')
+            .then(chai => chai.expect(namespaces[1]).to.equal(`kube-node-lease`))
+            .catch(chai => chai.expect.fail('this is chai error message, should not happen'));
+        import('chai')
+            .then(chai => chai.expect(namespaces[2]).to.equal(`voting-app`))
+            .catch(chai => chai.expect.fail('this is chai error message, should not happen'));
     });
     it(`getServicesAsync when the kubectl command returns services in system namespaces`, async () => {
         const returnString = `{
@@ -419,17 +468,27 @@ describe(`KubectlClient Test`, () => {
         const services: IKubernetesService[] = await kubectlClient.getServicesAsync();
 
         // Validate that the services in system namespaces have been filtered out properly.
-        expect(services.length).to.equal(1);
-        expect(services[0].name).to.equal(`bikes`);
-        expect(services[0].namespace).to.equal(`dev`);
-        expect(services[0].selector[`app`]).to.equal(`bikes`);
-        expect(services[0].selector[`release`]).to.equal(`bikesharing`);
+        import('chai')
+            .then(chai => chai.expect(services.length).to.equal(1))
+            .catch(chai => chai.expect.fail('this is chai error message, should not happen'));
+        import('chai')
+            .then(chai => chai.expect(services[0].name).to.equal(`bikes`))
+            .catch(chai => chai.expect.fail('this is chai error message, should not happen'));
+        import('chai')
+            .then(chai => chai.expect(services[0].namespace).to.equal(`dev`))
+            .catch(chai => chai.expect.fail('this is chai error message, should not happen'));
+        import('chai')
+            .then(chai => chai.expect(services[0].selector[`app`]).to.equal(`bikes`))
+            .catch(chai => chai.expect.fail('this is chai error message, should not happen'));
+        import('chai')
+            .then(chai => chai.expect(services[0].selector[`release`]).to.equal(`bikesharing`))
+            .catch(chai => chai.expect.fail('this is chai error message, should not happen'));
     });
 
     it('getPodNames for selected service name', async () => {
         const acctContextManagerStubLocal = sinon.createStubInstance(AccountContextManager);
         const k8sClientMock = {
-            k8sApi: sinon.createStubInstance(k8s.CoreV1Api)      
+            k8sApi: sinon.createStubInstance(k8s.CoreV1Api)
         }
         acctContextManagerStubLocal.getK8sClient.resolves(k8sClientMock.k8sApi);
         k8sClientMock.k8sApi.readNamespacedEndpoints.resolves({
@@ -448,16 +507,18 @@ describe(`KubectlClient Test`, () => {
                     }]
                 }]
             }
-        }) 
+        })
         const kubectlClient = new KubectlClient(`my/path/kubectl.exe`, commandRunnerStub, acctContextManagerStubLocal, loggerStub);
         const podNames: string[] = await kubectlClient.getPodNames(`stats-api`, `namespace`);
-        expect(podNames[0]).to.equal('stats-api-ff7d66c5b-4nc9x');
+        import('chai')
+            .then(chai => chai.expect(podNames[0]).to.equal('stats-api-ff7d66c5b-4nc9x'))
+            .catch(chai => chai.expect.fail('this is chai error message, should not happen'));
     });
 
     it('getPodNames for selected service name when no pod is found', async () => {
         const acctContextManagerStubLocal = sinon.createStubInstance(AccountContextManager);
         const k8sClientMock = {
-            k8sApi: sinon.createStubInstance(k8s.CoreV1Api)      
+            k8sApi: sinon.createStubInstance(k8s.CoreV1Api)
         }
         acctContextManagerStubLocal.getK8sClient.resolves(k8sClientMock.k8sApi);
         k8sClientMock.k8sApi.readNamespacedEndpoints.resolves({
@@ -471,16 +532,18 @@ describe(`KubectlClient Test`, () => {
                     addresses: []
                 }]
             }
-        }) 
+        })
         const kubectlClient = new KubectlClient(`my/path/kubectl.exe`, commandRunnerStub, acctContextManagerStubLocal, loggerStub);
         const podNames: string[] = await kubectlClient.getPodNames(`stats-api`, `namespace`);
-        expect(podNames.length).to.equal(0);
+        import('chai')
+            .then(chai => chai.expect(podNames.length).to.equal(0))
+            .catch(chai => chai.expect.fail('this is chai error message, should not happen'));
     });
 
     it('getPodNames for selected service name when multiple pods are found', async () => {
         const acctContextManagerStubLocal = sinon.createStubInstance(AccountContextManager);
         const k8sClientMock = {
-            k8sApi: sinon.createStubInstance(k8s.CoreV1Api)      
+            k8sApi: sinon.createStubInstance(k8s.CoreV1Api)
         }
         acctContextManagerStubLocal.getK8sClient.resolves(k8sClientMock.k8sApi);
         k8sClientMock.k8sApi.readNamespacedEndpoints.resolves({
@@ -496,7 +559,7 @@ describe(`KubectlClient Test`, () => {
                         targetRef: {
                             name: 'stats-api-ff7d66c5b-4nc9x'
                         }
-                    },{
+                    }, {
                         ip: 'sampleip2',
                         targetRef: {
                             name: 'stats-api-ff7d66c5b-4nc5k'
@@ -504,29 +567,35 @@ describe(`KubectlClient Test`, () => {
                     }]
                 }]
             }
-        }) 
+        })
         const kubectlClient = new KubectlClient(`my/path/kubectl.exe`, commandRunnerStub, acctContextManagerStubLocal, loggerStub);
         const podNames: string[] = await kubectlClient.getPodNames(`stats-api`, `namespace`);
-        expect(podNames[0]).to.equal('stats-api-ff7d66c5b-4nc9x');
-        expect(podNames[1]).to.equal('stats-api-ff7d66c5b-4nc5k');
+        import('chai')
+            .then(chai => chai.expect(podNames[0]).to.equal('stats-api-ff7d66c5b-4nc9x'))
+            .catch(chai => chai.expect.fail('this is chai error message, should not happen'));
+        import('chai')
+            .then(chai => chai.expect(podNames[1]).to.equal('stats-api-ff7d66c5b-4nc5k'))
+            .catch(chai => chai.expect.fail('this is chai error message, should not happen'));
     });
 
     it('getPodNames for selected service name when readNamespacedEndpoints throws error', async () => {
         const acctContextManagerStubLocal = sinon.createStubInstance(AccountContextManager);
         const k8sClientMock = {
-            k8sApi: sinon.createStubInstance(k8s.CoreV1Api)      
+            k8sApi: sinon.createStubInstance(k8s.CoreV1Api)
         }
         acctContextManagerStubLocal.getK8sClient.resolves(k8sClientMock.k8sApi);
         k8sClientMock.k8sApi.readNamespacedEndpoints.throws("error");
         const kubectlClient = new KubectlClient(`my/path/kubectl.exe`, commandRunnerStub, acctContextManagerStubLocal, loggerStub);
         const podNames: string[] = await kubectlClient.getPodNames(`stats-api`, `namespace`);
-        expect(podNames).to.be.null;
+        import('chai')
+            .then(chai => chai.expect(podNames).to.be.null)
+            .catch(chai => chai.expect.fail('this is chai error message, should not happen'));
     });
 
     it('getContainerNames for selected pod name', async () => {
         const acctContextManagerStubLocal = sinon.createStubInstance(AccountContextManager);
         const k8sClientMock = {
-            k8sApi: sinon.createStubInstance(k8s.CoreV1Api)      
+            k8sApi: sinon.createStubInstance(k8s.CoreV1Api)
         }
         acctContextManagerStubLocal.getK8sClient.resolves(k8sClientMock.k8sApi);
         k8sClientMock.k8sApi.readNamespacedPod.resolves({
@@ -542,17 +611,21 @@ describe(`KubectlClient Test`, () => {
                     }]
                 }
             }
-        }); 
+        });
         const kubectlClient = new KubectlClient(`my/path/kubectl.exe`, commandRunnerStub, acctContextManagerStubLocal, loggerStub);
         const containerNames: string[] = await kubectlClient.getContainerNames('stats-api-ff7d66c5b-4nc9x', 'namespace');
-        expect(containerNames.length).not.to.equal(0);
-        expect(containerNames[0]).to.equal('stats-api');
+        import('chai')
+            .then(chai => chai.expect(containerNames.length).not.to.equal(0))
+            .catch(chai => chai.expect.fail('this is chai error message, should not happen'));
+        import('chai')
+            .then(chai => chai.expect(containerNames[0]).to.equal('stats-api'))
+            .catch(chai => chai.expect.fail('this is chai error message, should not happen'));
     });
 
     it('getContainerNames for selected pod name when multiple containers are found', async () => {
         const acctContextManagerStubLocal = sinon.createStubInstance(AccountContextManager);
         const k8sClientMock = {
-            k8sApi: sinon.createStubInstance(k8s.CoreV1Api)      
+            k8sApi: sinon.createStubInstance(k8s.CoreV1Api)
         }
         acctContextManagerStubLocal.getK8sClient.resolves(k8sClientMock.k8sApi);
         k8sClientMock.k8sApi.readNamespacedPod.resolves({
@@ -571,21 +644,25 @@ describe(`KubectlClient Test`, () => {
                     }]
                 }
             }
-        }); 
+        });
         const kubectlClient = new KubectlClient(`my/path/kubectl.exe`, commandRunnerStub, acctContextManagerStubLocal, loggerStub);
         const containerNames: string[] = await kubectlClient.getContainerNames('stats-api-ff7d66c5b-4nc9x', 'namespace');
-        expect(containerNames.length).to.equal(2);
+        import('chai')
+            .then(chai => chai.expect(containerNames.length).to.equal(2))
+            .catch(chai => chai.expect.fail('this is chai error message, should not happen'));
     });
 
     it('getContainerNames for selected pod name when readNamespacedPod throws error', async () => {
         const acctContextManagerStubLocal = sinon.createStubInstance(AccountContextManager);
         const k8sClientMock = {
-            k8sApi: sinon.createStubInstance(k8s.CoreV1Api)      
+            k8sApi: sinon.createStubInstance(k8s.CoreV1Api)
         }
         acctContextManagerStubLocal.getK8sClient.resolves(k8sClientMock.k8sApi);
         k8sClientMock.k8sApi.readNamespacedPod.throws("error");
         const kubectlClient = new KubectlClient(`my/path/kubectl.exe`, commandRunnerStub, acctContextManagerStubLocal, loggerStub);
         const containerNames: string[] = await kubectlClient.getContainerNames('stats-api-ff7d66c5b-4nc9x', 'namespace');
-        expect(containerNames).to.be.null
+        import('chai')
+            .then(chai => chai.expect(containerNames).to.be.null)
+            .catch(chai => chai.expect.fail('this is chai error message, should not happen'));
     });
 });

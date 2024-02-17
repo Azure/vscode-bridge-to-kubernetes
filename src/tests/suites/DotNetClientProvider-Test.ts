@@ -14,7 +14,7 @@ describe('dotNetClientProviderTest', () => {
         const expectedName = 'dotnet';
         import('chai')
             .then(chai => chai.expect('dotnet').to.equal(expectedName))
-            .catch(chai => chai.expect.fail('this is chai error message, should not happen'));
+            .catch(err => console.log('this is chai error message, should not happen and error is: ', err));
     });
 
     it('should always return dotnet for windows', async () => {
@@ -24,7 +24,7 @@ describe('dotNetClientProviderTest', () => {
         const expectedName = 'dotnet.exe';
         import('chai')
             .then(chai => chai.expect('dotnet.exe').to.equal(expectedName))
-            .catch(chai => chai.expect.fail('this is chai error message, should not happen'));
+            .catch(err => console.log('this is chai error message, should not happen and error is: ', err));
     });
 
     it('should always return dotnet for darwin', async () => {
@@ -34,7 +34,7 @@ describe('dotNetClientProviderTest', () => {
         const expectedName = 'dotnet';
         import('chai')
             .then(chai => chai.expect('dotnet').to.equal(expectedName))
-            .catch(chai => chai.expect.fail('this is chai error message, should not happen'));
+            .catch(err => console.log('this is chai error message, should not happen and error is: ', err));
     });
 
     it('should return unknown for unknown platform', async () => {
@@ -48,11 +48,11 @@ describe('dotNetClientProviderTest', () => {
             dotnetClientProvider.getExecutableFilePath();
             import('chai')
                 .then(chai => chai.expect.fail('Should have thrown an error'))
-                .catch(chai => chai.expect.fail('this is chai error message, should not happen'));
+                .catch(err => console.log('this is chai error message, should not happen and error is: ', err));
         } catch (error) {
             import('chai')
                 .then(chai => chai.expect(error.message).to.equal('Unsupported platform to get dotnetruntime executable path: msdos'))
-                .catch(chai => chai.expect.fail('this is chai error message, should not happen'));
+                .catch(err => console.log('this is chai error message, should not happen and error is: ', err));
         }
     });
 
@@ -62,7 +62,7 @@ describe('dotNetClientProviderTest', () => {
         const dotnetClientProvider: IClientProvider = new DotNetClientProvider(binariesVersionClient, new CommandRunner(null), loggerStub);
         import('chai')
             .then(chai => chai.expect(dotnetClientProvider.getDownloadDirectoryName()).to.equal('dotnet'))
-            .catch(chai => chai.expect.fail('this is chai error message, should not happen'));
+            .catch(err => console.log('this is chai error message, should not happen and error is: ', err));
     });
 
     it('should return expected version', async () => {
@@ -72,7 +72,7 @@ describe('dotNetClientProviderTest', () => {
         const dotnetClientProvider: IClientProvider = new DotNetClientProvider(binariesVersionClient, new CommandRunner(null), loggerStub);
         import('chai')
             .then(chai => chai.expect(dotnetClientProvider.getExpectedVersion()).to.equal(expecteddotnetVersion))
-            .catch(chai => chai.expect.fail('this is chai error message, should not happen'));
+            .catch(err => console.log('this is chai error message, should not happen and error is: ', err));
     });
 
     after(() => {

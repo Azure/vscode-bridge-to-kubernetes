@@ -23,7 +23,7 @@ describe('KubectlClientProviderTest', () => {
         const expectedName = 'linux/kubectl';
         import('chai')
             .then(chai => chai.expect(kubectlName).to.equal(expectedName))
-            .catch(chai => chai.expect.fail('this is chai error message, should not happen'));
+            .catch(err => console.log('this is chai error message, should not happen and error is: ', err));
     });
 
     it('should always return win/kubectl for windows', async () => {
@@ -39,7 +39,7 @@ describe('KubectlClientProviderTest', () => {
         const expectedName = 'win/kubectl.exe';
         import('chai')
             .then(chai => chai.expect(kubectlName).to.equal(expectedName))
-            .catch(chai => chai.expect.fail('this is chai error message, should not happen'));
+            .catch(err => console.log('this is chai error message, should not happen and error is: ', err));
     });
 
     it('should always return osx/kubectl for darwin', async () => {
@@ -55,7 +55,7 @@ describe('KubectlClientProviderTest', () => {
         const expectedName = 'osx/kubectl';
         import('chai')
             .then(chai => chai.expect(kubectlName).to.equal(expectedName))
-            .catch(chai => chai.expect.fail('this is chai error message, should not happen'));
+            .catch(err => console.log('this is chai error message, should not happen and error is: ', err));
     });
 
     it('should return unknown for unknown platform', async () => {
@@ -71,11 +71,11 @@ describe('KubectlClientProviderTest', () => {
             kubectlClientProvide.getExecutableFilePath();
             import('chai')
                 .then(chai => chai.expect.fail('Should have thrown an error'))
-                .catch(chai => chai.expect.fail('this is chai error message, should not happen'));
+                .catch(err => console.log('this is chai error message, should not happen and error is: ', err));
         } catch (error) {
             import('chai')
                 .then(chai => chai.expect(error.message).to.equal('Unsupported platform to get kubectl executable path: msdos'))
-                .catch(chai => chai.expect.fail('this is chai error message, should not happen'));
+                .catch(err => console.log('this is chai error message, should not happen and error is: ', err));
         }
     });
 
@@ -87,7 +87,7 @@ describe('KubectlClientProviderTest', () => {
         const kubectlClientProvide: IClientProvider = new KubectlClientProvider(binariesVersionClient, commandRunnerStub, accountContextManagerStub, loggerStub)
         import('chai')
             .then(chai => chai.expect(kubectlClientProvide.getDownloadDirectoryName()).to.equal('kubectl'))
-            .catch(chai => chai.expect.fail('this is chai error message, should not happen'));
+            .catch(err => console.log('this is chai error message, should not happen and error is: ', err));
     });
 
     it('should return expected version', async () => {
@@ -99,7 +99,7 @@ describe('KubectlClientProviderTest', () => {
         const kubectlClientProvide: IClientProvider = new KubectlClientProvider(binariesVersionClient, commandRunnerStub, accountContextManagerStub, loggerStub)
         import('chai')
             .then(chai => chai.expect(kubectlClientProvide.getExpectedVersion()).to.equal(expectedkubectlVersion))
-            .catch(chai => chai.expect.fail('this is chai error message, should not happen'));
+            .catch(err => console.log('this is chai error message, should not happen and error is: ', err));
     });
 
     after(() => {

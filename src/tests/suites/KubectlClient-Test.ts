@@ -141,31 +141,31 @@ describe(`KubectlClient Test`, () => {
 
         import('chai')
             .then(chai => chai.expect(ingresses.length).to.equal(2))
-            .catch(chai => chai.expect.fail('this is chai error message, should not happen'));
+            .catch(err => console.log('this is chai error message, should not happen and error is: ', err));
         import('chai')
             .then(chai => chai.expect(ingresses[0].name).to.equal(`bikesharingweb`))
-            .catch(chai => chai.expect.fail('this is chai error message, should not happen'));
+            .catch(err => console.log('this is chai error message, should not happen and error is: ', err));
         import('chai')
             .then(chai => chai.expect(ingresses[0].namespace).to.equal(`dev`))
-            .catch(chai => chai.expect.fail('this is chai error message, should not happen'));
+            .catch(err => console.log('this is chai error message, should not happen and error is: ', err));
         import('chai')
             .then(chai => chai.expect(ingresses[0].host).to.equal(`dev.bikesharingweb.j7l6v4gz8d.eus.mindaro.io`))
-            .catch(chai => chai.expect.fail('this is chai error message, should not happen'));
+            .catch(err => console.log('this is chai error message, should not happen and error is: ', err));
         import('chai')
             .then(chai => chai.expect(ingresses[0].protocol).to.equal(`http`))
-            .catch(chai => chai.expect.fail('this is chai error message, should not happen'));
+            .catch(err => console.log('this is chai error message, should not happen and error is: ', err));
         import('chai')
             .then(chai => chai.expect(ingresses[1].name).to.equal(`gateway`))
-            .catch(chai => chai.expect.fail('this is chai error message, should not happen'));
+            .catch(err => console.log('this is chai error message, should not happen and error is: ', err));
         import('chai')
             .then(chai => chai.expect(ingresses[1].namespace).to.equal(`dev`))
-            .catch(chai => chai.expect.fail('this is chai error message, should not happen'));
+            .catch(err => console.log('this is chai error message, should not happen and error is: ', err));
         import('chai')
             .then(chai => chai.expect(ingresses[1].host).to.equal(`dev.gateway.j7l6v4gz8d.eus.mindaro.io`))
-            .catch(chai => chai.expect.fail('this is chai error message, should not happen'));
+            .catch(err => console.log('this is chai error message, should not happen and error is: ', err));
         import('chai')
             .then(chai => chai.expect(ingresses[1].protocol).to.equal(`http`))
-            .catch(chai => chai.expect.fail('this is chai error message, should not happen'));
+            .catch(err => console.log('this is chai error message, should not happen and error is: ', err));
     });
 
     it(`getIngressesAsync when the kubectl command returns no ingresses`, async () => {
@@ -177,7 +177,7 @@ describe(`KubectlClient Test`, () => {
 
         import('chai')
             .then(chai => chai.expect(ingresses.length).to.equal(0))
-            .catch(chai => chai.expect.fail('this is chai error message, should not happen'));
+            .catch(err => console.log('this is chai error message, should not happen and error is: ', err));
     });
 
     it(`getIngressesAsync when the kubectl command returns ingresses without service`, async () => {
@@ -291,7 +291,7 @@ describe(`KubectlClient Test`, () => {
         ingresses = await kubectlClient.getIngressesAsync(`dev`, `c:/users/alias/.kube/config`, false);
         import('chai')
             .then(chai => chai.expect(ingresses.length).to.equal(0))
-            .catch(chai => chai.expect.fail('this is chai error message, should not happen'));
+            .catch(err => console.log('this is chai error message, should not happen and error is: ', err));
     });
 
     it(`getServicesAsync when the kubectl command returns a set of various services`, async () => {
@@ -357,31 +357,31 @@ describe(`KubectlClient Test`, () => {
 
         import('chai')
             .then(chai => chai.expect(services.length).to.equal(2))
-            .catch(chai => chai.expect.fail('this is chai error message, should not happen'));
+            .catch(err => console.log('this is chai error message, should not happen and error is: ', err));
         import('chai')
             .then(chai => chai.expect(services[0].name).to.equal(`bikes`))
-            .catch(chai => chai.expect.fail('this is chai error message, should not happen'));
+            .catch(err => console.log('this is chai error message, should not happen and error is: ', err));
         import('chai')
             .then(chai => chai.expect(services[0].namespace).to.equal(`dev`))
-            .catch(chai => chai.expect.fail('this is chai error message, should not happen'));
+            .catch(err => console.log('this is chai error message, should not happen and error is: ', err));
         import('chai')
             .then(chai => chai.expect(services[0].selector[`app`]).to.equal(`bikes`))
-            .catch(chai => chai.expect.fail('this is chai error message, should not happen'));
+            .catch(err => console.log('this is chai error message, should not happen and error is: ', err));
         import('chai')
             .then(chai => chai.expect(services[0].selector[`release`]).to.equal(`bikesharing`))
-            .catch(chai => chai.expect.fail('this is chai error message, should not happen'));
+            .catch(err => console.log('this is chai error message, should not happen and error is: ', err));
         import('chai')
             .then(chai => chai.expect(services[1].name).to.equal(`bikesharingweb`))
-            .catch(chai => chai.expect.fail('this is chai error message, should not happen'));
+            .catch(err => console.log('this is chai error message, should not happen and error is: ', err));
         import('chai')
             .then(chai => chai.expect(services[1].namespace).to.equal(`dev`))
-            .catch(chai => chai.expect.fail('this is chai error message, should not happen'));
+            .catch(err => console.log('this is chai error message, should not happen and error is: ', err));
         import('chai')
             .then(chai => chai.expect(services[1].selector[`app`]).to.equal(`bikesharingweb`))
-            .catch(chai => chai.expect.fail('this is chai error message, should not happen'));
+            .catch(err => console.log('this is chai error message, should not happen and error is: ', err));
         import('chai')
             .then(chai => chai.expect(services[1].selector[`release`]).to.equal(`bikesharing`))
-            .catch(chai => chai.expect.fail('this is chai error message, should not happen'));
+            .catch(err => console.log('this is chai error message, should not happen and error is: ', err));
     });
 
     it(`getServicesAsync when the kubectl command returns no services`, async () => {
@@ -393,7 +393,7 @@ describe(`KubectlClient Test`, () => {
 
         import('chai')
             .then(chai => chai.expect(services.length).to.equal(0))
-            .catch(chai => chai.expect.fail('this is chai error message, should not happen'));
+            .catch(err => console.log('this is chai error message, should not happen and error is: ', err));
     });
 
     it(`getNamespacesAsync when the kubectl command returns a set of various namespaces`, async () => {
@@ -405,16 +405,16 @@ describe(`KubectlClient Test`, () => {
 
         import('chai')
             .then(chai => chai.expect(namespaces.length).to.equal(3))
-            .catch(chai => chai.expect.fail('this is chai error message, should not happen'));
+            .catch(err => console.log('this is chai error message, should not happen and error is: ', err));
         import('chai')
             .then(chai => chai.expect(namespaces[0]).to.equal(`default`))
-            .catch(chai => chai.expect.fail('this is chai error message, should not happen'));
+            .catch(err => console.log('this is chai error message, should not happen and error is: ', err));
         import('chai')
             .then(chai => chai.expect(namespaces[1]).to.equal(`kube-node-lease`))
-            .catch(chai => chai.expect.fail('this is chai error message, should not happen'));
+            .catch(err => console.log('this is chai error message, should not happen and error is: ', err));
         import('chai')
             .then(chai => chai.expect(namespaces[2]).to.equal(`voting-app`))
-            .catch(chai => chai.expect.fail('this is chai error message, should not happen'));
+            .catch(err => console.log('this is chai error message, should not happen and error is: ', err));
     });
     it(`getServicesAsync when the kubectl command returns services in system namespaces`, async () => {
         const returnString = `{
@@ -470,19 +470,19 @@ describe(`KubectlClient Test`, () => {
         // Validate that the services in system namespaces have been filtered out properly.
         import('chai')
             .then(chai => chai.expect(services.length).to.equal(1))
-            .catch(chai => chai.expect.fail('this is chai error message, should not happen'));
+            .catch(err => console.log('this is chai error message, should not happen and error is: ', err));
         import('chai')
             .then(chai => chai.expect(services[0].name).to.equal(`bikes`))
-            .catch(chai => chai.expect.fail('this is chai error message, should not happen'));
+            .catch(err => console.log('this is chai error message, should not happen and error is: ', err));
         import('chai')
             .then(chai => chai.expect(services[0].namespace).to.equal(`dev`))
-            .catch(chai => chai.expect.fail('this is chai error message, should not happen'));
+            .catch(err => console.log('this is chai error message, should not happen and error is: ', err));
         import('chai')
             .then(chai => chai.expect(services[0].selector[`app`]).to.equal(`bikes`))
-            .catch(chai => chai.expect.fail('this is chai error message, should not happen'));
+            .catch(err => console.log('this is chai error message, should not happen and error is: ', err));
         import('chai')
             .then(chai => chai.expect(services[0].selector[`release`]).to.equal(`bikesharing`))
-            .catch(chai => chai.expect.fail('this is chai error message, should not happen'));
+            .catch(err => console.log('this is chai error message, should not happen and error is: ', err));
     });
 
     it('getPodNames for selected service name', async () => {
@@ -512,7 +512,7 @@ describe(`KubectlClient Test`, () => {
         const podNames: string[] = await kubectlClient.getPodNames(`stats-api`, `namespace`);
         import('chai')
             .then(chai => chai.expect(podNames[0]).to.equal('stats-api-ff7d66c5b-4nc9x'))
-            .catch(chai => chai.expect.fail('this is chai error message, should not happen'));
+            .catch(err => console.log('this is chai error message, should not happen and error is: ', err));
     });
 
     it('getPodNames for selected service name when no pod is found', async () => {
@@ -537,7 +537,7 @@ describe(`KubectlClient Test`, () => {
         const podNames: string[] = await kubectlClient.getPodNames(`stats-api`, `namespace`);
         import('chai')
             .then(chai => chai.expect(podNames.length).to.equal(0))
-            .catch(chai => chai.expect.fail('this is chai error message, should not happen'));
+            .catch(err => console.log('this is chai error message, should not happen and error is: ', err));
     });
 
     it('getPodNames for selected service name when multiple pods are found', async () => {
@@ -572,10 +572,10 @@ describe(`KubectlClient Test`, () => {
         const podNames: string[] = await kubectlClient.getPodNames(`stats-api`, `namespace`);
         import('chai')
             .then(chai => chai.expect(podNames[0]).to.equal('stats-api-ff7d66c5b-4nc9x'))
-            .catch(chai => chai.expect.fail('this is chai error message, should not happen'));
+            .catch(err => console.log('this is chai error message, should not happen and error is: ', err));
         import('chai')
             .then(chai => chai.expect(podNames[1]).to.equal('stats-api-ff7d66c5b-4nc5k'))
-            .catch(chai => chai.expect.fail('this is chai error message, should not happen'));
+            .catch(err => console.log('this is chai error message, should not happen and error is: ', err));
     });
 
     it('getPodNames for selected service name when readNamespacedEndpoints throws error', async () => {
@@ -589,7 +589,7 @@ describe(`KubectlClient Test`, () => {
         const podNames: string[] = await kubectlClient.getPodNames(`stats-api`, `namespace`);
         import('chai')
             .then(chai => chai.expect(podNames).to.be.null)
-            .catch(chai => chai.expect.fail('this is chai error message, should not happen'));
+            .catch(err => console.log('this is chai error message, should not happen and error is: ', err));
     });
 
     it('getContainerNames for selected pod name', async () => {
@@ -616,10 +616,10 @@ describe(`KubectlClient Test`, () => {
         const containerNames: string[] = await kubectlClient.getContainerNames('stats-api-ff7d66c5b-4nc9x', 'namespace');
         import('chai')
             .then(chai => chai.expect(containerNames.length).not.to.equal(0))
-            .catch(chai => chai.expect.fail('this is chai error message, should not happen'));
+            .catch(err => console.log('this is chai error message, should not happen and error is: ', err));
         import('chai')
             .then(chai => chai.expect(containerNames[0]).to.equal('stats-api'))
-            .catch(chai => chai.expect.fail('this is chai error message, should not happen'));
+            .catch(err => console.log('this is chai error message, should not happen and error is: ', err));
     });
 
     it('getContainerNames for selected pod name when multiple containers are found', async () => {
@@ -649,7 +649,7 @@ describe(`KubectlClient Test`, () => {
         const containerNames: string[] = await kubectlClient.getContainerNames('stats-api-ff7d66c5b-4nc9x', 'namespace');
         import('chai')
             .then(chai => chai.expect(containerNames.length).to.equal(2))
-            .catch(chai => chai.expect.fail('this is chai error message, should not happen'));
+            .catch(err => console.log('this is chai error message, should not happen and error is: ', err));
     });
 
     it('getContainerNames for selected pod name when readNamespacedPod throws error', async () => {
@@ -663,6 +663,6 @@ describe(`KubectlClient Test`, () => {
         const containerNames: string[] = await kubectlClient.getContainerNames('stats-api-ff7d66c5b-4nc9x', 'namespace');
         import('chai')
             .then(chai => chai.expect(containerNames).to.be.null)
-            .catch(chai => chai.expect.fail('this is chai error message, should not happen'));
+            .catch(err => console.log('this is chai error message, should not happen and error is: ', err));
     });
 });

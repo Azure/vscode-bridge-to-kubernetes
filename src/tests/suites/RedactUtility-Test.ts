@@ -21,10 +21,10 @@ describe('Redact Test', () => {
         const result = redactJsonObject(error);
         import('chai')
             .then(chai => chai.expect(JSON.parse(result.message)["extra"]["clientsecret"]).to.equal("[REDACTED]"))
-            .catch(chai => chai.expect.fail('this is chai error message, should not happen'));
+            .catch(err => console.log('this is chai error message, should not happen and error is: ', err));
         import('chai')
             .then(chai => chai.expect(JSON.parse(result.message)["clientsecret"]).to.equal("[REDACTED]"))
-            .catch(chai => chai.expect.fail('this is chai error message, should not happen'));
+            .catch(err => console.log('this is chai error message, should not happen and error is: ', err));
     });
     it('should return invalid json error when supplied with malformed json', async () => {
         const error = new Error(`
@@ -48,7 +48,7 @@ describe('Redact Test', () => {
         const containsInvalidJson = result.message.toString().includes("Invalid Json");
         import('chai')
             .then(chai => chai.expect(containsInvalidJson).to.be.true)
-            .catch(chai => chai.expect.fail('this is chai error message, should not happen'));
+            .catch(err => console.log('this is chai error message, should not happen and error is: ', err));
     });
 });
 

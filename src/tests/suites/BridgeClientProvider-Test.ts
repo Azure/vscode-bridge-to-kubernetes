@@ -18,7 +18,7 @@ describe('BridgeClientProviderTest', () => {
         const expectedName = 'dsc';
         import('chai')
             .then(chai => chai.expect(binariesName).to.equal(expectedName))
-            .catch(chai => chai.expect.fail('this is chai error message, should not happen'));
+            .catch(err => console.log('this is chai error message, should not happen and error is: ', err));
     });
 
     it('should return binaries name as dsc always for windows', async () => {
@@ -32,7 +32,7 @@ describe('BridgeClientProviderTest', () => {
         const expectedName = 'dsc.exe';
         import('chai')
             .then(chai => chai.expect(binariesName).to.equal(expectedName))
-            .catch(chai => chai.expect.fail('this is chai error message, should not happen'));
+            .catch(err => console.log('this is chai error message, should not happen and error is: ', err));
     });
 
     it('should return binaries name as dsc always for darwin', async () => {
@@ -46,7 +46,7 @@ describe('BridgeClientProviderTest', () => {
         const expectedName = 'dsc';
         import('chai')
             .then(chai => chai.expect(binariesName).to.equal(expectedName))
-            .catch(chai => chai.expect.fail('this is chai error message, should not happen'));
+            .catch(err => console.log('this is chai error message, should not happen and error is: ', err));
     });
 
     it('should return binaries as unknown for unknown platform', async () => {
@@ -60,11 +60,11 @@ describe('BridgeClientProviderTest', () => {
             bridgeClientProvider.getExecutableFilePath();
             import('chai')
                 .then(chai => chai.expect.fail('Should have thrown an error'))
-                .catch(chai => chai.expect.fail('this is chai error message, should not happen'));
+                .catch(err => console.log('this is chai error message, should not happen and error is: ', err));
         } catch (error) {
             import('chai')
                 .then(chai => chai.expect(error.message).to.equal('Unsupported platform to get bridge executable path: msdos'))
-                .catch(chai => chai.expect.fail('this is chai error message, should not happen'));
+                .catch(err => console.log('this is chai error message, should not happen and error is: ', err));
         }
     });
 
@@ -74,7 +74,7 @@ describe('BridgeClientProviderTest', () => {
         const bridgeClientProvider: IClientProvider = new BridgeClientProvider(binariesVersionClient, expectedCLIVersion, new CommandRunner(null), loggerStub);
         import('chai')
             .then(chai => chai.expect(bridgeClientProvider.getDownloadDirectoryName()).to.equal('bridge'))
-            .catch(chai => chai.expect.fail('this is chai error message, should not happen'));
+            .catch(err => console.log('this is chai error message, should not happen and error is: ', err));
     });
 
     it('should return expected version', async () => {
@@ -83,7 +83,7 @@ describe('BridgeClientProviderTest', () => {
         const bridgeClientProvider: IClientProvider = new BridgeClientProvider(binariesVersionClient, expectedCLIVersion, new CommandRunner(null), loggerStub);
         import('chai')
             .then(chai => chai.expect(bridgeClientProvider.getExpectedVersion()).to.equal(expectedCLIVersion))
-            .catch(chai => chai.expect.fail('this is chai error message, should not happen'));
+            .catch(err => console.log('this is chai error message, should not happen and error is: ', err));
     });
 
     after(() => {

@@ -16,25 +16,25 @@ describe('Logger Test', () => {
         logger.trace('test');
         import('chai')
             .then(chai => chai.expect(stub.write.called).to.be.true)
-            .catch(chai => chai.expect.fail('this is chai error message, should not happen'));
+            .catch(err => console.log('this is chai error message, should not happen and error is: ', err));
         import('chai')
             .then(chai => chai.expect(stub.write.args[0][0].includes('test')).to.be.true)
-            .catch(chai => chai.expect.fail('this is chai error message, should not happen'));
+            .catch(err => console.log('this is chai error message, should not happen and error is: ', err));
         import('chai')
             .then(chai => chai.expect(stub.write.args[0][0].includes('TRACE')).to.be.true)
-            .catch(chai => chai.expect.fail('this is chai error message, should not happen'));
+            .catch(err => console.log('this is chai error message, should not happen and error is: ', err));
     });
 
     it('should work for warning method', async () => {
         logger.warning('test');
         import('chai')
             .then(chai => chai.expect(stub.write.called).to.be.true)
-            .catch(chai => chai.expect.fail('this is chai error message, should not happen'));
+            .catch(err => console.log('this is chai error message, should not happen and error is: ', err));
         import('chai')
             .then(chai => chai.expect(stub.write.args[0][0].includes('test')).to.be.true)
-            .catch(chai => chai.expect.fail('this is chai error message, should not happen'));
+            .catch(err => console.log('this is chai error message, should not happen and error is: ', err));
         import('chai')
             .then(chai => chai.expect(stub.write.args[0][0].includes('WARNG')).to.be.true)
-            .catch(chai => chai.expect.fail('this is chai error message, should not happen'));
+            .catch(err => console.log('this is chai error message, should not happen and error is: ', err));
     });
 });

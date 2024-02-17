@@ -8,8 +8,6 @@ import { loggerStub } from '../CommonTestObjects';
 
 describe('BridgeClient Tests', () => {
     it('connectAsync should work with multiple containers', async () => {
-        loggerStub.trace.reset();
-        loggerStub.trace.onCall(0).returns();
         const commandRunnerStub = sinon.createStubInstance(CommandRunner);
         commandRunnerStub.runAsync.resolves("");
         const bridgeClient = new BridgeClient("", "", commandRunnerStub, "", loggerStub);
@@ -23,8 +21,6 @@ describe('BridgeClient Tests', () => {
     });
 
     it('connectAsync should work when container name is empty', async () => {
-        loggerStub.trace.reset();
-        loggerStub.trace.onCall(0).returns();
         const commandRunnerStub = sinon.createStubInstance(CommandRunner);
         commandRunnerStub.runAsync.resolves("");
         const bridgeClient = new BridgeClient("", "", commandRunnerStub, "", loggerStub);
@@ -37,8 +33,6 @@ describe('BridgeClient Tests', () => {
     });
 
     it('connectAsync should work when container name is null', async () => {
-        loggerStub.trace.reset();
-        loggerStub.trace.onCall(0).returns();
         const commandRunnerStub = sinon.createStubInstance(CommandRunner);
         commandRunnerStub.runAsync.resolves("");
         const bridgeClient = new BridgeClient("", "", commandRunnerStub, "", loggerStub);
@@ -51,8 +45,6 @@ describe('BridgeClient Tests', () => {
     });
 
     it('connectAsync should work when container name is undefined', async () => {
-        loggerStub.trace.reset();
-        loggerStub.trace.onCall(0).returns();
         const commandRunnerStub = sinon.createStubInstance(CommandRunner);
         commandRunnerStub.runAsync.resolves("");
         const bridgeClient = new BridgeClient("", "", commandRunnerStub, "", loggerStub);

@@ -9,8 +9,6 @@ import { loggerStub } from '../CommonTestObjects';
 describe('BridgeClientProviderTest', () => {
     const originalPlatform = Object.getOwnPropertyDescriptor(process, 'platform');
     it('should return binaries name as dsc always for linux', async () => {
-        loggerStub.trace.reset();
-        loggerStub.trace.onCall(0).returns();
         Object.defineProperty(process, 'platform', {
             value: 'linux'
         });
@@ -23,8 +21,6 @@ describe('BridgeClientProviderTest', () => {
     });
 
     it('should return binaries name as dsc always for windows', async () => {
-        loggerStub.trace.reset();
-        loggerStub.trace.onCall(0).returns();
         Object.defineProperty(process, 'platform', {
             value: 'win32'
         });
@@ -37,8 +33,6 @@ describe('BridgeClientProviderTest', () => {
     });
 
     it('should return binaries name as dsc always for darwin', async () => {
-        loggerStub.trace.reset();
-        loggerStub.trace.onCall(0).returns();
         Object.defineProperty(process, 'platform', {
             value: 'darwin'
         });
@@ -51,8 +45,6 @@ describe('BridgeClientProviderTest', () => {
     });
 
     it('should return binaries as unknown for unknown platform', async () => {
-        loggerStub.trace.reset();
-        loggerStub.trace.onCall(0).returns();
         Object.defineProperty(process, 'platform', {
             value: 'msdos'
         });

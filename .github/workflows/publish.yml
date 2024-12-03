@@ -37,7 +37,7 @@ jobs:
       uses: martinbeentjes/npm-get-version-action@95bc31c6dd3145896c110e382f840bb1e750d09c # v1.1.0
     - name: Check version is mentioned in Changelog
       id: changelog_reader
-      uses: mindsers/changelog-reader-action@b97ce03a10d9bdbb07beb491c76a5a01d78cd3ef # v2.2.2
+      uses: mindsers/changelog-reader-action@32aa5b4c155d76c94e4ec883a223c947b2f02656 # v2.2.3
       with:
         validation_depth: 10
         version: ${{ steps.package_version.outputs.current-version }}

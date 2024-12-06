@@ -23,44 +23,36 @@ jobs:
       matrix:
         os: [macos-latest, ubuntu-latest, windows-latest]
     steps:
-    - name: Harden Runner
-      uses: step-security/harden-runner@63c24ba6bd7ba022e95695ff85de572c04a18142 # v2.7.0
-      with:
-        egress-policy: audit
+      - name: Harden Runner
+        uses: step-security/harden-runner@63c24ba6bd7ba022e95695ff85de572c04a18142 # v2.7.0
+        with:
+          egress-policy: audit
 
-    - name: Checkout Branch
-      uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
-    - name: Setup Node.js
-      uses: actions/setup-node@60edb5dd545a775178f52524783378180af0d1f8 # v4.0.2
-      with:
-        node-version: '16.20.1'
-    - name: Build Extension
-      run: |
-        npm install
-        npm run compile
-    - name: Smoke test (Linux)
-      run: xvfb-run -a npm run test
-      if: runner.os == 'Linux'
-    - name: Smoke test (Mac, Windows)
-      run: npm run test
-      if: runner.os != 'Linux'
-    - name: Upload coverage reports to Codecov
-      uses: codecov/codecov-action@def81595a67c83cbb0a42ba9b624b97f4c7deb3d #v3.1.4
-      with:
-        token: ${{ secrets.CODECOV_TOKEN }}
-        flags: unittests # optional
-        fail_ci_if_error: true # optional (default = false)
-        verbose: true # optional (default = false)
-    - name: Package Extension
-      if: matrix.os == 'ubuntu-latest'
-      run: |
-        npm install -g vsce
-        vsce package
-        mkdir vsix
-        mv *.vsix vsix
-    - name: Archive Extension
-      if: matrix.os == 'ubuntu-latest'
-      uses: actions/upload-artifact@5d5d22a31266ced268874388b861e4b58bb5c2f3 # v4.3.1
-      with:
-        name: vsix
-        path: vsix
+      - name: Checkout Branch
+        uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
+      - name: Setup Node.js
+        uses: actions/setup-node@60edb5dd545a775178f52524783378180af0d1f8 # v4.0.2
+        with:
+          node-version: "16.20.1"
+      - name: Build Extension
+        run: |
+          npm install
+          npm run compile
+      - name: Smoke test (Linux)
+        run: xvfb-run -a npm run test
+        if: runner.os == 'Linux'
+      - name: Smoke test (Mac, Windows)
+        run: npm run test
+        if: runner.os != 'Linux'
+      - name: Package Extension
+        if: matrix.os == 'ubuntu-latest'
+        run: |
+          npm run vscode:package
+          mkdir vsix
+          mv *.vsix vsix
+      - name: Archive Extension
+        if: matrix.os == 'ubuntu-latest'
+        uses: actions/upload-artifact@5d5d22a31266ced268874388b861e4b58bb5c2f3 # v4.3.1
+        with:
+          name: vsix
+          path: vsix

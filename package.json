@@ -229,7 +229,7 @@
         "utf-8-validate": "^6.0.3"
     },
     "dependencies": {
-        "@kubernetes/client-node": "^0.19.0",
+        "@kubernetes/client-node": "^0.22.3",
         "@microsoft/vscode-file-downloader-api": "^1.0.1",
         "@types/tmp": "^0.1.0",
         "@vscode/extension-telemetry": "^0.9.6", 

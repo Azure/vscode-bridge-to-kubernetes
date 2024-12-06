@@ -238,7 +238,7 @@
         "got": "^11.0.0",
         "guid-typescript": "^1.0.9",
         "lodash": "^4.17.21",
-        "node-fetch": "^2.6.7",
+        "node-fetch": "^3.3.2",
         "opener": "^1.5.1",
         "portfinder": "^1.0.28",
         "telaug": "0.0.13",

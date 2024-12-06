@@ -9,7 +9,7 @@
     "qna": "marketplace",
     "license": "MIT",
     "engines": {
-        "vscode": "^1.74.0",
+        "vscode": "^1.95.0",
         "node": ">=16.20.x",
         "npm": ">=8.19.x"
     },
@@ -206,7 +206,7 @@
         "@types/node": "^18.11.17",
         "@types/node-fetch": "^2.6.2",
         "@types/sinon": "^10.0.16",
-        "@types/vscode": "1.74.0",
+        "@types/vscode": "1.95.0",
         "@vscode/test-electron": "^2.3.9",
         "@vscode/vsce": "^2.23.0",
         "c8": "^8.0.1",

@@ -29,7 +29,7 @@ export class StringUtility {
 
         // Make sure that the username exists and only contains ASCII characters.
         if (username.length === 0 || /[^\u0000-\u007f]/.test(username)) {
-            username = crypto.createHash(`md5`).update(username).digest(`hex`);
+            username = crypto.createHash(`sha256`).update(username).digest(`hex`);
         }
 
         // Make sure we only take the first 8 characters of the username.

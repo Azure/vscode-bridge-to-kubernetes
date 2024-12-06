@@ -242,7 +242,7 @@
         "opener": "^1.5.1",
         "portfinder": "^1.0.28",
         "telaug": "0.0.13",
-        "tmp": "^0.2.1",
+        "tmp": "^0.2.3",
         "username": "^5.1.0",
         "vscode-kubernetes-tools-api": "^1.3.0",
         "vscode-tas-client": "^0.1.75",

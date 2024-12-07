@@ -3,15 +3,15 @@
 // ----------------------------------------------------------------------------
 'use strict';
 
-import fetch, { Response } from 'node-fetch';
-import * as util from "util";
+import { PathOrFileDescriptor } from 'fs';
 import { Constants } from '../Constants';
 import { Logger } from '../logger/Logger';
 import { TelemetryEvent } from '../logger/TelemetryEvent';
 import { IBinariesDownloadInfo, IDownloadInfo } from '../models/IBinariesDownloadInfo';
-import { Environment, EnvironmentUtility } from '../utility/EnvironmentUtility';
+import { fileSystem } from '../utility/FileSystem';
 import { RetryUtility } from '../utility/RetryUtility';
 import { ClientType } from './ClientType';
+import path = require('path');
 
 export class BinariesVersionClient {
     private _binariesDownloadInfoPromise: Promise<IBinariesDownloadInfo>;
@@ -44,8 +44,7 @@ export class BinariesVersionClient {
             const getDownloadInfoAsyncFn = async (): Promise<IBinariesDownloadInfo> => {
 
                 // Get latest download URL and checksum
-                const binaryVersionsResponse: Response = await fetch(this.getBinariesVersionUrl(this._expectedBridgeVersion));
-                const binaryVersionsJson: any = await binaryVersionsResponse.json();
+                const binaryVersionsJson: any = this.getBinariesJsonContent();
                 const osString: string = this.getOsString();
                 const version: string = binaryVersionsJson[`version`];
                 const binariesDownloadInfo: object = binaryVersionsJson[osString];
@@ -97,25 +96,21 @@ export class BinariesVersionClient {
         }
     }
 
-    private getBinariesVersionUrl(expectedCLIVersion: string): string {
-        const environment: Environment = EnvironmentUtility.getBridgeEnvironment(this._logger);
-        let versionUrl: string;
-        switch (environment) {
-            case Environment.Production:
-                versionUrl = expectedCLIVersion === null ? Constants.BinariesLatestVersionUrlProd : util.format(Constants.BinariesVersionedUrlProd, `zipv2`, expectedCLIVersion);
-                break;
-            case Environment.Staging:
-                versionUrl = expectedCLIVersion === null ? Constants.BinariesLatestVersionUrlStaging : util.format(Constants.BinariesVersionedUrlStaging, `zipv2`, expectedCLIVersion);
-                break;
-            case Environment.Dev:
-                versionUrl = expectedCLIVersion === null ? Constants.BinariesLatestVersionUrlDev : util.format(Constants.BinariesVersionedUrlDev, `zipv2`, expectedCLIVersion);
-                break;
-            default:
-                const error = new Error(`Unsupported value for the Environment enum: ${environment}`);
-                this._logger.error(TelemetryEvent.UnexpectedError, error);
-                throw error;
+    private async getBinariesJsonContent() {
+        let jsonContent: any;
+        let filePath: PathOrFileDescriptor;
+        try {
+            filePath = path.join(__dirname, '/src/utility/BinaryDownloadInfo.json');
+            const rawContent: string = await fileSystem.readFileAsync(filePath, `utf8`);
+            jsonContent = JSON.parse(rawContent);
+            if (jsonContent == null) {
+                throw new Error(`Parsing the BinariesDownloadInfo.json file at path ${filePath} returned null`);
+            }
         }
-        this._logger.trace(`Resolved versionUrl '${versionUrl}'`);
-        return versionUrl;
+        catch (error) {
+            const userFriendlyError = new Error(`Failed to retrieve the BinariesDownloadInfo.json file at path ${filePath}. Error: ${error.message}`);
+            this._logger.error(TelemetryEvent.UnexpectedError, userFriendlyError);
+            throw userFriendlyError;
+        }
     }
 }

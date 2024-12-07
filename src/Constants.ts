@@ -4,26 +4,13 @@
 'use strict';
 
 export class Constants {
-    /* BinariesUtility V1 & V2 Shared Constants */
-    public static readonly BinariesVersionedUrlProd = `https://bridgetokubernetes.blob.core.windows.net/%s/%s/lks.json`;
-    public static readonly BinariesVersionedUrlStaging = `https://mindarostaging.blob.core.windows.net/%s/%s/lks.json`;
-    public static readonly BinariesVersionedUrlDev = `https://mindaromaster.blob.core.windows.net/%s/%s/lks.json`;
-
     /* BinariesUtilityV2 Constants */
-    public static readonly BinariesLatestVersionUrlProd = `https://aka.ms/bridge-lks-v2`;
-    public static readonly BinariesLatestVersionUrlStaging = `https://aka.ms/bridge-lks-staging-v2`;
-    public static readonly BinariesLatestVersionUrlDev = `https://aka.ms/bridge-lks-dev-v2`;
     public static readonly LegacyBridgeDownloadDirectoryName = `binaries`;
     public static readonly BridgeDownloadDirectoryName = `bridge`;
     public static readonly KubectlDownloadDirectoryName = `kubectl`;
     public static readonly DotNetDownloadDirectoryName = `dotnet`;
     public static readonly KubectlMinVersion = `1.27.3`;
     public static readonly DotNetMinVersion = `7.0.7`;
-
-    /* BinariesUtility Constants */
-    public static readonly CliVersionsUrlProd = `https://aka.ms/bridge-lks`;
-    public static readonly CliVersionsUrlStaging = `https://aka.ms/bridge-lks-staging`;
-    public static readonly CliVersionsUrlDev = `https://aka.ms/bridge-lks-dev`;
     public static readonly CliDownloadDirectoryName = `binaries`;
 
     public static readonly ProductName = `Bridge to Kubernetes`;
@@ -58,7 +45,7 @@ export class Constants {
 
     public static readonly LegacyConnectServiceTaskType3 = `${Constants.TaskSource}.service`;
 
-    public static readonly FileDownloaderMinVersion = `1.0.10`;
+    public static readonly FileDownloaderMinVersion = `1.0.13`;
     public static readonly FileDownloaderVersionError = `${Constants.ProductName} cannot run alongside the extension, File Downloader with version older than '${Constants.FileDownloaderMinVersion}'. Please update the File Downloader extension.`;
 
     public static readonly ListOfErrorMessagesForUsingKubernetesServiceEnvironmentVariables = [

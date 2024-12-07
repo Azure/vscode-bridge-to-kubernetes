@@ -100,7 +100,7 @@ export class BinariesVersionClient {
         let jsonContent: any;
         let filePath: PathOrFileDescriptor;
         try {
-            filePath = path.join(__dirname, '/src/utility/BinaryDownloadInfo.json');
+            filePath = path.join(__dirname, '..', 'utility', 'BinaryDownloadInfo.json');
             const rawContent: string = await fileSystem.readFileAsync(filePath, `utf8`);
             jsonContent = JSON.parse(rawContent);
             if (jsonContent == null) {
@@ -112,5 +112,6 @@ export class BinariesVersionClient {
             this._logger.error(TelemetryEvent.UnexpectedError, userFriendlyError);
             throw userFriendlyError;
         }
+        return jsonContent;
     }
 }

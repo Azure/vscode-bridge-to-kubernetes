@@ -522,13 +522,12 @@ export class BinariesUtilityV2 implements IBinariesUtility {
     }
 
     public async getApi(): Promise<FileDownloader> {
-        let _extension: vscode.Extension<FileDownloader> | undefined;
-        if (_extension == null) {
-            _extension = this.getFileDownloaderExtension();
-        }
+        let _extension = this.getFileDownloaderExtension();
+
         if (!_extension.isActive) {
             await _extension.activate();
         }
+
         return _extension.exports;
     }
 }

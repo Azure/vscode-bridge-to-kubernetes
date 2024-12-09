@@ -44,7 +44,7 @@ export class BinariesVersionClient {
             const getDownloadInfoAsyncFn = async (): Promise<IBinariesDownloadInfo> => {
 
                 // Get latest download URL and checksum
-                const binaryVersionsJson: any = this.getBinariesJsonContent();
+                const binaryVersionsJson: any = await this.getBinariesJsonContent();
                 const osString: string = this.getOsString();
                 const version: string = binaryVersionsJson[`version`];
                 const binariesDownloadInfo: object = binaryVersionsJson[osString];
@@ -100,7 +100,7 @@ export class BinariesVersionClient {
         let jsonContent: any;
         let filePath: PathOrFileDescriptor;
         try {
-            filePath = path.join(__dirname, '..', 'utility', 'BinaryDownloadInfo.json');
+            filePath = path.join(__dirname, '..', 'src', 'utility', 'BinaryDownloadInfo.json');
             const rawContent: string = await fileSystem.readFileAsync(filePath, `utf8`);
             jsonContent = JSON.parse(rawContent);
             if (jsonContent == null) {

@@ -17,7 +17,7 @@
   "linux_arm64": {
     "bridge": {
       "sha256hash": "39E86AD8D3C60FE9B5F462F6947B632E0BF57AE8C1B61CF2DFABFB8A9A324756",
-      "url": "https://github.com/Azure/Bridge-To-Kubernetes/releases/download/1.0.20240109.1/dotnetruntime-linux.zip/lpk-linux-arm64.zip"
+      "url": "https://github.com/Azure/Bridge-To-Kubernetes/releases/download/1.0.20240109.1/lpk-linux-arm64.zip"
     },
     "kubectl": {
       "sha256hash": "01B76D4E4A9081452932F27C767C9D8F3507C8AD3CC9269CEB16729F4D0ED900",
@@ -31,7 +31,7 @@
   "osx": {
     "bridge": {
       "sha256hash": "F60F28FACE7887B58768112F65D092146692679691E72C19C1A822C28876503C",
-      "url": "https://github.com/Azure/Bridge-To-Kubernetes/releases/download/1.0.20240109.1/dotnetruntime-linux.zip/lpk-osx.zip"
+      "url": "https://github.com/Azure/Bridge-To-Kubernetes/releases/download/1.0.20240109.1/lpk-osx.zip"
     },
     "kubectl": {
       "sha256hash": "D24EAFEC39EB2393DBA0088B762953BEDCC04156AC9E324FA290476BD3C888B9",
@@ -45,7 +45,7 @@
   "win": {
     "bridge": {
       "sha256hash": "29CE6477ABAF4003947EC1D83B62DB32C5A03D24F4444E4CCB24BF41F5A0C232",
-      "url": "https://github.com/Azure/Bridge-To-Kubernetes/releases/download/1.0.20240109.1/dotnetruntime-linux.zip/lpk-win.zip"
+      "url": "https://github.com/Azure/Bridge-To-Kubernetes/releases/download/1.0.20240109.1/lpk-win.zip"
     },
     "kubectl": {
       "sha256hash": "5490F9B60E4C2C4229CA00FBFA946AE65655F0739BE9714C6A0A0FB7BE2A6F2C",
@@ -59,7 +59,7 @@
   "osx_arm64": {
     "bridge": {
       "sha256hash": "32696DA350D8B5381234DFF5667F150DEE47A3EC9DF91CB00FCBEBEEE76CB026",
-      "url": "https://github.com/Azure/Bridge-To-Kubernetes/releases/download/1.0.20240109.1/dotnetruntime-linux.zip/lpk-osx-arm64.zip"
+      "url": "https://github.com/Azure/Bridge-To-Kubernetes/releases/download/1.0.20240109.1/lpk-osx-arm64.zip"
     },
     "kubectl": {
       "sha256hash": "D24EAFEC39EB2393DBA0088B762953BEDCC04156AC9E324FA290476BD3C888B9",
@@ -73,7 +73,7 @@
   "linux": {
     "bridge": {
       "sha256hash": "ACA7355ADBE0FA4277C4A74C8A67B5916555035F7E66F5DDD0D4E26259D95FA4",
-      "url": "https://github.com/Azure/Bridge-To-Kubernetes/releases/download/1.0.20240109.1/dotnetruntime-linux.zip/lpk-linux.zip"
+      "url": "https://github.com/Azure/Bridge-To-Kubernetes/releases/download/1.0.20240109.1/lpk-linux.zip"
     },
     "kubectl": {
       "sha256hash": "01B76D4E4A9081452932F27C767C9D8F3507C8AD3CC9269CEB16729F4D0ED900",

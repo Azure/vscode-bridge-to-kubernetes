@@ -3,7 +3,6 @@
 // ----------------------------------------------------------------------------
 'use strict';
 
-import { FileDownloader, getApi as getFileDownloaderApi } from '@microsoft/vscode-file-downloader-api';
 import * as path from 'path';
 import * as process from 'process';
 import * as vscode from 'vscode';
@@ -24,6 +23,7 @@ import { TelemetryEvent } from '../logger/TelemetryEvent';
 import { IDownloadInfo } from '../models/IBinariesDownloadInfo';
 import { AccountContextManager } from '../models/context/AccountContextManager';
 import { EventSource, IReadOnlyEventSource } from '../utility/Event';
+import FileDownloader, { FileDownloadSettings } from '../utility/FileDownloader';
 import { fileSystem } from '../utility/FileSystem';
 import { VersionUtility } from '../utility/VersionUtility';
 import { IBinariesUtility } from './IBinariesUtility';
@@ -154,7 +154,7 @@ export class BinariesUtilityV2 implements IBinariesUtility {
         let kubectlClient: IClient;
         let dotNetClient: IClient = await this.checkIfBinaryExistsAsync(dotNetClientProvider);
         const existingDotNetPath: string = dotNetClient == null ? null : dotNetClient.getExecutablePath();
-        [ bridgeClient, kubectlClient ] = await Promise.all([
+        [bridgeClient, kubectlClient] = await Promise.all([
             this.checkIfBinaryExistsAsync(bridgeClientProvider, existingDotNetPath),
             this.checkIfBinaryExistsAsync(kubectlClientProvider)
         ]);
@@ -168,7 +168,7 @@ export class BinariesUtilityV2 implements IBinariesUtility {
 
         // Callback which tracks the overall download progress of the binaries
         let shouldReportDownloadProgress = true;
-        const currentPercentages: number[] = [ 0, 0, 0 ];
+        const currentPercentages: number[] = [0, 0, 0];
         const overAllDownloadProgressCallBack = (binaryIndex: number, downloadPercent: number): void => {
             currentPercentages[binaryIndex] = downloadPercent;
             if (shouldReportDownloadProgress) {
@@ -190,14 +190,14 @@ export class BinariesUtilityV2 implements IBinariesUtility {
             let downloadingBinaryIndex = 0;
             const downloadBinaryPromises: Promise<string>[] = [
                 dotNetClient == null ? this.downloadBinaryAsync(dotNetClientProvider, overAllDownloadProgressCallBack, downloadingBinaryIndex++)
-                                    : new Promise((resolve): void => resolve(dotNetClient.getExecutablePath())),
+                    : new Promise((resolve): void => resolve(dotNetClient.getExecutablePath())),
                 bridgeClient == null ? this.downloadBinaryAsync(bridgeClientProvider, overAllDownloadProgressCallBack, downloadingBinaryIndex++, bridgeCleanupBeforeDownload)
-                                : new Promise((resolve): void => resolve(bridgeClient.getExecutablePath())),
+                    : new Promise((resolve): void => resolve(bridgeClient.getExecutablePath())),
                 kubectlClient == null ? this.downloadBinaryAsync(kubectlClientProvider, overAllDownloadProgressCallBack, downloadingBinaryIndex++)
-                                    : new Promise((resolve): void => resolve(kubectlClient.getExecutablePath()))
+                    : new Promise((resolve): void => resolve(kubectlClient.getExecutablePath()))
             ];
 
-            [ dotNetPath, bridgePath, kubectlPath ] = await Promise.all(downloadBinaryPromises);
+            [dotNetPath, bridgePath, kubectlPath] = await Promise.all(downloadBinaryPromises);
             downloadSucceeded = true;
         }
         catch (error) {
@@ -216,14 +216,14 @@ export class BinariesUtilityV2 implements IBinariesUtility {
         // Perform validation only for the binaries that have been downloaded
         const postDownloadPromises: Promise<IClient>[] = [
             dotNetClient == null ? this.postDownloadValidationAsync(dotNetClientProvider, dotNetPath)
-                                 : new Promise((resolve): void => resolve(dotNetClient)),
+                : new Promise((resolve): void => resolve(dotNetClient)),
             bridgeClient == null ? this.postDownloadValidationAsync(bridgeClientProvider, bridgePath, dotNetPath)
-                              : new Promise((resolve): void => resolve(bridgeClient)),
+                : new Promise((resolve): void => resolve(bridgeClient)),
             kubectlClient == null ? this.postDownloadValidationAsync(kubectlClientProvider, kubectlPath)
-                                  : new Promise((resolve): void => resolve(kubectlClient))
+                : new Promise((resolve): void => resolve(kubectlClient))
         ];
 
-        [ dotNetClient, bridgeClient, kubectlClient ] = await Promise.all(postDownloadPromises);
+        [dotNetClient, bridgeClient, kubectlClient] = await Promise.all(postDownloadPromises);
 
         // Bridge expects kubectl to be present in its folder, so copy only if kubectl or bridge has been downloaded
         await this.moveKubectlToBridgeFolderIfRequiredAsync(bridgeOrKubectlClientToBeDownloaded, bridgePath, kubectlPath, kubectlClientProvider);
@@ -242,7 +242,7 @@ export class BinariesUtilityV2 implements IBinariesUtility {
             }
         }
 
-        return [ bridgeClient as BridgeClient, kubectlClient as KubectlClient ];
+        return [bridgeClient as BridgeClient, kubectlClient as KubectlClient];
     }
 
     private async postDownloadValidationAsync(clientProvider: IClientProvider, executablePath: string, dotNetPath: string = null): Promise<IClient> {
@@ -253,7 +253,7 @@ export class BinariesUtilityV2 implements IBinariesUtility {
             const commandRunner = new CommandRunner(this._commandEnvironmentVariables);
             const chmodPath = process.platform === `darwin` ? `/bin/chmod` : `chmod`;
             const directoryName: string = await this.getBinariesDirectoryPathAsync(clientProvider.getDownloadDirectoryName());
-            const args: string[] = [ `+x` ];
+            const args: string[] = [`+x`];
             args.push(...clientProvider.getExecutablesToUpdatePermissions());
             await commandRunner.runAsync(chmodPath, args, directoryName);
         }
@@ -279,9 +279,9 @@ export class BinariesUtilityV2 implements IBinariesUtility {
      * Also, performs any clean up before download.
      */
     private async downloadBinaryAsync(clientProvider: IClientProvider,
-                                      overAllDownloadProgressCallBack: (binaryIndex: number, downloadPercent: number) => void,
-                                      downloadingBinaryIndex: number,
-                                      cleanUpBeforeDownload?: () => Promise<void>
+        overAllDownloadProgressCallBack: (binaryIndex: number, downloadPercent: number) => void,
+        downloadingBinaryIndex: number,
+        cleanUpBeforeDownload?: () => Promise<void>
     ): Promise<string> {
         if (cleanUpBeforeDownload != null) {
             this._logger.trace(`Performing clean up before download for client '${clientProvider.Type}'`);
@@ -312,6 +312,14 @@ export class BinariesUtilityV2 implements IBinariesUtility {
         this._logger.trace(`Downloading client ${clientProvider.Type}...`);
         const fileDownloader: FileDownloader = await this.validateAndGetFileDownloaderApiAsync();
         let unzipDirectory: vscode.Uri;
+        const settings: FileDownloadSettings = {
+            makeExecutable: true,
+            // eslint-disable-next-line @typescript-eslint/naming-convention
+            // needed for github download
+            headers: { "Accept": `application/octet-stream`, "Content-Type": `application/octet-stream` },
+            shouldUnzip: true,
+            retries: 8
+        };
         try {
             unzipDirectory = await fileDownloader.downloadFile(
                 vscode.Uri.parse(downloadInfo.downloadUrl),
@@ -319,10 +327,7 @@ export class BinariesUtilityV2 implements IBinariesUtility {
                 this._context,
                 /*cancellationToken*/ undefined,
                 downloadProgressCallback,
-                {
-                    shouldUnzip: true,
-                    retries: 8
-                }
+                settings
             );
 
             const binaryPath = path.join(unzipDirectory.fsPath, clientProvider.getExecutableFilePath());
@@ -402,9 +407,9 @@ export class BinariesUtilityV2 implements IBinariesUtility {
     }
 
     private async moveKubectlToBridgeFolderIfRequiredAsync(bridgeOrKubectlClientDownloaded: boolean,
-                                                           bridgePath: string,
-                                                           kubectlPath: string,
-                                                           kubectlClientProvider: IClientProvider
+        bridgePath: string,
+        kubectlPath: string,
+        kubectlClientProvider: IClientProvider
     ): Promise<void> {
         try {
             const kubectlExecutableFilePathForBridge: string = path.join(path.dirname(bridgePath), kubectlClientProvider.getDownloadDirectoryName(), kubectlClientProvider.getExecutableFilePath());
@@ -500,7 +505,7 @@ export class BinariesUtilityV2 implements IBinariesUtility {
                 throw error;
             }
 
-            this._fileDownloader = await getFileDownloaderApi();
+            this._fileDownloader = await this.getApi();
         }
 
         return this._fileDownloader;
@@ -514,5 +519,15 @@ export class BinariesUtilityV2 implements IBinariesUtility {
             throw error;
         }
         return fileDownloaderExtension;
+    }
+
+    public async getApi(): Promise<FileDownloader> {
+        let _extension = this.getFileDownloaderExtension();
+
+        if (!_extension.isActive) {
+            await _extension.activate();
+        }
+
+        return _extension.exports;
     }
 }

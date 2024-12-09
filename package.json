@@ -1,263 +1,262 @@
 {
-    "name": "mindaro",
-    "displayName": "Bridge to Kubernetes",
-    "description": "Rapid Kubernetes development for teams",
-    "version": "2.0.120240111",
-    "icon": "images/bridge128.png",
-    "preview": false,
-    "publisher": "mindaro",
-    "qna": "marketplace",
-    "license": "MIT",
-    "engines": {
-        "vscode": "^1.95.0",
-        "node": ">=16.20.x",
-        "npm": ">=8.19.x"
-    },
-    "categories": [
-        "Azure",
-        "Debuggers",
-        "Other"
+  "name": "mindaro",
+  "displayName": "Bridge to Kubernetes",
+  "description": "Rapid Kubernetes development for teams",
+  "version": "2.0.120240111",
+  "icon": "images/bridge128.png",
+  "preview": false,
+  "publisher": "mindaro",
+  "qna": "marketplace",
+  "license": "MIT",
+  "engines": {
+    "vscode": "^1.95.0",
+    "node": ">=16.20.x",
+    "npm": ">=8.19.x"
+  },
+  "categories": [
+    "Azure",
+    "Debuggers",
+    "Other"
+  ],
+  "keywords": [
+    "container",
+    "docker",
+    "kubernetes",
+    "Bridge",
+    "Bridge to Kubernetes",
+    "Azure Dev Spaces",
+    "azds",
+    "Local Process with Kubernetes",
+    "lpk",
+    "connect",
+    "cluster",
+    "debug",
+    "microservice",
+    "cloud native",
+    "kubernetes-extension-local-tunnel-debug-provider"
+  ],
+  "activationEvents": [
+    "*"
+  ],
+  "extensionKind": [
+    "workspace"
+  ],
+  "aiKey": "0c6ae279ed8443289764825290e4f9e2-1a736e7c-1324-4338-be46-fc2a58ae4d14-7255",
+  "main": "./dist/extension",
+  "contributes": {
+    "commands": [
+      {
+        "command": "mindaro.open-menu",
+        "title": "Open Menu",
+        "category": "Bridge to Kubernetes"
+      },
+      {
+        "command": "mindaro.configure",
+        "title": "Configure",
+        "category": "Bridge to Kubernetes"
+      }
     ],
-    "keywords": [
-        "container",
-        "docker",
-        "kubernetes",
-        "Bridge",
-        "Bridge to Kubernetes",
-        "Azure Dev Spaces",
-        "azds",
-        "Local Process with Kubernetes",
-        "lpk",
-        "connect",
-        "cluster",
-        "debug",
-        "microservice",
-        "cloud native",
-        "kubernetes-extension-local-tunnel-debug-provider"
+    "debuggers": [
+      {
+        "type": "dev-spaces-connect-configuration",
+        "label": "Legacy Bridge to Kubernetes Configuration"
+      },
+      {
+        "type": "local-process-with-kubernetes.configuration",
+        "label": "Legacy Bridge to Kubernetes Configuration"
+      },
+      {
+        "type": "bridge-to-kubernetes.configuration",
+        "label": "Bridge to Kubernetes Configuration"
+      }
     ],
-    "activationEvents": [
-        "*"
-    ],
-    "extensionKind": [
-        "workspace"
-    ],
-    "aiKey": "0c6ae279ed8443289764825290e4f9e2-1a736e7c-1324-4338-be46-fc2a58ae4d14-7255",
-    "main": "./dist/extension",
-    "contributes": {
-        "commands": [
-            {
-                "command": "mindaro.open-menu",
-                "title": "Open Menu",
-                "category": "Bridge to Kubernetes"
-            },
-            {
-                "command": "mindaro.configure",
-                "title": "Configure",
-                "category": "Bridge to Kubernetes"
-            }
+    "taskDefinitions": [
+      {
+        "type": "bridge-to-kubernetes.resource",
+        "required": [
+          "resource",
+          "resourceType",
+          "ports"
         ],
-        "debuggers": [
-            {
-                "type": "dev-spaces-connect-configuration",
-                "label": "Legacy Bridge to Kubernetes Configuration"
-            },
-            {
-                "type": "local-process-with-kubernetes.configuration",
-                "label": "Legacy Bridge to Kubernetes Configuration"
-            },
-            {
-                "type": "bridge-to-kubernetes.configuration",
-                "label": "Bridge to Kubernetes Configuration"
-            }
-        ],
-        "taskDefinitions": [
-            {
-                "type": "bridge-to-kubernetes.resource",
-                "required": [
-                    "resource",
-                    "resourceType",
-                    "ports"
-                ],
-                "properties": {
-                    "resource": {
-                        "type": "string"
-                    },
-                    "resourceType": {
-                        "type": "string"
-                    },
-                    "ports": {
-                        "type": "array"
-                    },
-                    "isolateAs": {
-                        "type": "string"
-                    },
-                    "targetCluster": {
-                        "type": "string"
-                    },
-                    "targetNamespace": {
-                        "type": "string"
-                    },
-                    "targetContainer": {
-                        "type": "string"
-                    },
-                    "useKubernetesServiceEnvironmentVariables": {
-                        "type": "boolean"
-                    }
-                }
-            },
-            {
-                "type": "bridge-to-kubernetes.service",
-                "required": [
-                    "service",
-                    "ports"
-                ],
-                "properties": {
-                    "service": {
-                        "type": "string"
-                    },
-                    "ports": {
-                        "type": "array"
-                    },
-                    "isolateAs": {
-                        "type": "string"
-                    },
-                    "targetCluster": {
-                        "type": "string"
-                    },
-                    "targetNamespace": {
-                        "type": "string"
-                    },
-                    "targetContainer": {
-                        "type": "string"
-                    },
-                    "useKubernetesServiceEnvironmentVariables": {
-                        "type": "boolean"
-                    }
-                }
-            },
-            {
-                "type": "local-process-with-kubernetes.service",
-                "required": [
-                    "service",
-                    "ports"
-                ],
-                "properties": {
-                    "service": {
-                        "type": "string"
-                    },
-                    "ports": {
-                        "type": "array"
-                    },
-                    "isolateAs": {
-                        "type": "string"
-                    }
-                }
-            },
-            {
-                "type": "dev-spaces.connect.service",
-                "required": [
-                    "service",
-                    "ports"
-                ],
-                "properties": {
-                    "service": {
-                        "type": "string"
-                    },
-                    "ports": {
-                        "type": "array"
-                    },
-                    "isolateAs": {
-                        "type": "string"
-                    }
-                }
-            }
-        ],
-        "configuration": {
-            "title": "Kubernetes Debugging Tools",
-            "properties": {
-                "bridgeToKubernetes.disconnectAfterDebugging": {
-                    "type": "boolean",
-                    "default": true,
-                    "description": "Disconnect automatically when debugging stops. If unchecked, the connection to the service in the cluster will be kept alive when debugging stops. You can manually disconnect using the \"Kubernetes\" status bar menu."
-                }
-            }
+        "properties": {
+          "resource": {
+            "type": "string"
+          },
+          "resourceType": {
+            "type": "string"
+          },
+          "ports": {
+            "type": "array"
+          },
+          "isolateAs": {
+            "type": "string"
+          },
+          "targetCluster": {
+            "type": "string"
+          },
+          "targetNamespace": {
+            "type": "string"
+          },
+          "targetContainer": {
+            "type": "string"
+          },
+          "useKubernetesServiceEnvironmentVariables": {
+            "type": "boolean"
+          }
         }
-    },
-    "scripts": {
-        "vscode:prepublish": "del-cli dist/template && webpack --mode production && cd ./src/template && node ../../node_modules/copy/copy.js ./**/* ../../dist/template",
-        "vscode:package": "node ./node_modules/@vscode/vsce/vsce package",
-        "lint": "node node_modules/tslint/bin/tslint **/*.ts -e **/*.d.ts -e node_modules/**/*.ts -p .",
-        "fixlint": "node node_modules/tslint/bin/tslint **/*.ts -e **/*.d.ts -e node_modules/**/*.ts -p . --fix",
-        "compile": "del-cli dist/template && webpack --mode development && node ./node_modules/copy/copy.js ./src/template/**/* dist/template",
-        "preinstall": "npx npm-force-resolutions",
-        "pretest": "npm run test-compile",
-        "test": "c8 --reporter=lcov node ./out/tests/TestsRunHost.js",
-        "test-compile": "npm run compile && del-cli out/models/recognizers/template && tsc -p ./ && cd ./src/template && node ../../node_modules/copy/copy.js ./**/* ../../out/models/recognizers/template"
-    },
-    "extensionDependencies": [
-        "ms-kubernetes-tools.vscode-kubernetes-tools",
-        "mindaro-dev.file-downloader"
+      },
+      {
+        "type": "bridge-to-kubernetes.service",
+        "required": [
+          "service",
+          "ports"
+        ],
+        "properties": {
+          "service": {
+            "type": "string"
+          },
+          "ports": {
+            "type": "array"
+          },
+          "isolateAs": {
+            "type": "string"
+          },
+          "targetCluster": {
+            "type": "string"
+          },
+          "targetNamespace": {
+            "type": "string"
+          },
+          "targetContainer": {
+            "type": "string"
+          },
+          "useKubernetesServiceEnvironmentVariables": {
+            "type": "boolean"
+          }
+        }
+      },
+      {
+        "type": "local-process-with-kubernetes.service",
+        "required": [
+          "service",
+          "ports"
+        ],
+        "properties": {
+          "service": {
+            "type": "string"
+          },
+          "ports": {
+            "type": "array"
+          },
+          "isolateAs": {
+            "type": "string"
+          }
+        }
+      },
+      {
+        "type": "dev-spaces.connect.service",
+        "required": [
+          "service",
+          "ports"
+        ],
+        "properties": {
+          "service": {
+            "type": "string"
+          },
+          "ports": {
+            "type": "array"
+          },
+          "isolateAs": {
+            "type": "string"
+          }
+        }
+      }
     ],
-    "devDependencies": {
-        "@types/chai": "^4.3.5",
-        "@types/glob": "^7.1.1",
-        "@types/got": "^9.6.12",
-        "@types/mocha": "^10.0.1",
-        "@types/node": "^18.11.17",
-        "@types/node-fetch": "^2.6.2",
-        "@types/sinon": "^10.0.16",
-        "@types/vscode": "1.95.0",
-        "@vscode/test-electron": "^2.3.9",
-        "@vscode/vsce": "^2.23.0",
-        "c8": "^8.0.1",
-        "chai": "^4.3.7",
-        "copy": "^0.0.1",
-        "del-cli": "^5.0.0",
-        "eslint": "^8.27.0",
-        "glob": "^10.3.10",
-        "mocha": "^10.2.0",
-        "sinon": "^15.2.0",
-        "source-map-support": "^0.5.12",
-        "ts-loader": "^9.4.2",
-        "typescript": "^5.1.3",
-        "webpack": "^5.97.1",
-        "webpack-cli": "^5.0.1"
-    },
-    "optionalDependencies": {
-        "bufferutil": "^4.0.8",
-        "fsevents": "^2.1.3",
-        "utf-8-validate": "^6.0.3"
-    },
-    "dependencies": {
-        "@kubernetes/client-node": "^0.22.3",
-        "@microsoft/vscode-file-downloader-api": "^1.0.1",
-        "@types/tmp": "^0.1.0",
-        "@vscode/extension-telemetry": "^0.9.6", 
-        "chokidar": "^3.5.3",
-        "command-exists": "^1.2.8",
-        "got": "^11.0.0",
-        "guid-typescript": "^1.0.9",
-        "lodash": "^4.17.21",
-        "node-fetch": "^2.6.7",
-        "opener": "^1.5.1",
-        "portfinder": "^1.0.28",
-        "telaug": "0.0.13",
-        "tmp": "^0.2.1",
-        "username": "^5.1.0",
-        "vscode-kubernetes-tools-api": "^1.3.0",
-        "vscode-tas-client": "^0.1.75",
-        "watchpack": "^2.3.1"
-    },
-    "overrides": {
-        "serialize-javascript": "3.1.0",
-        "execa": "5.1.1"
-    },
-    "homepage": "https://aka.ms/bridge-to-k8s-vscode-quickstart",
-    "repository": {
-        "type": "git",
-        "url": "https://github.com/Azure/vscode-bridge-to-kubernetes"
-    },
-    "extensionMetadata": {
-        "expectedCLIVersion": "1.0.20240109.1"
+    "configuration": {
+      "title": "Kubernetes Debugging Tools",
+      "properties": {
+        "bridgeToKubernetes.disconnectAfterDebugging": {
+          "type": "boolean",
+          "default": true,
+          "description": "Disconnect automatically when debugging stops. If unchecked, the connection to the service in the cluster will be kept alive when debugging stops. You can manually disconnect using the \"Kubernetes\" status bar menu."
+        }
+      }
     }
+  },
+  "scripts": {
+    "vscode:prepublish": "del-cli dist/template && webpack --mode production && cd ./src/template && node ../../node_modules/copy/copy.js ./**/* ../../dist/template",
+    "vscode:package": "node ./node_modules/@vscode/vsce/vsce package",
+    "lint": "node node_modules/tslint/bin/tslint **/*.ts -e **/*.d.ts -e node_modules/**/*.ts -p .",
+    "fixlint": "node node_modules/tslint/bin/tslint **/*.ts -e **/*.d.ts -e node_modules/**/*.ts -p . --fix",
+    "compile": "del-cli dist/template && webpack --mode development && node ./node_modules/copy/copy.js ./src/template/**/* dist/template",
+    "preinstall": "npx npm-force-resolutions",
+    "pretest": "npm run test-compile",
+    "test": "c8 --reporter=lcov node ./out/tests/TestsRunHost.js",
+    "test-compile": "npm run compile && del-cli out/models/recognizers/template && tsc -p ./ && cd ./src/template && node ../../node_modules/copy/copy.js ./**/* ../../out/models/recognizers/template"
+  },
+  "extensionDependencies": [
+    "ms-kubernetes-tools.vscode-kubernetes-tools",
+    "mindaro-dev.file-downloader"
+  ],
+  "devDependencies": {
+    "@types/chai": "^4.3.5",
+    "@types/glob": "^7.1.1",
+    "@types/got": "^9.6.12",
+    "@types/mocha": "^10.0.1",
+    "@types/node": "^18.11.17",
+    "@types/node-fetch": "^2.6.2",
+    "@types/sinon": "^10.0.16",
+    "@types/vscode": "1.95.0",
+    "@vscode/test-electron": "^2.3.9",
+    "@vscode/vsce": "^2.23.0",
+    "c8": "^8.0.1",
+    "chai": "^4.3.7",
+    "copy": "^0.0.1",
+    "del-cli": "^5.0.0",
+    "eslint": "^8.27.0",
+    "glob": "^10.3.10",
+    "mocha": "^10.2.0",
+    "sinon": "^15.2.0",
+    "source-map-support": "^0.5.12",
+    "ts-loader": "^9.4.2",
+    "typescript": "^5.1.3",
+    "webpack": "^5.97.1",
+    "webpack-cli": "^5.0.1"
+  },
+  "optionalDependencies": {
+    "bufferutil": "^4.0.8",
+    "fsevents": "^2.1.3",
+    "utf-8-validate": "^6.0.3"
+  },
+  "dependencies": {
+    "@kubernetes/client-node": "^0.22.3",
+    "@types/tmp": "^0.1.0",
+    "@vscode/extension-telemetry": "^0.9.6",
+    "chokidar": "^3.5.3",
+    "command-exists": "^1.2.8",
+    "got": "^11.0.0",
+    "guid-typescript": "^1.0.9",
+    "lodash": "^4.17.21",
+    "node-fetch": "^2.6.7",
+    "opener": "^1.5.1",
+    "portfinder": "^1.0.28",
+    "telaug": "0.0.13",
+    "tmp": "^0.2.1",
+    "username": "^5.1.0",
+    "vscode-kubernetes-tools-api": "^1.3.0",
+    "vscode-tas-client": "^0.1.75",
+    "watchpack": "^2.3.1"
+  },
+  "overrides": {
+    "serialize-javascript": "3.1.0",
+    "execa": "5.1.1"
+  },
+  "homepage": "https://aka.ms/bridge-to-k8s-vscode-quickstart",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Azure/vscode-bridge-to-kubernetes"
+  },
+  "extensionMetadata": {
+    "expectedCLIVersion": "1.0.20240109.1"
+  }
 }

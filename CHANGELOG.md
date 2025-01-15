@@ -1,5 +1,12 @@
 # Change Log
 
+## [2.0.120250115]
+- [Changes in correlation with new GH Action Permission Changes](https://github.com/Azure/vscode-bridge-to-kubernetes/pull/89)
+-  Dependabot fixes, security fixes
+- [download from github instead of storage blob](https://github.com/Azure/vscode-bridge-to-kubernetes/pull/180)
+
+Thank you @Tatsinnit, @qpetraroia, @pauldotyu for testing and collobarations.
+
 ## [2.0.120240111]
 - Updating to latest B2K CLI version. Please refer for release notes [here](https://github.com/Azure/Bridge-To-Kubernetes/blob/main/CHANGELOG.md#10202401091)
 - [Addressing module not found error](https://github.com/Azure/vscode-bridge-to-kubernetes/pull/85)

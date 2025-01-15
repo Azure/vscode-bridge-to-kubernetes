@@ -17,7 +17,7 @@ import { IPromptItem, PromptResult } from './PromptItem';
 import { CheckExtensionSupport } from './utility/CheckExtensionSupport';
 import { Environment, EnvironmentUtility } from './utility/EnvironmentUtility';
 import { EventSource, IReadOnlyEventSource } from './utility/Event';
-import { KubeconfigCredentialsManager as KubeconfigCredentialsManager } from './utility/KubeconfigCredentialsManager';
+import { KubeconfigCredentialsManager } from './utility/KubeconfigCredentialsManager';
 import { ThenableUtility } from './utility/ThenableUtility';
 import { UrlUtility } from './utility/UrlUtility';
 
@@ -200,8 +200,8 @@ export class StatusBarMenu {
 
     private async validatePrerequisitesAsync(): Promise<boolean> {
         try {
-            const preDownloadPrequisitesAlertCallback  = CheckExtensionSupport.preDownloadValidatePrerequisites(this._logger);
-            if (preDownloadPrequisitesAlertCallback  != null) {
+            const preDownloadPrequisitesAlertCallback = CheckExtensionSupport.preDownloadValidatePrerequisites(this._logger);
+            if (preDownloadPrequisitesAlertCallback != null) {
                 this._prerequisitesAlertCallback = preDownloadPrequisitesAlertCallback;
                 return false;
             }
@@ -259,7 +259,7 @@ export class StatusBarMenu {
                             this.validateAndInitializeMenuItemsAsync();
                         }
                         else if (selectedValue === installManually) {
-                            UrlUtility.openUrl(`https://github.com/microsoft/mindaro/issues/32`);
+                            UrlUtility.openUrl(`https://github.com/Azure/vscode-bridge-to-kubernetes/issues/191`);
                         }
                     };
                 }
@@ -407,9 +407,9 @@ export class StatusBarMenu {
             this._itemsByGroup.set(StatusBarItemGroup.Ingresses, []);
             let ingressesMap: Map<string, IKubernetesIngress>;
             let loadBalancerIngresses: IKubernetesIngress[];
-            [ ingressesMap, loadBalancerIngresses ] = await Promise.all([
+            [ingressesMap, loadBalancerIngresses] = await Promise.all([
                 kubectlClient.getIngressesAsync(currentKubeconfigContext.namespace, currentKubeconfigContext.kubeconfigPath, /*quiet*/ true).then(
-                    (ingressesArray: IKubernetesIngress[]) => new Map(ingressesArray.map(i => [ i.name, i ]))),
+                    (ingressesArray: IKubernetesIngress[]) => new Map(ingressesArray.map(i => [i.name, i]))),
                 kubectlClient.getLoadBalancerIngressesAsync(currentKubeconfigContext.namespace, currentKubeconfigContext.kubeconfigPath, /*quiet*/ true)
             ]);
 

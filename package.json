@@ -229,7 +229,7 @@
     "utf-8-validate": "^6.0.3"
   },
   "dependencies": {
-    "@kubernetes/client-node": "^0.22.3",
+    "@kubernetes/client-node": "^1.0.0",
     "@types/tmp": "^0.1.0",
     "@vscode/extension-telemetry": "^0.9.6",
     "chokidar": "^3.5.3",

@@ -291,7 +291,7 @@ export class ConnectWorkspaceFolder extends WorkspaceFolderBase {
                 let consentedElevationRequests: IElevationRequest[];
                 if (!useKubernetesServiceEnvironmentVariables) {
                     try {
-                        consentedElevationRequests = await this.validateElevationRequestsAsync(bridgeClient, kubeconfigPath, resourceType, resourceName, kubeconfig.namespace, cancellationToken);
+                        consentedElevationRequests = await this.validateElevationRequestsAsync(bridgeClient, kubeconfigPath, resourceType, resourceName, kubeconfig.namespace, containerName, cancellationToken);
                         if (consentedElevationRequests == null) {
                             // We need admin permissions to kill some services/process, and/or edit the hosts file but the user didn't give
                             // consent to do so. Stopping the Connect session.
@@ -564,6 +564,7 @@ export class ConnectWorkspaceFolder extends WorkspaceFolderBase {
         resourceType: ResourceType,
         resourceName: string,
         currentNamespace: string,
+        containerName: string,
         cancellationToken: vscode.CancellationToken): Promise<IElevationRequest[]> {
         let isCancelled = false;
         cancellationToken.onCancellationRequested(async () => {
@@ -577,7 +578,8 @@ export class ConnectWorkspaceFolder extends WorkspaceFolderBase {
             kubeconfigPath,
             resourceType,
             resourceName,
-            currentNamespace
+            currentNamespace,
+            containerName
         );
         if (elevationRequests.length === 0) {
             // We already have everything we need to Connect. No need to ask the user to consent.

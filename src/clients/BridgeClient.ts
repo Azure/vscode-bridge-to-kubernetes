@@ -133,7 +133,8 @@ export class BridgeClient implements IClient {
         kubeconfigPath: string,
         resourceType: string,
         resource: string,
-        currentNamespace: string): Promise<IElevationRequest[]> {
+        currentNamespace: string,
+        containerName: string): Promise<IElevationRequest[]> {
         try {
             let resourceTypeFlag: string;
             switch (resourceType) {
@@ -152,6 +153,10 @@ export class BridgeClient implements IClient {
             }
             else {
                 args = [ `prep-connect`, `--output`, `json`, `--namespace`, currentNamespace ];
+            }
+
+            if (containerName?.length > 0) {
+                args.push(`--container`, containerName);
             }
 
             const customEnvironmentVariables: NodeJS.ProcessEnv = { ...this.getRequiredEnvironmentVariables(), ...this.getCustomEnvironmentVariables(kubeconfigPath) };
